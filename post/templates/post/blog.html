@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %} | Posts{% endblock%}
+
+{% block content %}
+<section class="fluid-container landing-item gray-bg-color">
+    <h1 class="pt-5 ps-5 dark-color">Posts:</h1>
+    <div class="container card-columns pt-5 pb-3">
+
+        {% for post in posts %}
+        <article class="card dark-bg-color light-color">
+            {% if post.image_post.url %}
+            <a href="{% url 'post:post' %}">
+                <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="card-img-top">
+            </a>
+            {% endif %}
+            <div class="card-body">
+                <h1 class="h3">{{ post.title_post }}</h1>
+                <p class="text-center">
+                    <small> {{ post.ratting_post }} <i class="bi bi-star-fill text-warning"></i> |
+                            0 <i class="bi bi-chat-left-text-fill"></i> |
+                            {{ post.published_date_post|naturalday|title }}</small>
+                </p>
+                <p>{{ post.excerpt_post }}</p>
+            </div>
+            <div class="card-footer text-end">
+                <a href="post.html">
+                    <button class="gray-bg-color dark-color"><strong>Acessar</strong></button>
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+
+    </div>
+    <div class="container pb-5">
+        {% include 'partials/_pagination.html' %}
+    </div>
+</section>
+{% endblock %}
