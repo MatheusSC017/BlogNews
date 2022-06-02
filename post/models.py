@@ -22,7 +22,7 @@ class Post(models.Model):
     excerpt_post = models.CharField(max_length=300, verbose_name='excerto')
     description_post = models.TextField(verbose_name='descrição')
     image_post = models.ImageField(upload_to='post/%Y/%m/', blank=True, null=True, verbose_name='Imagem')
-    ratting_post = models.FloatField(blank=True, null=True, verbose_name='avaliação')
+    ratting_post = models.FloatField(default=0, verbose_name='avaliação')
     published_post = models.BooleanField(default=True, verbose_name='publicado')
     published_date_post = models.DateTimeField(default=datetime.now, verbose_name='data de publicação')
     edition_date_post = models.DateTimeField(default=datetime.now, verbose_name='data de edição')

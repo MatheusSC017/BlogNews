@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('summernote/', include('django_summernote.urls')),
 
-    path('', views.Home.as_view, name='index'),
+    path('', views.Home.as_view(), name='index'),
     path('post/', include('post.urls')),
 
     # TODO: Remover no final do projeto

@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Configurations
+local_settings
+
+# IDE date
+.idea/

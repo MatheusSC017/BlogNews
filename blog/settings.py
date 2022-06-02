@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-oe&ani0fzvn90=wc@v-ertcv=asd(iun3&nrrxoiw^ty-xl_8!'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'django_summernote',
 
     # TODO: Remover ao final do projeto
@@ -156,3 +157,8 @@ MESSAGES = {
     constants.ERROR: 'bg-danger',
     constants.WARNING: 'bg-warning',
 }
+
+try:
+    from local_settings import *
+except:
+    pass
