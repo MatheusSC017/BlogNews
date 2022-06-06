@@ -25,7 +25,8 @@ class Image(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        resize_image(self.image, new_width=400)
+        if self.image:
+            resize_image(self.image, new_width=400)
 
     class Meta:
         verbose_name = 'imagem'

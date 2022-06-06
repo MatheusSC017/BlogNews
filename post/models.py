@@ -19,10 +19,11 @@ class Category(models.Model):
 
 class Post(models.Model):
     title_post = models.CharField(max_length=50, verbose_name='título')
-    excerpt_post = models.CharField(max_length=300, verbose_name='excerto')
+    excerpt_post = models.TextField(max_length=300, verbose_name='excerto')
     description_post = models.TextField(verbose_name='descrição')
     image_post = models.ImageField(upload_to='post/%Y/%m/', blank=True, null=True, verbose_name='Imagem')
     ratting_post = models.FloatField(default=0, verbose_name='avaliação')
+    views_post = models.PositiveIntegerField(default=0, verbose_name='Visualizações')
     published_post = models.BooleanField(default=True, verbose_name='publicado')
     published_date_post = models.DateTimeField(default=datetime.now, verbose_name='data de publicação')
     edition_date_post = models.DateTimeField(default=datetime.now, verbose_name='data de edição')
@@ -32,7 +33,8 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        resize_image(self.image_post, new_width=600)
+        if self.image_post:
+            resize_image(self.image_post, new_width=600)
 
     def __str__(self):
         return self.title_post

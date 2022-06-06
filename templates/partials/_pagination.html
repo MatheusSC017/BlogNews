@@ -1,17 +1,35 @@
-<div class="pagination">
-    <span class="step-links">
+<nav aria-label="Indices das páginas">
+    <ul class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        <li class="page-item">
+            <a class="page-link button-format rounded-0 rounded-start" href="?page=1" aria-label="Anterior">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link button-format rounded-0" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                <span aria-hidden="true"><</span>
+            </a>
+        </li>
         {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
+        <li class="page-item current">
+            <a class="page-link button-format rounded-0" href="#">
+                {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </a>
+        </li>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        <li class="page-item">
+            <a class="page-link button-format rounded-0" href="?page={{ page_obj.next_page_number }}" aria-label="Anterior">
+                <span aria-hidden="true">></span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link button-format rounded-0 rounded-end" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Anterior">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
         {% endif %}
-    </span>
-</div>
+    </ul>
+</nav>

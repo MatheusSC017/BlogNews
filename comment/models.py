@@ -10,7 +10,7 @@ class Comment(models.Model):
     published_comment = models.BooleanField(default=True, verbose_name='publicado')
     published_date_comment = models.DateTimeField(default=datetime.now, verbose_name='data de publicação')
     edition_date_comment = models.DateTimeField(default=datetime.now, verbose_name='ultima edição')
-    comment = models.CharField(max_length=200, verbose_name='comentário')
+    comment = models.TextField(max_length=200, verbose_name='comentário')
 
     def __str__(self):
         return f'{self.user_comment.first_name} | {self.post_comment.title_post}'

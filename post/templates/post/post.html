@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<section class="container-fluid landing-item gray-bg-color pt-5 pb-5">
+    <div class="row">
+        <div class="col-xl"></div>
+        <div class="col-xl-8">
+            <h1 class="text-center dark-color">{{ post.title_post }}</h1>
+            <div class="text-center">
+                <small>
+                    {{ post.ratting_post }} <i class="bi bi-star-fill text-warning"></i> |
+                    {{ post.views_post }} <i class="bi bi-chat-left-text-fill"></i> |
+                    {{ post.views_post }} <i class="bi bi-chat-left-text-fill"></i>
+                </small>
+            </div>
+            {% if post.image_post %}
+            <div class="text-center p-3">
+                <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="img-fluid w-50">
+            </div>
+            {% endif %}
+            <p>
+                {{ post.description_post|safe }}
+            </p>
+            <div class="text-end mt-3">
+                <a href="{% url 'post:post' {{ post.pk }} %}">
+                    <button class="button-format"><strong>Album</strong></button>
+                </a>
+            </div>
+
+            <form method="POST" action="#btn_send_avaliation" id="avaliation-form" class="mt-5">
+                <div class="container d-flex justify-content-center">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="stars">
+
+                                <input class="star star-5" id="star-5" type="radio" name="star"/>
+                                <label class="star star-5" for="star-5"></label>
+
+                                <input class="star star-4" id="star-4" type="radio" name="star"/>
+                                <label class="star star-4" for="star-4"></label>
+
+                                <input class="star star-3" id="star-3" type="radio" name="star"/>
+                                <label class="star star-3" for="star-3"></label>
+
+                                <input class="star star-2" id="star-2" type="radio" name="star"/>
+                                <label class="star star-2" for="star-2"></label>
+
+                                <input class="star star-1" id="star-1" type="radio" name="star"/>
+                                <label class="star star-1" for="star-1"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Enviar">
+                </div>
+            </form>
+
+        </div>
+        <div class="col-xl"></div>
+    </div>
+
+    <div class="row pt-5">
+        <div class="col-xl"></div>
+        <div class="col-xl-8">
+            <h2 class="my-3">Comentários {{ post.comments_post }}</h2>
+
+            <section class="border-bottom comment">
+                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
+                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
+                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
+            </section>
+
+            <section class="border-bottom comment">
+                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
+                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
+                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
+            </section>
+
+            <section class="border-bottom comment">
+                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
+                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
+                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
+            </section>
+
+            <section class="border-bottom comment">
+                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
+                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
+                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
+            </section>
+
+            <section class="border-bottom comment">
+                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
+                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
+                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
+            </section>
+
+        </div>
+        <div class="col-xl"></div>
+    </div>
+
+    <div class="row pt-5">
+        <div class="col-xl"></div>
+        <div class="col-xl-8">
+            <h2 class="my-3">Deixe um comentário</h2>
+
+            <form method="POST" action="#btn_send_comment" id="comment-form">
+                <div class="form-group">
+                    <label for="input-name">Nome</label>
+                    <input type="email" class="form-control" id="input-name" placeholder="name@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="input-email">E-mail</label>
+                    <input type="email" class="form-control" id="input-email" placeholder="name@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="textarea-comment">Comentário</label>
+                    <textarea class="form-control" id="textarea-comment" rows="3"></textarea>
+                </div>
+
+                <div class="text-end mt-3">
+                    <input id="btn_send_comment" type="submit" class="btn button-format" value="Enviar">
+                </div>
+            </form>
+        </div>
+        <div class="col-xl"></div>
+    </div>
+</section>
+{% endblock %}
