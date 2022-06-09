@@ -57,36 +57,40 @@ class BlogPageTest(TestCase):
         self.assertEqual([self.post2.pk, self.post1.pk, self.post3.pk, self.post5.pk], self.template_post_data_order())
 
     def test_post_data_ordering_by_ratting(self):
-        order = self.template_post_data_order(parameter='?order_by=avaliacao')
+        order = self.template_post_data_order({'order_by': 'avaliacao', })
         self.assertEqual([self.post3.pk, self.post5.pk, self.post1.pk, self.post2.pk], order)
 
     def test_post_data_with_category_select(self):
-        order = self.template_post_data_order(parameter=('?category=' + str(self.py_category.pk)))
+        order = self.template_post_data_order({'category': str(self.py_category.pk), })
         self.assertEqual([self.post1.pk, self.post3.pk, self.post5.pk], order)
 
     def test_post_data_with_category_select_and_ordering_by_ratting(self):
-        order = self.template_post_data_order(parameter=('?order_by=avaliacao&category=' + str(self.py_category.pk)))
+        order = self.template_post_data_order({'order_by': 'avaliacao',
+                                               'category': str(self.py_category.pk), })
         self.assertEqual([self.post3.pk, self.post5.pk, self.post1.pk], order)
 
     def test_post_data_search_framework(self):
-        order = self.template_post_data_order(parameter='?search=framework')
+        order = self.template_post_data_order({'search': 'framework', })
         self.assertEqual([self.post2.pk, self.post1.pk, self.post5.pk], order)
 
     def test_post_data_search_framework_with_category_select(self):
-        order = self.template_post_data_order(parameter=('?search=framework&category=' + str(self.py_category.pk)))
+        order = self.template_post_data_order({'search': 'framework',
+                                               'category': str(self.py_category.pk), })
         self.assertEqual([self.post1.pk, self.post5.pk], order)
 
     def test_post_data_search_framework_and_ordering_by_ratting(self):
-        order = self.template_post_data_order(parameter='?search=framework&order_by=avaliacao')
+        order = self.template_post_data_order({'search': 'framework',
+                                               'order_by': 'avaliacao', })
         self.assertEqual([self.post5.pk, self.post1.pk, self.post2.pk], order)
 
     def test_post_data_search_framework_with_category_select_and_ordering_by_ratting(self):
-        order = self.template_post_data_order(parameter=('?search=framework&order_by=avaliacao&category=' +
-                                                         str(self.py_category.pk)))
+        order = self.template_post_data_order({'search': 'framework',
+                                               'order_by': 'avaliacao',
+                                               'category': str(self.py_category.pk), })
         self.assertEqual([self.post5.pk, self.post1.pk], order)
 
-    def template_post_data_order(self, parameter=""):
-        response = self.client.get(reverse('blog:blog') + parameter)
+    def template_post_data_order(self, parameter={}):
+        response = self.client.get(reverse('blog:blog'), parameter)
         return [_.pk for _ in response.context.get('posts')]
 
 
@@ -105,10 +109,10 @@ class PostPageTest(TestCase):
                                          ratting_post=3)
 
     def test_connection_with_the_post_page(self):
-        response = self.client.get(reverse('blog:post', pk=self.post1.pk))
+        response = self.client.get(reverse('blog:post', args=[self.post1.pk]))
         self.assertEqual(response.status_code, 200)
 
     def test_receiving_data_post_page(self):
-        response = self.client.get(reverse('blog:post', pk=self.post1.pk))
+        response = self.client.get(reverse('blog:post', args=[self.post1.pk]))
         self.assertIn('post', response.context)
         self.assertIn('comments', response.context)

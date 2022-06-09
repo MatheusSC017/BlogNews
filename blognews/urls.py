@@ -17,14 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from . import views
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('summernote/', include('django_summernote.urls')),
-
-    path('', views.Home.as_view(), name='index'),
+    path('', include('user.urls')),
     path('post/', include('post.urls')),
+    path('summernote/', include('django_summernote.urls')),
+    path('admin/', admin.site.urls),
 
     # TODO: Remover no final do projeto
     path('__debug__/', include('debug_toolbar.urls')),

@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from django.db.models import Count, Q
 from .models import Post, Category
 from comment.models import Comment
+from comment.forms import CommentForm
 
 
 class Blog(ListView):
@@ -34,7 +35,12 @@ class Blog(ListView):
         """
         qs = super().get_queryset(*args, **kwargs)
 
-        qs = qs.filter(published_post=True).order_by(self.order_by)
+        qs = qs.annotate(
+            comments_post=Count(
+                'comment',
+                filter=Q(comment__published_comment=True)
+            )
+        )
 
         if self.category is not None:
             qs = qs.filter(category_post=self.category)
@@ -42,12 +48,7 @@ class Blog(ListView):
         if self.search is not None:
             qs = qs.filter(Q(title_post__icontains=self.search) | Q(excerpt_post__icontains=self.search))
 
-        qs = qs.annotate(
-            comments_post=Count(
-                'comment',
-                filter=Q(comment__published_comment=True)
-            )
-        )
+        qs = qs.filter(published_post=True).order_by(self.order_by)
 
         qs = qs.defer('description_post')
 
@@ -92,3 +93,28 @@ class Post(DetailView):
     template_name = 'post/post.html'
     model = Post
     context_object_name = 'post'
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+
+        qs = qs.annotate(
+            comments_post=Count(
+                'comment',
+                filter=Q(comment__published_comment=True)
+            )
+        )
+
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        comments_qs = Comment.objects.select_related('user_comment').filter(post_comment=context.get('post').pk,
+                                                                            published_comment=True)
+        context['comments'] = comments_qs
+        context['comment_form'] = CommentForm()
+
+        return context
+
+    def post(self):
+        pass

@@ -23,6 +23,21 @@
                 <li class="nav-item">
                     <a class="nav-link" href="sobre.html"><i class="bi bi-person-fill"></i> Sobre</a>
                 </li>
+                {% if not request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link button-format" href="{% url 'user:login' %}">Login</a>
+                </li>
+                {% else %}
+                <li class="nav-item dropdown">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle h4"></i>
+                    </a>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'user:logout' %}">Sair</a></li>
+                    </ul>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>

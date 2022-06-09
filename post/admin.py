@@ -2,6 +2,7 @@ from django.contrib import admin
 from django_summernote import admin as summer_admin
 from .models import Post, Category, RattingUserPost
 
+
 class PostAdmin(summer_admin.SummernoteModelAdmin):
     list_display = ('id', 'title_post', 'ratting_post', 'published_post',
                     'published_date_post', 'edition_date_post', 'album_post', 'category_post',)

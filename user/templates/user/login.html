@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} | Login{% endblock %}
+
+{% block content %}
+<section class="container p-5">
+    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
+        <div class="col">
+            <img src="{% get_media_prefix %}static/user_svg_image.svg" alt="" class="img-fluid">
+        </div>
+        <div class="col pt-5 pb-5 dark-color">
+            <h2 class="my-3">Login</h2>
+
+            <form method="POST" action="#" id="comment-form">
+                <div class="form-group">
+                    <label for="input-user">Usuário</label>
+                    <input name="username" type="text" class="form-control" id="input-user">
+                </div>
+
+                <div class="form-group">
+                    <label for="input-password">Senha</label>
+                    <input name="password" type="password" class="form-control" id="input-password">
+                </div>
+
+                <div class="text-end">
+                    <a href="{% url 'user:register' %}">
+                        Cadastrar
+                    </a>
+                </div>
+
+                {% csrf_token %}
+                <div class="text-end mt-3">
+                    <input type="submit" class="btn button-format" value="Enviar">
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% include 'partials/_messages.html' %}
+{% endblock %}

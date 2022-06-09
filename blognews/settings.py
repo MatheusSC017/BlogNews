@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'user',
     'post',
     'album',
     'comment',
@@ -61,7 +62,7 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ROOT_URLCONF = 'blog.urls'
+ROOT_URLCONF = 'blognews.urls'
 
 TEMPLATES = [
     {
@@ -79,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'blog.wsgi.application'
+WSGI_APPLICATION = 'blognews.wsgi.application'
 
 
 # Database
@@ -150,7 +151,7 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-MESSAGES = {
+MESSAGE_TAGS = {
     constants.INFO: 'bg-info',
     constants.DEBUG: 'bg-info',
     constants.SUCCESS: 'bg-success',

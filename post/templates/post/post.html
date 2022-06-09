@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}{% endblock %}
+{% block head %}
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block title %} | {{ post.title_post }}{% endblock %}
 
 {% block content %}
 <section class="container-fluid landing-item gray-bg-color pt-5 pb-5">
@@ -12,8 +17,8 @@
             <div class="text-center">
                 <small>
                     {{ post.ratting_post }} <i class="bi bi-star-fill text-warning"></i> |
-                    {{ post.views_post }} <i class="bi bi-chat-left-text-fill"></i> |
-                    {{ post.views_post }} <i class="bi bi-chat-left-text-fill"></i>
+                    {{ post.views_post }} <i class="bi bi-eye-fill"></i> |
+                    {{ post.comments_post }} <i class="bi bi-chat-left-text-fill"></i>
                 </small>
             </div>
             {% if post.image_post %}
@@ -24,11 +29,13 @@
             <p>
                 {{ post.description_post|safe }}
             </p>
+            {% if post.album_post %}
             <div class="text-end mt-3">
-                <a href="{% url 'post:post' {{ post.pk }} %}">
+                <a href="{% url 'blog:post' post.pk %}">
                     <button class="button-format"><strong>Album</strong></button>
                 </a>
             </div>
+            {% endif %}
 
             <form method="POST" action="#btn_send_avaliation" id="avaliation-form" class="mt-5">
                 <div class="container d-flex justify-content-center">
@@ -69,35 +76,15 @@
         <div class="col-xl-8">
             <h2 class="my-3">Comentários {{ post.comments_post }}</h2>
 
+            {% for comment in comments %}
             <section class="border-bottom comment">
-                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
-                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
-                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
+                <h3 class="h5 mb-2 mt-5">
+                    {{ comment.user_comment__first_name }} {{ comment.user_comment__last_name}}
+                </h3>
+                <small class="text-muted">{{ comment.edition_date_comment|naturalday|title }}</small>
+                <p class="mb-1">{{ comment.comment }}</p>
             </section>
-
-            <section class="border-bottom comment">
-                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
-                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
-                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
-            </section>
-
-            <section class="border-bottom comment">
-                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
-                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
-                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
-            </section>
-
-            <section class="border-bottom comment">
-                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
-                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
-                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
-            </section>
-
-            <section class="border-bottom comment">
-                <h3 class="h5 mb-2 mt-5">Nome da pessoa que comentou</h3>
-                <small class="text-muted">Outras informações relevantes sobre a pessoa que comentou</small>
-                <p class="mb-1">Comentario com duvidas, sugestoes e opnioes criticas sobre pontos tratados no texto acima apresentado, buscando aprimorar seu conteudo e sua escrita</p>
-            </section>
+            {% endfor %}
 
         </div>
         <div class="col-xl"></div>
@@ -109,20 +96,8 @@
             <h2 class="my-3">Deixe um comentário</h2>
 
             <form method="POST" action="#btn_send_comment" id="comment-form">
-                <div class="form-group">
-                    <label for="input-name">Nome</label>
-                    <input type="email" class="form-control" id="input-name" placeholder="name@example.com">
-                </div>
 
-                <div class="form-group">
-                    <label for="input-email">E-mail</label>
-                    <input type="email" class="form-control" id="input-email" placeholder="name@example.com">
-                </div>
 
-                <div class="form-group">
-                    <label for="textarea-comment">Comentário</label>
-                    <textarea class="form-control" id="textarea-comment" rows="3"></textarea>
-                </div>
 
                 <div class="text-end mt-3">
                     <input id="btn_send_comment" type="submit" class="btn button-format" value="Enviar">
