@@ -19,3 +19,6 @@ class CommentForm(ModelForm):
     class Meta:
         model = Comment
         fields = ['comment', ]
+
+    def __init__(self):
+        super().__init__()

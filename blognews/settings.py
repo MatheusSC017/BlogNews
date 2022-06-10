@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'blog',
     'user',
     'post',
     'album',
@@ -158,6 +159,8 @@ MESSAGE_TAGS = {
     constants.ERROR: 'bg-danger',
     constants.WARNING: 'bg-warning',
 }
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 try:
     from .local_settings import *

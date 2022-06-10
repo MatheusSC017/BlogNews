@@ -46,11 +46,11 @@ class BlogPageTest(TestCase):
                                          published_post=True)
 
     def test_connection_with_the_blog_page(self):
-        response = self.client.get(reverse('blog:blog'))
+        response = self.client.get(reverse('post:blog'))
         self.assertEqual(response.status_code, 200)
 
     def test_post_data_receiving(self):
-        response = self.client.get(reverse('blog:blog'))
+        response = self.client.get(reverse('post:blog'))
         self.assertIn('posts', response.context)
 
     def test_post_data_default_configuration(self):
@@ -90,7 +90,7 @@ class BlogPageTest(TestCase):
         self.assertEqual([self.post5.pk, self.post1.pk], order)
 
     def template_post_data_order(self, parameter={}):
-        response = self.client.get(reverse('blog:blog'), parameter)
+        response = self.client.get(reverse('post:blog'), parameter)
         return [_.pk for _ in response.context.get('posts')]
 
 
@@ -109,10 +109,16 @@ class PostPageTest(TestCase):
                                          ratting_post=3)
 
     def test_connection_with_the_post_page(self):
-        response = self.client.get(reverse('blog:post', args=[self.post1.pk]))
+        response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertEqual(response.status_code, 200)
 
     def test_receiving_data_post_page(self):
-        response = self.client.get(reverse('blog:post', args=[self.post1.pk]))
+        response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertIn('post', response.context)
         self.assertIn('comments', response.context)
+
+    def test_comment_registration_user_logged_in(self):
+        pass
+
+    def text_comment_registration_anonymous_user(self):
+        pass

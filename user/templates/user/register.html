@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} | Cadastro{% endblock %}
+
+{% block content %}
+<section class="container p-5">
+    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
+        <div class="col d-flex">
+            <img src="{% get_media_prefix %}static/user_svg_image.svg" alt="" class="img-fluid align-middle">
+        </div>
+        <div class="col pt-3 pb-3 dark-color">
+            <h2 class="my-3">Cadastrar</h2>
+
+            <form method="POST" action="#" id="form-field">
+                {% for field in form %}
+                    <div class="form-floating mb-3">
+                        {{ field }}
+                        {{ field.label_tag }}
+                        <div class="primary-color">
+                        {{ field.errors }}
+                        </div>
+                        {% if field.help_text %}
+                        <p class="help secondary-color">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+
+                {% csrf_token %}
+
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}">
+                        Login
+                    </a>
+                </div>
+
+                <div class="text-end mt-3">
+                    <button formaction="{% url 'user:register' %}" class="btn button-format">
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<div class="container-fluid">
+    <div class="border-bottom border-light"></div>
+</div>
+{% endblock %}

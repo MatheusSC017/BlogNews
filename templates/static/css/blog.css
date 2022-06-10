@@ -19,15 +19,15 @@
 .gray-bg-color {
     background-color: #837d72;
 }
-/*
+
 .primary-color {
-    color: #5a7f78;
+    color: #680a1d;
 }
 
 .secondary-color {
-    color: #bbdec6;
+    color: #6da67a;
 }
-*/
+
 .light-color {
     color: #ececec;
 }
@@ -81,6 +81,10 @@ p {
 }
 
 #form-field .form-floating label {
+    color: #020202;
+}
+
+.form-text {
     color: #020202;
 }
 

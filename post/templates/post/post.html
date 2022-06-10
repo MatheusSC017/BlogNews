@@ -31,7 +31,7 @@
             </p>
             {% if post.album_post %}
             <div class="text-end mt-3">
-                <a href="{% url 'blog:post' post.pk %}">
+                <a href="{% url 'post:post' post.pk %}">
                     <button class="button-format"><strong>Album</strong></button>
                 </a>
             </div>
@@ -97,7 +97,7 @@
 
             <form method="POST" action="#btn_send_comment" id="comment-form">
 
-
+                {{ comment_form.comment }}
 
                 <div class="text-end mt-3">
                     <input id="btn_send_comment" type="submit" class="btn button-format" value="Enviar">

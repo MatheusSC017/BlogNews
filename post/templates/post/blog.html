@@ -7,7 +7,7 @@
 <section class="fluid-container landing-item gray-bg-color">
     <h1 class="pt-5 ps-5 dark-color">Posts:</h1>
     <div class="container pt-5">
-        <form action="{% url 'blog:blog' %}" method="GET">
+        <form action="{% url 'post:blog' %}" method="GET">
             <div class="row" id="form-field">
                 <div class="form-floating col-12 col-md-6">
                   <input name="search" type="text" class="form-control" id="search_field"
@@ -50,7 +50,7 @@
         {% for post in posts %}
         <article class="card dark-bg-color light-color">
             {% if post.image_post %}
-            <a href="{% url 'blog:post' post.pk %}">
+            <a href="{% url 'post:post' post.pk %}">
                 <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="card-img-top">
             </a>
             {% endif %}
@@ -64,7 +64,7 @@
                 <p>{{ post.excerpt_post }}</p>
             </div>
             <div class="card-footer text-end">
-                <a href="{% url 'blog:post' post.pk %}">
+                <a href="{% url 'post:post' post.pk %}">
                     <button class="gray-bg-color dark-color"><strong>Acessar</strong></button>
                 </a>
             </div>
