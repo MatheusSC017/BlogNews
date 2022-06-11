@@ -105,14 +105,20 @@ class PostPageTest(TestCase):
                                          excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
                                                       'python',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
+                                         category_post=self.py_category)
+        self.post2 = Post.objects.create(title_post='Python Machine Learning Frameworks',
+                                         excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
+                                         description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
-                                         image_post='',
-                                         published_date_post='2022-05-21',
-                                         ratting_post=3)
+                                         published_post=False)
 
     def test_connection_with_the_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertEqual(response.status_code, 200)
+
+    def test_access_to_unpublished_post(self):
+        response = self.client.get(reverse('post:post', args=[self.post2.pk]))
+        self.assertEqual(response.resolver_match.func.__name__, PostView.as_view().__name__)
 
     def test_receiving_data_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))

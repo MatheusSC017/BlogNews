@@ -23,7 +23,8 @@ class Post(models.Model):
     description_post = models.TextField(verbose_name='descrição')
     image_post = models.ImageField(upload_to='post/%Y/%m/', blank=True, null=True, verbose_name='Imagem')
     ratting_post = models.FloatField(default=0, verbose_name='avaliação')
-    views_post = models.PositiveIntegerField(default=0, verbose_name='Visualizações')
+    anonymous_views_post = models.PositiveIntegerField(default=0, verbose_name='Visualizações')
+    user_views_post = models.PositiveIntegerField(default=0, verbose_name='Visualizações')
     published_post = models.BooleanField(default=True, verbose_name='publicado')
     published_date_post = models.DateTimeField(default=datetime.now, verbose_name='data de publicação')
     edition_date_post = models.DateTimeField(default=datetime.now, verbose_name='data de edição')
@@ -38,6 +39,9 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title_post
+
+    def views_post(self):
+        return self.user_views_post + self.anonymous_views_post
 
 
 class RattingUserPost(models.Model):

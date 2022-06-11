@@ -2,7 +2,7 @@ from django.shortcuts import redirect, reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.db.models import Count, Q
-from . import models
+from .models import Post as PostModel, Category as CategoryModel
 from comment.models import Comment
 from comment.forms import CommentForm
 
@@ -15,7 +15,7 @@ class Blog(ListView):
 
     """
     template_name = 'post/blog.html'
-    model = models.Post
+    model = PostModel
     paginate_by = 10
     context_object_name = 'posts'
     category = None
@@ -58,7 +58,7 @@ class Blog(ListView):
         """ Include the list of posts and the request to the context """
         context = super().get_context_data(*args, **kwargs)
 
-        context['categories'] = models.Category.objects.all()
+        context['categories'] = CategoryModel.objects.all()
 
         get_request = dict(self.request.GET)
         if get_request.get('category'):
@@ -73,7 +73,7 @@ class Blog(ListView):
         search_field = request.GET.get('search')
         order_by_field = request.GET.get('order_by')
 
-        if category_field in [str(_.pk) for _ in models.Category.objects.all().defer('title_category')]:
+        if category_field in [str(_.pk) for _ in CategoryModel.objects.all().defer('title_category')]:
             self.category = category_field
 
         if search_field != '':
@@ -96,8 +96,29 @@ class Post(DetailView):
     Show Details about the post and registered comments
     """
     template_name = 'post/post.html'
-    model = models.Post
+    model = PostModel
     context_object_name = 'post'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        post = context['post']
+        if not post.published_post:
+            return redirect(reverse('blog:post'))
+
+        response = self.render_to_response(context)
+
+        if request.COOKIES.get('view-flag') != str(post.pk):
+            if request.user.is_authenticated:
+                post.user_views_post += 1
+            else:
+                post.anonymous_views_post += 1
+
+            post.save()
+
+            response.set_cookie('view-flag', post.pk)
+
+        return response
 
     def get_queryset(self, *args, **kwargs):
         """ Returns the data of the Post """
@@ -128,7 +149,10 @@ class Post(DetailView):
         if not request.user.is_authenticated:
             return redirect(reverse('user:login'))
 
-        context = self.get_context_data(object=self.get_object())
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        if not context['post'].published_post:
+            return redirect(reverse('blog:post'))
 
         form = context.get('comment_form')
 
