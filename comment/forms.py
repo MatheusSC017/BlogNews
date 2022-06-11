@@ -6,7 +6,7 @@ class CommentForm(ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
 
-        comment = cleaned_data.get('comment')
+        comment = cleaned_data.get('comment') or ''
 
         if len(comment) < 5:
             self.add_error(
@@ -14,11 +14,11 @@ class CommentForm(ModelForm):
                 'O comentário deve ter pelo menos 5 caracteres.'
             )
 
-        return super().clean(self)
-
     class Meta:
         model = Comment
         fields = ['comment', ]
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['comment'].widget.attrs['class'] = 'form-control'
+        self.fields['comment'].widget.attrs['placeholder'] = 'Comentário'

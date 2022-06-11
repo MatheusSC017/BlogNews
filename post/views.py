@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.db.models import Count, Q
-from .models import Post, Category
+from django.contrib.auth.decorators import login_required
+from . import models
 from comment.models import Comment
 from comment.forms import CommentForm
-
 
 class Blog(ListView):
     """
@@ -15,7 +15,7 @@ class Blog(ListView):
 
     """
     template_name = 'post/blog.html'
-    model = Post
+    model = models.Post
     paginate_by = 10
     context_object_name = 'posts'
     category = None
@@ -58,7 +58,7 @@ class Blog(ListView):
         """ Include the list of posts and the request to the context"""
         context = super().get_context_data(*args, **kwargs)
 
-        context['categories'] = Category.objects.all()
+        context['categories'] = models.Category.objects.all()
 
         get_request = dict(self.request.GET)
         if get_request.get('category'):
@@ -73,7 +73,7 @@ class Blog(ListView):
         search_field = request.GET.get('search')
         order_by_field = request.GET.get('order_by')
 
-        if category_field in [str(_.pk) for _ in Category.objects.all().defer('title_category')]:
+        if category_field in [str(_.pk) for _ in models.Category.objects.all().defer('title_category')]:
             self.category = category_field
 
         if search_field != '':
@@ -91,7 +91,7 @@ class Blog(ListView):
 
 class Post(DetailView):
     template_name = 'post/post.html'
-    model = Post
+    model = models.Post
     context_object_name = 'post'
 
     def get_queryset(self, *args, **kwargs):
@@ -112,9 +112,26 @@ class Post(DetailView):
         comments_qs = Comment.objects.select_related('user_comment').filter(post_comment=context.get('post').pk,
                                                                             published_comment=True)
         context['comments'] = comments_qs
-        context['comment_form'] = CommentForm()
+        context['comment_form'] = CommentForm(self.request.POST or None)
 
         return context
 
-    def post(self):
-        pass
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(reverse('user:login'))
+
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+
+        form = context.get('comment_form')
+
+        if not form.is_valid():
+            return self.render_to_response(context)
+
+        comment = form.save(commit=False)
+
+        comment.user_comment = request.user
+        comment.post_comment = context.get('post')
+        comment.save()
+
+        return redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))

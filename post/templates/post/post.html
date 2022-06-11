@@ -78,10 +78,10 @@
 
             {% for comment in comments %}
             <section class="border-bottom comment">
-                <h3 class="h5 mb-2 mt-5">
-                    {{ comment.user_comment__first_name }} {{ comment.user_comment__last_name}}
+                <h3 class="h5 mb-2 mt-5 dark-color">
+                    {{ comment.user_comment.first_name }} {{ comment.user_comment.last_name}}
                 </h3>
-                <small class="text-muted">{{ comment.edition_date_comment|naturalday|title }}</small>
+                <small class="dark-color">{{ comment.edition_date_comment|naturalday|title }}</small>
                 <p class="mb-1">{{ comment.comment }}</p>
             </section>
             {% endfor %}
@@ -95,12 +95,21 @@
         <div class="col-xl-8">
             <h2 class="my-3">Deixe um comentário</h2>
 
-            <form method="POST" action="#btn_send_comment" id="comment-form">
+            <form method="POST" action="#btn_send_comment" id="form-field">
 
-                {{ comment_form.comment }}
+                <div class="form-floating">
+                    {{ comment_form.comment }}
+                    {{ comment_form.comment.label_tag }}
+                    <div class="primary-color">
+                        {{ comment_form.comment.errors }}
+                    </div>
+                </div>
 
+                {% csrf_token %}
                 <div class="text-end mt-3">
-                    <input id="btn_send_comment" type="submit" class="btn button-format" value="Enviar">
+                    <button id="btn_send_comment" class="btn button-format">
+                        Enviar
+                    </button>
                 </div>
             </form>
         </div>
