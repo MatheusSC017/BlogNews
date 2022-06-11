@@ -19,6 +19,7 @@ class CommentForm(ModelForm):
         fields = ['comment', ]
 
     def __init__(self, *args, **kwargs):
+        """ Adds design features to the form """
         super().__init__(*args, **kwargs)
         self.fields['comment'].widget.attrs['class'] = 'form-control'
         self.fields['comment'].widget.attrs['placeholder'] = 'Comentário'

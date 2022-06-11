@@ -6,6 +6,8 @@
 {% block content %}
 <section class="fluid-container landing-item gray-bg-color">
     <h1 class="pt-5 ps-5 dark-color">Posts:</h1>
+
+    <!-- Search form  -->
     <div class="container pt-5">
         <form action="{% url 'post:blog' %}" method="GET">
             <div class="row" id="form-field">
@@ -45,6 +47,8 @@
             </div>
         </form>
     </div>
+
+    <!-- List of posts -->
     <div class="container card-columns pt-3 pb-3">
 
         {% for post in posts %}

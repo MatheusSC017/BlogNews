@@ -1,6 +1,8 @@
 from django.shortcuts import reverse
 from django.test import Client, TestCase
 from .models import Category, Post, RattingUserPost
+from .views import Post as PostView
+from user.views import Login
 
 
 class BlogPageTest(TestCase):
@@ -118,7 +120,9 @@ class PostPageTest(TestCase):
         self.assertIn('comments', response.context)
 
     def test_comment_registration_user_logged_in(self):
-        pass
+        response = self.client.post(reverse('post:post', args=[self.post1.pk]), {'comment': 'Comment_test'})
+        self.assertEqual(response.resolver_match.func.__name__, PostView.as_view().__name__)
 
-    def text_comment_registration_anonymous_user(self):
-        pass
+    def text_comment_registration_user_logged_out(self):
+        response = self.client.post(reverse('post:post', args=[self.post1.pk]), {'comment': 'Comment_test'})
+        self.assertEqual(response.resolver_match.func.__name__, Login.as_view().__name__)

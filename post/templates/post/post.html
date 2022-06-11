@@ -10,9 +10,13 @@
 
 {% block content %}
 <section class="container-fluid landing-item gray-bg-color pt-5 pb-5">
+
+    <!-- Main Content -->
     <div class="row">
         <div class="col-xl"></div>
         <div class="col-xl-8">
+
+            <!-- Details about the post -->
             <h1 class="text-center dark-color">{{ post.title_post }}</h1>
             <div class="text-center">
                 <small>
@@ -29,6 +33,8 @@
             <p>
                 {{ post.description_post|safe }}
             </p>
+
+            <!-- Album option -->
             {% if post.album_post %}
             <div class="text-end mt-3">
                 <a href="{% url 'post:post' post.pk %}">
@@ -37,6 +43,7 @@
             </div>
             {% endif %}
 
+            <!-- Avaliation form -->
             <form method="POST" action="#btn_send_avaliation" id="avaliation-form" class="mt-5">
                 <div class="container d-flex justify-content-center">
                     <div class="row">
@@ -71,6 +78,7 @@
         <div class="col-xl"></div>
     </div>
 
+    <!-- Registered comments -->
     <div class="row pt-5">
         <div class="col-xl"></div>
         <div class="col-xl-8">
@@ -90,6 +98,7 @@
         <div class="col-xl"></div>
     </div>
 
+    <!-- Comment Form -->
     <div class="row pt-5">
         <div class="col-xl"></div>
         <div class="col-xl-8">
