@@ -1,10 +1,12 @@
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect, reverse, get_object_or_404
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.db.models import Count, Q
+from django.contrib import messages
 from .models import Post as PostModel, Category as CategoryModel
 from comment.models import Comment
 from comment.forms import CommentForm
+from datetime import datetime
 
 
 class Blog(ListView):
@@ -36,10 +38,7 @@ class Blog(ListView):
         qs = super().get_queryset(*args, **kwargs)
 
         qs = qs.annotate(
-            comments_post=Count(
-                'comment',
-                filter=Q(comment__published_comment=True)
-            )
+            comments_post=Count('comment')
         )
 
         if self.category is not None:
@@ -104,7 +103,7 @@ class Post(DetailView):
         context = self.get_context_data(object=self.object)
         post = context['post']
         if not post.published_post:
-            return redirect(reverse('blog:post'))
+            return redirect(reverse('post:blog'))
 
         response = self.render_to_response(context)
 
@@ -125,10 +124,7 @@ class Post(DetailView):
         qs = super().get_queryset(*args, **kwargs)
 
         qs = qs.annotate(
-            comments_post=Count(
-                'comment',
-                filter=Q(comment__published_comment=True)
-            )
+            comments_post=Count('comment')
         )
 
         return qs
@@ -137,8 +133,8 @@ class Post(DetailView):
         """ Adds the registered comments and the comment form to the context"""
         context = super().get_context_data(*args, **kwargs)
 
-        comments_qs = Comment.objects.select_related('user_comment').filter(post_comment=context.get('post').pk,
-                                                                            published_comment=True)
+        comments_qs = Comment.objects.select_related('user_comment').filter(post_comment=context.get('post').pk)
+
         context['comments'] = comments_qs
         context['comment_form'] = CommentForm(self.request.POST or None)
 
@@ -152,8 +148,24 @@ class Post(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         if not context['post'].published_post:
-            return redirect(reverse('blog:post'))
+            return redirect(reverse('post:blog'))
 
+        action = {'create-comment': self.create_comment,
+                  'update-comment': self.update_comment,
+                  'delete-comment': self.delete_comment, }
+
+        response = None
+        try:
+            response = action[request.POST.get('action')](request, context)
+        except KeyError:
+            messages.error(request, 'Ação inválida')
+
+        if response is None:
+            response = redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
+
+        return response
+
+    def create_comment(self, request, context):
         form = context.get('comment_form')
 
         if not form.is_valid():
@@ -164,5 +176,41 @@ class Post(DetailView):
         comment.user_comment = request.user
         comment.post_comment = context.get('post')
         comment.save()
+        messages.success(request, 'Comentário adicionado')
 
-        return redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
+    def update_comment(self, request, context):
+        form = context.get('comment_form')
+
+        if not form.is_valid():
+            return self.render_to_response(context)
+
+        try:
+            comment = get_object_or_404(Comment, pk=request.POST.get('comment-pk'))
+        except ValueError:
+            messages.error(request, 'Comentário não encontrado')
+            return self.render_to_response(context)
+
+        if comment.user_comment != request.user:
+            messages.error(request, 'Usuário inválido')
+            return self.render_to_response(context)
+
+        comment.comment = request.POST.get('comment')
+        comment.edition_date_comment = datetime.now()
+
+        comment.save()
+        messages.success(request, 'Comentário editado')
+
+    def delete_comment(self, request, context):
+        try:
+            comment = get_object_or_404(Comment, pk=request.POST.get('comment-pk'))
+        except ValueError:
+            messages.error(request, 'Comentário não encontrado')
+            return self.render_to_response(context)
+
+        if comment.user_comment != request.user:
+            messages.error(request, 'Usuário inválido')
+            return self.render_to_response(context)
+
+        comment.delete()
+        messages.success(request, 'Comentário deletado')
+

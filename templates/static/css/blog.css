@@ -1,11 +1,11 @@
 /* Geral */
 
 .primary-bg-color {
-    background-color: #680a1d;
+    background-color: #6da67a;
 }
 
 .secondary-bg-color {
-    background-color: #6da67a;
+    background-color: #680a1d;
 }
 
 .light-bg-color {
@@ -21,11 +21,11 @@
 }
 
 .primary-color {
-    color: #680a1d;
+    color: #6da67a;
 }
 
 .secondary-color {
-    color: #6da67a;
+    color: #680a1d;
 }
 
 .light-color {
@@ -63,24 +63,24 @@ p {
 }
 
 /* Forms */
-#form-field input,
-#form-field textarea,
-#form-field select{
+.form-field input,
+.form-field textarea,
+.form-field select{
     border: none;
     border-bottom: 1px solid #020202;
     border-radius: 10px 10px 0 0;
     background-color: #837d72;
 }
 
-#form-field input:focus {
+.form-field input:focus {
     box-shadow: none;
 }
 
-#form-field select:focus {
+.form-field select:focus {
     box-shadow: 0 0 0.5rem 0.15rem #020202;
 }
 
-#form-field .form-floating label {
+.form-field .form-floating label {
     color: #020202;
 }
 
@@ -339,4 +339,51 @@ label.star:hover {
 label.star:before {
     content: '\f006';
     font-family: FontAwesome;
+}
+
+/* Post */
+#popup {
+    position: fixed;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+
+.dark-background {
+    background-color: #020202;
+    opacity: 0.7;
+    position: absolute;
+    z-index: 11;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+
+.popup-content {
+    position: absolute;
+    z-index: 12;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.comment-options {
+    position: absolute;
+    z-index: 1;
+    left: 100%;
+    top: 0;
+    transform: translate(-100%, 0);
+}
+
+.comment-options button {
+    display: inline;
+    float: left;
+}
+
+/* Messages */
+.toast {
+    z-index: 20;
 }

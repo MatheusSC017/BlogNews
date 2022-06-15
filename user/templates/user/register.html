@@ -12,16 +12,16 @@
         <div class="col pt-3 pb-3 dark-color">
             <h2 class="my-3">Cadastrar</h2>
 
-            <form method="POST" action="#" id="form-field">
+            <form method="POST" action="#" class="form-field">
                 {% for field in form %}
                     <div class="form-floating mb-3">
                         {{ field }}
                         {{ field.label_tag }}
-                        <div class="primary-color">
+                        <div class="secondary-color">
                         {{ field.errors }}
                         </div>
                         {% if field.help_text %}
-                        <p class="help secondary-color">{{ field.help_text|safe }}</p>
+                        <p class="help primary-color">{{ field.help_text|safe }}</p>
                         {% endif %}
                     </div>
                 {% endfor %}

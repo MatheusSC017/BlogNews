@@ -86,7 +86,7 @@
                 </div>
 
                 <div class="text-end">
-                    <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Enviar">
+                    <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Avaliar">
                 </div>
             </form>
 
@@ -97,11 +97,24 @@
     <!-- Registered comments -->
     <div class="row pt-5">
         <div class="col-xl"></div>
-        <div class="col-xl-8">
+        <div class="col-xl-8" id="comments-post">
             <h2 class="my-3">Comentários {{ post.comments_post }}</h2>
 
             {% for comment in comments %}
-            <section class="border-bottom comment">
+            <section class="border-bottom comment position-relative" id="comment-{{ comment.pk }}">
+                {% if comment.user_comment == user %}
+                <div class="comment-options">
+                    <button onclick="popupForm('update-comment-form', 1);
+                                                commentField({{ comment.pk }});
+                                                pkField('update-comment-form', {{ comment.pk }})">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button onclick="popupForm('delete-comment-form', 1);
+                                     pkField('delete-comment-form', {{ comment.pk }})">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                {% endif %}
                 <h3 class="h5 mb-2 mt-5 dark-color">
                     {{ comment.user_comment.first_name }} {{ comment.user_comment.last_name}}
                 </h3>
@@ -117,22 +130,24 @@
     <!-- Comment Form -->
     <div class="row pt-5">
         <div class="col-xl"></div>
-        <div class="col-xl-8">
+        <div class="col-xl-8" id="send-comment">
             <h2 class="my-3">Deixe um comentário</h2>
 
-            <form method="POST" action="#btn_send_comment" id="form-field">
+            <form method="POST" action="#send-comment" class="form-field">
 
                 <div class="form-floating">
                     {{ comment_form.comment }}
                     {{ comment_form.comment.label_tag }}
-                    <div class="primary-color">
+                    <div class="secondary-color">
                         {{ comment_form.comment.errors }}
                     </div>
                 </div>
 
+                <input type="hidden" name="action" value="create-comment">
+
                 {% csrf_token %}
                 <div class="text-end mt-3">
-                    <button id="btn_send_comment" class="btn button-format">
+                    <button class="btn button-format">
                         Enviar
                     </button>
                 </div>
@@ -141,4 +156,54 @@
         <div class="col-xl"></div>
     </div>
 </section>
+
+<!-- Form Update Comment -->
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="update-comment-form">
+        <form action="#comments-post" method="POST" class="form-field">
+
+            <div class="form-floating">
+                {{ comment_form.comment }}
+                {{ comment_form.comment.label_tag }}
+                <div class="secondary-color">
+                    {{ comment_form.comment.errors }}
+                </div>
+            </div>
+
+            <input type="hidden" name="action" value="update-comment">
+            <input type="hidden" name="comment-pk">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('update-comment-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-comment-form">
+        <form action="#comments-post" method="POST" class="form-field">
+
+            <input type="hidden" name="action" value="delete-comment">
+            <input type="hidden" name="comment-pk">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('delete-comment-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
 {% endblock %}
