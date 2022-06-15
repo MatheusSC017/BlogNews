@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
+from django.contrib.messages import get_messages
 from blog.views import Home
 from .views import Login, Register
 
@@ -41,6 +42,9 @@ class RegisterPageTest(TestCase):
         response = self.registration_test()
         self.assertEqual(response.resolver_match.func.__name__, Home.as_view().__name__)
         self.assertTrue(User.objects.get(username='username_test'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Usuário cadastrado')
 
     def registration_test(self, username='username_test', password1='ut123_name_ut', password2='ut123_name_ut'):
         response = self.client.post(reverse('user:register'), {'username': username,
@@ -66,16 +70,25 @@ class LoginPageTest(TestCase):
                                                       'password': 'password_test', })
         response = self.client.get(reverse('user:login'))
         self.assertEqual(response.resolver_match.func.__name__, Home.as_view().__name__)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Usuário já logado')
 
     def test_login_user_correct_data(self):
         response = self.client.post(reverse('user:login'), data={'username': 'username_test',
                                                                  'password': 'password_test', })
         self.assertEqual(response.resolver_match.func.__name__, Home.as_view().__name__)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Usuário logado')
 
     def test_login_user_incorrect_data(self):
         response = self.client.post(reverse('user:login'), data={'username': 'username_test',
                                                                  'password': 'password', })
         self.assertEqual(response.resolver_match.func.__name__, Login.as_view().__name__)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Usuário ou senha incorretos')
 
 
 class LogoutPageTest(TestCase):
@@ -90,9 +103,15 @@ class LogoutPageTest(TestCase):
     def test_logout_user_already_logged_out(self):
         response = self.client.get(reverse('user:logout'))
         self.assertRedirects(response, reverse('user:login'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Usuário já deslogado')
 
     def test_logout_user(self):
         self.client.post(reverse('user:login'), data={'username': 'username_test',
                                                       'password': 'password_test', })
         response = self.client.get(reverse('user:logout'))
         self.assertRedirects(response, reverse('blog:index'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Usuário deslogado')

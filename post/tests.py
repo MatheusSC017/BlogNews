@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from .models import Category, Post, RattingUserPost
 from comment.models import Comment
-from .views import Blog
+from .views import Post as PostView, Blog
 from user.views import Login
 
 
@@ -105,6 +105,7 @@ class PostPageTest(TestCase):
         self.py_category = Category.objects.create(title_category='Python')
 
         self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
+        self.other_user = User.objects.create_user('username_test2', 'test2@test.com.br', 'password_test2')
 
         self.post1 = Post.objects.create(title_post='Python Frameworks',
                                          excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
@@ -116,6 +117,10 @@ class PostPageTest(TestCase):
                                          description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
                                          published_post=False)
+        self.post3 = Post.objects.create(title_post='Python Frameworks 2',
+                                         excerpt_post='Continuação',
+                                         description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
+                                         category_post=self.py_category)
         self.comment = Comment.objects.create(user_comment=self.user,
                                               post_comment=self.post1,
                                               comment='Testando')
@@ -172,15 +177,52 @@ class PostPageTest(TestCase):
         action_parameter = {'comment': 'Comment_test', 'comment-pk': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário editado')
 
+    def test_comment_update_with_other_user_logged_in(self):
+        user_parameter = {'username': 'username_test2', 'password': 'password_test2', }
+        action_parameter = {'comment': 'Comment_test', 'comment-pk': self.comment.pk, 'action': 'update-comment', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
+
+    def test_comment_update_with_invalid_pk(self):
+        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        action_parameter = {'comment-pk': '', 'comment': 'Comment_test', 'action': 'update-comment', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
+
+    def test_update_comment_other_post(self):
+        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        action_parameter = {'comment': 'Comment_test', 'comment-pk': self.comment.pk, 'action': 'update-comment', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
+                                                         'Comentário inválido', self.post3.pk)
+
     def test_comment_delete_with_user_logged_in(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
         action_parameter = {'comment-pk': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário deletado')
 
-    def template_comment_action_with_user_logged_in(self, user_parameters, action_parameters, message):
+    def test_comment_delete_with_other_user_logged_in(self):
+        user_parameter = {'username': 'username_test2', 'password': 'password_test2', }
+        action_parameter = {'comment-pk': self.comment.pk, 'action': 'delete-comment', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
+
+    def test_comment_delete_with_invalid_pk(self):
+        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        action_parameter = {'comment-pk': '', 'action': 'delete-comment', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
+
+    def test_delete_comment_other_post(self):
+        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        action_parameter = {'comment-pk': self.comment.pk, 'action': 'delete-comment', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
+                                                         'Comentário inválido', self.post3.pk)
+
+    def template_comment_action_with_user_logged_in(self, user_parameters, action_parameters, message, pk=0):
+        if pk == 0:
+            pk = self.post1.pk
         self.client.post(reverse('user:login'), user_parameters)
-        response = self.client.post(reverse('post:post', args=[self.post1.pk]), action_parameters)
-        self.assertRedirects(response, reverse('post:post', args=[self.post1.pk]))
+        response = self.client.post(reverse('post:post', args=[pk]), action_parameters)
+        if response.status_code == 200:
+            self.assertEqual(response.resolver_match.func.__name__, PostView.as_view().__name__)
+        else:
+            self.assertRedirects(response, reverse('post:post', args=[pk]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), message)

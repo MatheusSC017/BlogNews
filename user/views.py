@@ -31,7 +31,7 @@ class Login(View, TemplateResponseMixin):
             messages.success(self.request, 'Usuário logado')
             return redirect(reverse('blog:index'))
         else:
-            messages.error(self.request, 'Usuário ou senha incorretos.')
+            messages.error(self.request, 'Usuário ou senha incorretos')
             return self.render_to_response({})
 
 

@@ -186,6 +186,10 @@ class Post(DetailView):
 
         try:
             comment = get_object_or_404(Comment, pk=request.POST.get('comment-pk'))
+
+            if comment.post_comment != context.get('post'):
+                messages.error(request, 'Comentário inválido')
+                return self.render_to_response(context)
         except ValueError:
             messages.error(request, 'Comentário não encontrado')
             return self.render_to_response(context)
@@ -203,6 +207,10 @@ class Post(DetailView):
     def delete_comment(self, request, context):
         try:
             comment = get_object_or_404(Comment, pk=request.POST.get('comment-pk'))
+
+            if comment.post_comment != context.get('post'):
+                messages.error(request, 'Comentário inválido')
+                return self.render_to_response(context)
         except ValueError:
             messages.error(request, 'Comentário não encontrado')
             return self.render_to_response(context)
