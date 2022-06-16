@@ -1,12 +1,12 @@
 from django.shortcuts import redirect, reverse, get_object_or_404
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.db.models import Count, Q
+from django.db.models import Q, Count, Avg
 from django.contrib import messages
-from .models import Post as PostModel, Category as CategoryModel
+from django.utils import timezone
+from .models import Post as PostModel, Category as CategoryModel, RattingUserPost
 from comment.models import Comment
 from comment.forms import CommentForm
-from datetime import datetime
 
 
 class Blog(ListView):
@@ -38,7 +38,8 @@ class Blog(ListView):
         qs = super().get_queryset(*args, **kwargs)
 
         qs = qs.annotate(
-            comments_post=Count('comment')
+            comments_post=Count('comment', distinct=True),
+            ratting_post=Avg('rattinguserpost__ratting', distinct=True)
         )
 
         if self.category is not None:
@@ -124,7 +125,8 @@ class Post(DetailView):
         qs = super().get_queryset(*args, **kwargs)
 
         qs = qs.annotate(
-            comments_post=Count('comment')
+            comments_post=Count('comment', distinct=True),
+            ratting_post=Avg('rattinguserpost__ratting', distinct=True),
         )
 
         return qs
@@ -137,6 +139,11 @@ class Post(DetailView):
 
         context['comments'] = comments_qs
         context['comment_form'] = CommentForm(self.request.POST or None)
+        if self.request.user.is_authenticated:
+            ratting_user = RattingUserPost.objects.filter(user_ratting=self.request.user,
+                                                          post_ratting=context['post'])
+            if ratting_user.count() == 1:
+                context['ratting_user'] = ratting_user[0].ratting
 
         return context
 
@@ -152,7 +159,8 @@ class Post(DetailView):
 
         action = {'create-comment': self.create_comment,
                   'update-comment': self.update_comment,
-                  'delete-comment': self.delete_comment, }
+                  'delete-comment': self.delete_comment,
+                  'ratting-post': self.ratting_post, }
 
         response = None
         try:
@@ -199,7 +207,7 @@ class Post(DetailView):
             return self.render_to_response(context)
 
         comment.comment = request.POST.get('comment')
-        comment.edition_date_comment = datetime.now()
+        comment.edition_date_comment = timezone.now()
 
         comment.save()
         messages.success(request, 'Comentário editado')
@@ -222,3 +230,27 @@ class Post(DetailView):
         comment.delete()
         messages.success(request, 'Comentário deletado')
 
+    def ratting_post(self, request, context):
+        try:
+            ratting = int(self.request.POST.get('star'))
+
+            if 1 > ratting or ratting > 5:
+                messages.error(request, 'Avaliação inválida')
+                return self.render_to_response(context)
+        except TypeError:
+            messages.error(request, 'Falha na avaliação')
+            return self.render_to_response(context)
+
+        ratting_post = RattingUserPost.objects.filter(user_ratting=request.user,
+                                                      post_ratting=context.get('post'))
+
+        if ratting_post.count() == 0:
+            RattingUserPost.objects.create(user_ratting=request.user,
+                                           post_ratting=context.get('post'),
+                                           ratting=ratting)
+        else:
+            ratting_post = ratting_post[0]
+            ratting_post.ratting = ratting
+            ratting_post.save()
+
+        messages.success(request, 'Obrigado pelo Feedback')

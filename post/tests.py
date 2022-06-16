@@ -14,14 +14,15 @@ class BlogPageTest(TestCase):
         self.py_category = Category.objects.create(title_category='Python')
         self.django_category = Category.objects.create(title_category='Django')
 
+        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
+
         self.post1 = Post.objects.create(title_post='Python Frameworks',
                                          excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
                                                       'python',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
                                          category_post=self.py_category,
                                          image_post='',
-                                         published_date_post='2022-05-21',
-                                         ratting_post=3)
+                                         published_date_post='2022-05-21')
         self.post2 = Post.objects.create(title_post='Django',
                                          excerpt_post='Tutorial interativo do framework django',
                                          description_post='Informações diversas sobre o framework e suas '
@@ -33,22 +34,32 @@ class BlogPageTest(TestCase):
                                          description_post='O que é ML e apresentação teorica do seu '
                                                           'funcionamento',
                                          category_post=self.py_category,
-                                         published_date_post='2022-01-09',
-                                         ratting_post=5)
+                                         published_date_post='2022-01-09')
         self.post4 = Post.objects.create(title_post='Python Machine Learning Frameworks',
                                          excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
                                          description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
                                          published_date_post='2022-06-04',
-                                         ratting_post=4,
                                          published_post=False)
         self.post5 = Post.objects.create(title_post='Python análise de dados',
                                          excerpt_post='Curso de python DataScience (Frameworks)',
                                          description_post='Informações sobre os processos envolvendo análise de dados',
                                          category_post=self.py_category,
                                          published_date_post='2020-01-01',
-                                         ratting_post=4,
                                          published_post=True)
+
+        RattingUserPost.objects.create(user_ratting=self.user,
+                                       post_ratting=self.post1,
+                                       ratting=3)
+        RattingUserPost.objects.create(user_ratting=self.user,
+                                       post_ratting=self.post3,
+                                       ratting=5)
+        RattingUserPost.objects.create(user_ratting=self.user,
+                                       post_ratting=self.post4,
+                                       ratting=4)
+        RattingUserPost.objects.create(user_ratting=self.user,
+                                       post_ratting=self.post5,
+                                       ratting=4)
 
     def test_connection_with_the_blog_page(self):
         response = self.client.get(reverse('post:blog'))
@@ -121,9 +132,14 @@ class PostPageTest(TestCase):
                                          excerpt_post='Continuação',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
                                          category_post=self.py_category)
+
         self.comment = Comment.objects.create(user_comment=self.user,
                                               post_comment=self.post1,
                                               comment='Testando')
+
+        self.ratting = RattingUserPost.objects.create(user_ratting=self.user,
+                                                      post_ratting=self.post2,
+                                                      ratting=3)
 
     def test_connection_with_the_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
@@ -214,11 +230,23 @@ class PostPageTest(TestCase):
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
                                                          'Comentário inválido', self.post3.pk)
 
+    def test_register_feedback_to_post(self):
+        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        action_parameter = {'star': '5', 'action': 'ratting-post', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Obrigado pelo Feedback')
+
+    def test_update_feedback_to_post(self):
+        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        action_parameter = {'star': '5', 'action': 'ratting-post', }
+        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
+                                                         'Obrigado pelo Feedback', self.post3.pk)
+
     def template_comment_action_with_user_logged_in(self, user_parameters, action_parameters, message, pk=0):
         if pk == 0:
             pk = self.post1.pk
         self.client.post(reverse('user:login'), user_parameters)
         response = self.client.post(reverse('post:post', args=[pk]), action_parameters)
+
         if response.status_code == 200:
             self.assertEqual(response.resolver_match.func.__name__, PostView.as_view().__name__)
         else:

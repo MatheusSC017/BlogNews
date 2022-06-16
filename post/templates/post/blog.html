@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load convert_tags %}
 
 {% block title %} | Posts{% endblock%}
 
@@ -62,7 +63,7 @@
                 <h1 class="h3">{{ post.title_post }}</h1>
                 <p class="d-flex justify-content-around">
                     <small>
-                        {{ post.ratting_post }} <i class="bi bi-star-fill text-warning"></i>
+                        {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
                     </small>
 
                     <small>

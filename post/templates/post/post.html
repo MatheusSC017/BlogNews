@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load convert_tags %}
 
 {% block head %}
 <!-- Font Awesome -->
@@ -21,7 +22,7 @@
             <div class="d-flex justify-content-center">
                 <div class="w-25 d-flex justify-content-around">
                     <small>
-                        {{ post.ratting_post }} <i class="bi bi-star-fill text-warning"></i>
+                        {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
                     </small>
 
                     <small>
@@ -66,25 +67,33 @@
                         <div class="col-md-12">
                             <div class="stars">
 
-                                <input class="star star-5" id="star-5" type="radio" name="star"/>
+                                <input class="star star-5" id="star-5" type="radio" name="star" value="5"
+                                    {% if ratting_user == 5 %}checked{% endif %}/>
                                 <label class="star star-5" for="star-5"></label>
 
-                                <input class="star star-4" id="star-4" type="radio" name="star"/>
+                                <input class="star star-4" id="star-4" type="radio" name="star" value="4"
+                                    {% if ratting_user == 4 %}checked{% endif %}/>
                                 <label class="star star-4" for="star-4"></label>
 
-                                <input class="star star-3" id="star-3" type="radio" name="star"/>
+                                <input class="star star-3" id="star-3" type="radio" name="star" value="3"
+                                    {% if ratting_user == 3 %}checked{% endif %}/>
                                 <label class="star star-3" for="star-3"></label>
 
-                                <input class="star star-2" id="star-2" type="radio" name="star"/>
+                                <input class="star star-2" id="star-2" type="radio" name="star" value="2"
+                                    {% if ratting_user == 2 %}checked{% endif %}/>
                                 <label class="star star-2" for="star-2"></label>
 
-                                <input class="star star-1" id="star-1" type="radio" name="star"/>
+                                <input class="star star-1" id="star-1" type="radio" name="star" value="1"
+                                    {% if ratting_user == 1 %}checked{% endif %}/>
                                 <label class="star star-1" for="star-1"></label>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="action" value="ratting-post">
+
+                {% csrf_token %}
                 <div class="text-end">
                     <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Avaliar">
                 </div>
