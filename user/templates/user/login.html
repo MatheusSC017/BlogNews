@@ -13,19 +13,21 @@
             <h2 class="my-3">Login</h2>
 
             <form method="POST" action="#" class="form-field">
-                <div class="form-floating">
+                <div class="form-floating pb-2">
                     <input name="username" type="text" class="form-control" id="input-user" placeholder="Nome do usuário">
                     <label for="input-user">Usuário</label>
                 </div>
 
-                <div class="form-floating">
+                <div class="form-floating pb-2">
                     <input name="password" type="password" class="form-control" id="input-password" placeholder="Senha">
                     <label for="input-password">Senha</label>
                 </div>
 
                 <div class="text-end">
                     <a href="{% url 'user:register' %}">
-                        Cadastrar
+                        <strong>
+                            Cadastrar
+                        </strong>
                     </a>
                 </div>
 

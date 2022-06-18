@@ -44,7 +44,7 @@
             </p>
             <p class="text-end">
                 Escrito por:
-                <cite>Nome do usuário</cite><br>
+                <cite>{{ post.user_post.first_name }} {{ post.user_post.last_name }}</cite><br>
                 Publicado:
                 <small>
                     {{ post.published_date_post|naturalday|title }}
@@ -181,7 +181,7 @@
             </div>
 
             <input type="hidden" name="action" value="update-comment">
-            <input type="hidden" name="comment-pk">
+            <input type="hidden" name="primary-key">
 
             {% csrf_token %}
             <div class="text-end mt-3">
@@ -199,7 +199,7 @@
         <form action="#comments-post" method="POST" class="form-field">
 
             <input type="hidden" name="action" value="delete-comment">
-            <input type="hidden" name="comment-pk">
+            <input type="hidden" name="primary-key">
 
             {% csrf_token %}
             <div class="text-end mt-3">

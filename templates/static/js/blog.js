@@ -11,5 +11,5 @@ function commentField(pk) {
 }
 
 function pkField(form, pk) {
-    document.querySelector('#' + form + ' input[name="comment-pk"]').value = pk
+    document.querySelector('#' + form + ' input[name="primary-key"]').value = pk
 }

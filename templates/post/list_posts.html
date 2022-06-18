@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %} | Posts{% endblock%}
+
+{% block content %}
+<section class="fluid-container landing-item gray-bg-color">
+    {% block header %}
+    <h1 class="pt-5 ps-5 dark-color">Posts:</h1>
+    {% endblock %}
+    <!-- Search form  -->
+    <div class="container pt-5">
+        <form action="{% url 'post:blog' %}" method="GET">
+            <div class="row" class="form-field">
+                <div class="form-floating col-12 col-md-6">
+                  <input name="search" type="text" class="form-control" id="search_field"
+                         placeholder="Digite sua pesquisa aqui"
+                         aria-label="Campo para pesquisa"
+                         value="{{ get_request.search.0 }}">
+                  <label for="search_field">Buscar por</label>
+                </div>
+
+                <div class="form-floating col-12 col-md-3">
+                    <select name="category" class="form-select" id="category_field" aria-label="Categoria para pesquisa">
+                        <option value="0">Todas</option>
+                        {% for category in categories %}
+                        <option value="{{ category.pk }}" {% if category.pk == get_request.category.0 %}selected{% endif %}>
+                            {{ category.title_category }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <label for="category_field">Categoria</label>
+                </div>
+
+                <div class="form-floating col-12 col-md-3">
+                    <select name="order_by" class="form-select" id="order_by_field" aria-label="Ordenar pesquisa por">
+                        <option value="publicacao" {% if get_request.order_by.0 == "publicacao" %}selected{% endif %}>Data de publicação</option>
+                        <option value="avaliacao" {% if get_request.order_by.0 == "avaliacao" %}selected{% endif %}>Avaliação</option>
+                    </select>
+                    <label for="order_by_field">Ordenar por</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mt-2 text-end">
+                    <input class="button-format" type="submit" value="Pesquisar">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- List of posts -->
+    <div class="container card-columns pt-3 pb-3">
+
+        {% block posts %}{% endblock %}
+
+    </div>
+    <div class="container pb-5">
+        {% include 'partials/_pagination.html' %}
+    </div>
+</section>
+
+{% block popup %}{% endblock %}
+
+{% endblock %}

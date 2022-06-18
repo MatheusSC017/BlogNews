@@ -21,32 +21,36 @@ class BlogPageTest(TestCase):
                                                       'python',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
                                          category_post=self.py_category,
-                                         image_post='',
-                                         published_date_post='2022-05-21')
+                                         published_date_post='2022-05-21',
+                                         user_post=self.user)
         self.post2 = Post.objects.create(title_post='Django',
                                          excerpt_post='Tutorial interativo do framework django',
                                          description_post='Informações diversas sobre o framework e suas '
                                                           'funcionalidades',
                                          category_post=self.django_category,
-                                         published_date_post='2022-06-01')
+                                         published_date_post='2022-06-01',
+                                         user_post=self.user)
         self.post3 = Post.objects.create(title_post='Python Machine Learning',
                                          excerpt_post='Introdução a tecnicas de ML com python',
                                          description_post='O que é ML e apresentação teorica do seu '
                                                           'funcionamento',
                                          category_post=self.py_category,
-                                         published_date_post='2022-01-09')
+                                         published_date_post='2022-01-09',
+                                         user_post=self.user)
         self.post4 = Post.objects.create(title_post='Python Machine Learning Frameworks',
                                          excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
                                          description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
                                          published_date_post='2022-06-04',
-                                         published_post=False)
+                                         published_post=False,
+                                         user_post=self.user)
         self.post5 = Post.objects.create(title_post='Python análise de dados',
                                          excerpt_post='Curso de python DataScience (Frameworks)',
                                          description_post='Informações sobre os processos envolvendo análise de dados',
                                          category_post=self.py_category,
                                          published_date_post='2020-01-01',
-                                         published_post=True)
+                                         published_post=True,
+                                         user_post=self.user)
 
         RattingUserPost.objects.create(user_ratting=self.user,
                                        post_ratting=self.post1,
@@ -122,16 +126,19 @@ class PostPageTest(TestCase):
                                          excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
                                                       'python',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
-                                         category_post=self.py_category)
+                                         category_post=self.py_category,
+                                         user_post=self.user)
         self.post2 = Post.objects.create(title_post='Python Machine Learning Frameworks',
                                          excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
                                          description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
-                                         published_post=False)
+                                         published_post=False,
+                                         user_post=self.user)
         self.post3 = Post.objects.create(title_post='Python Frameworks 2',
                                          excerpt_post='Continuação',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
-                                         category_post=self.py_category)
+                                         category_post=self.py_category,
+                                         user_post=self.user)
 
         self.comment = Comment.objects.create(user_comment=self.user,
                                               post_comment=self.post1,

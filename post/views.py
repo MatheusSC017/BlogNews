@@ -1,22 +1,22 @@
 from django.shortcuts import redirect, reverse, get_object_or_404
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count, Avg
 from django.contrib import messages
 from django.utils import timezone
 from .models import Post as PostModel, Category as CategoryModel, RattingUserPost
 from comment.models import Comment
 from comment.forms import CommentForm
+from .forms import PostForm
 
 
-class Blog(ListView):
+class BlogTemplate(ListView):
     """
-    Blog Page
+    Blog template
 
-    List of published posts with search tool by category, text and sorting
+    List of posts with search tool by category, text and sorting
 
     """
-    template_name = 'post/blog.html'
     model = PostModel
     paginate_by = 10
     context_object_name = 'posts'
@@ -28,7 +28,7 @@ class Blog(ListView):
         """
         Blog Search
 
-        Searches for published posts, returning the number of comments, title, excerpt, image, rating and
+        Searches for posts, returning the number of comments, title, excerpt, image, rating and
         publication date
 
         :param args: Other Arguments without key
@@ -48,7 +48,7 @@ class Blog(ListView):
         if self.search is not None:
             qs = qs.filter(Q(title_post__icontains=self.search) | Q(excerpt_post__icontains=self.search))
 
-        qs = qs.filter(published_post=True).order_by(self.order_by)
+        qs = qs.order_by(self.order_by)
 
         qs = qs.defer('description_post')
 
@@ -89,6 +89,21 @@ class Blog(ListView):
         return super().get(request, *args, **kwargs)
 
 
+class Blog(BlogTemplate):
+    """
+    Blog Page
+
+    List only the published posts
+    """
+    template_name = 'post/blog.html'
+
+    def get_queryset(self, *args, **kwargs):
+        """ Select only the published posts """
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(published_post=True)
+        return qs
+
+
 class Post(DetailView):
     """
     PostPage
@@ -100,6 +115,9 @@ class Post(DetailView):
     context_object_name = 'post'
 
     def get(self, request, *args, **kwargs):
+        """
+            Check if the post is published and the post view system
+        """
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         post = context['post']
@@ -108,7 +126,9 @@ class Post(DetailView):
 
         response = self.render_to_response(context)
 
+        """" Check the flag to avoid repeated views """
         if request.COOKIES.get('view-flag') != str(post.pk):
+            """ Separetes views of anonymous users and logged in users """
             if request.user.is_authenticated:
                 post.user_views_post += 1
             else:
@@ -148,7 +168,7 @@ class Post(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
-        """ Registration of the comment """
+        """ Check the action to be take """
         if not request.user.is_authenticated:
             return redirect(reverse('user:login'))
 
@@ -174,6 +194,7 @@ class Post(DetailView):
         return response
 
     def create_comment(self, request, context):
+        """ Registration of the comment """
         form = context.get('comment_form')
 
         if not form.is_valid():
@@ -187,18 +208,19 @@ class Post(DetailView):
         messages.success(request, 'Comentário adicionado')
 
     def update_comment(self, request, context):
+        """ Update the comment """
         form = context.get('comment_form')
 
         if not form.is_valid():
             return self.render_to_response(context)
 
         try:
-            comment = get_object_or_404(Comment, pk=request.POST.get('comment-pk'))
+            comment = get_object_or_404(Comment, pk=request.POST['primary-key'])
 
             if comment.post_comment != context.get('post'):
                 messages.error(request, 'Comentário inválido')
                 return self.render_to_response(context)
-        except ValueError:
+        except (KeyError, ValueError):
             messages.error(request, 'Comentário não encontrado')
             return self.render_to_response(context)
 
@@ -213,13 +235,14 @@ class Post(DetailView):
         messages.success(request, 'Comentário editado')
 
     def delete_comment(self, request, context):
+        """ Delete the comment """
         try:
-            comment = get_object_or_404(Comment, pk=request.POST.get('comment-pk'))
+            comment = get_object_or_404(Comment, pk=request.POST['primary-key'])
 
             if comment.post_comment != context.get('post'):
                 messages.error(request, 'Comentário inválido')
                 return self.render_to_response(context)
-        except ValueError:
+        except (KeyError, ValueError):
             messages.error(request, 'Comentário não encontrado')
             return self.render_to_response(context)
 
@@ -231,6 +254,7 @@ class Post(DetailView):
         messages.success(request, 'Comentário deletado')
 
     def ratting_post(self, request, context):
+        """ Registration/ update the ratting of user """
         try:
             ratting = int(self.request.POST.get('star'))
 
@@ -254,3 +278,72 @@ class Post(DetailView):
             ratting_post.save()
 
         messages.success(request, 'Obrigado pelo Feedback')
+
+
+class BlogUser(LoginRequiredMixin, BlogTemplate):
+    template_name = 'post/blog_user.html'
+    login_url = '/usuario/login/'
+
+    def dispatch(self, request, *args, **kwargs):
+        dispatch = super().dispatch(request, *args, **kwargs)
+        if not request.user.has_perm('post.view_post'):
+            return self.handle_no_permission()
+        return dispatch
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(user_post=self.request.user)
+        return qs
+
+    def post(self, *args, **kwargs):
+        try:
+            post = get_object_or_404(PostModel, pk=self.request.POST['primary-key'])
+            post.published_post = not post.published_post
+            if post.published_post:
+                messages.success(self.request, 'Post publicado')
+            else:
+                messages.error(self.request, 'Post despublicado')
+            post.save()
+        except (KeyError, ValueError):
+            messages.error(self.request, 'Post não encontrado')
+
+        return redirect(reverse('post:user_blog'))
+
+
+class RegisterPost(LoginRequiredMixin, CreateView):
+    template_name = 'post/post_user.html'
+    model = PostModel
+    form_class = PostForm
+
+    def dispatch(self, request, *args, **kwargs):
+        dispatch = super().dispatch(request, *args, **kwargs)
+        if not request.user.has_perm('post.add_post'):
+            return self.handle_no_permission()
+        return dispatch
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        post = form.save(commit=False)
+        post.user_post = request.user
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('post:user_blog')
+
+
+class UpdatePost(LoginRequiredMixin, UpdateView):
+    template_name = 'post/post_user.html'
+    model = PostModel
+    form_class = PostForm
+
+    def dispatch(self, request, *args, **kwargs):
+        dispatch = super().dispatch(request, *args, **kwargs)
+        if not request.user.has_perm('post.change_post'):
+            return self.handle_no_permission()
+        return dispatch
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('post:user_blog')

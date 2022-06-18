@@ -1,0 +1,84 @@
+{% extends 'post/list_posts.html' %}
+{% load humanize %}
+{% load convert_tags %}
+
+{% block header %}
+<div class="pt-5 ps-5">
+    <h1 class="dark-color">Post</h1>
+    <a href="{% url 'post:register_post' %}">
+        <button class="btn button-format">Cadastrar</button>
+    </a>
+</div>
+{% endblock %}
+
+{% block posts %}
+
+{% for post in posts %}
+<article class="card dark-bg-color light-color">
+    {% if post.image_post %}
+    <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="card-img-top">
+    {% endif %}
+    <div class="card-body">
+        <h1 class="h3">{{ post.title_post }}</h1>
+        <p class="d-flex justify-content-around">
+            <small>
+                {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
+            </small>
+
+            <small>
+                {{ post.views_post }} <i class="bi bi-eye-fill"></i>
+            </small>
+
+            <small>
+                {{ post.comments_post }} <i class="bi bi-chat-left-text-fill"></i>
+            </small>
+        </p>
+        <p>{{ post.excerpt_post }}</p>
+        <p class="text-end">
+            <small>
+                {{ post.published_date_post|naturalday|title }}
+            </small>
+        </p>
+    </div>
+    <div class="card-footer text-end">
+        <button class="btn button-format"
+                onclick="popupForm('delete-post-form', 1); pkField('delete-post-form', {{ post.pk }})">
+            {% if post.published_post %}
+            <strong>Desativar</strong>
+            {% else %}
+            <strong>Ativar</strong>
+            {% endif %}
+        </button>
+
+        <a href="{% url 'post:update_post' post.pk %}">
+            <button class="btn button-format">
+                <strong>Editar</strong>
+            </button>
+        </a>
+    </div>
+</article>
+{% endfor %}
+
+{% endblock %}
+
+{% block popup %}
+
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-post-form">
+
+            <button class="btn button-format secondary-bg-color"
+                onclick="popupForm('delete-post-form', 0)">
+                Cancelar
+            </button>
+            <form action="#" method="POST" class="d-inline">
+                <input type="hidden" name="primary-key">
+                {% csrf_token %}
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+            </form>
+    </div>
+</section>
+
+{% endblock %}

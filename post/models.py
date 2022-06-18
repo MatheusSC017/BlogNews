@@ -29,6 +29,7 @@ class Post(models.Model):
     edition_date_post = models.DateTimeField(default=timezone.now, verbose_name='data de edição')
     album_post = models.ForeignKey(Album, blank=True, null=True, on_delete=models.CASCADE, verbose_name='Album')
     category_post = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoria')
+    user_post = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuário')
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

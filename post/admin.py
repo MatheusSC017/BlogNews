@@ -4,7 +4,7 @@ from .models import Post, Category, RattingUserPost
 
 
 class PostAdmin(summer_admin.SummernoteModelAdmin):
-    list_display = ('id', 'title_post', 'published_post', 'published_date_post',
+    list_display = ('id', 'title_post', 'user_post', 'published_post', 'published_date_post',
                     'edition_date_post', 'album_post', 'category_post',)
     list_display_links = ('id', 'title_post',)
     list_filter = ('published_post', 'category_post',)

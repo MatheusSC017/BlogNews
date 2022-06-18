@@ -1,10 +1,11 @@
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import CreateView
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission, ContentType
 from django.shortcuts import redirect, reverse
 from django.contrib import messages
 from .forms import UserCreationFormBlog
+from post.models import Post
 
 
 class Login(View, TemplateResponseMixin):
@@ -57,5 +58,10 @@ class Register(CreateView):
         return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
+        if self.request.POST.get('checkpermissions'):
+            content_type = ContentType.objects.get_for_model(Post)
+            post_permissions = Permission.objects.filter(content_type=content_type)
+            for permission in post_permissions:
+                self.object.user_permissions.add(permission)
         messages.success(self.request, 'Usuário cadastrado')
         return reverse('user:login')

@@ -26,12 +26,24 @@
                     </div>
                 {% endfor %}
 
+                <div class="form-check">
+                    <input class="form-check-input border border-dark"
+                           name="checkpermissions"
+                           type="checkbox"
+                           value="Aceitar"
+                           id="contentCreator">
+                    <label class="form-check-label" for="contentCreator">
+                        Aceito os termos de uso para criação de conteúdo
+                    </label>
+                </div>
 
                 {% csrf_token %}
 
                 <div class="text-end">
                     <a href="{% url 'user:login' %}">
-                        Login
+                        <strong>
+                            Login
+                        </strong>
                     </a>
                 </div>
 

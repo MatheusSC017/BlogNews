@@ -1,97 +1,44 @@
-{% extends 'base.html' %}
+{% extends 'post/list_posts.html' %}
 {% load humanize %}
 {% load convert_tags %}
 
-{% block title %} | Posts{% endblock%}
+{% block posts %}
 
-{% block content %}
-<section class="fluid-container landing-item gray-bg-color">
-    <h1 class="pt-5 ps-5 dark-color">Posts:</h1>
+{% for post in posts %}
+<article class="card dark-bg-color light-color">
+    {% if post.image_post %}
+    <a href="{% url 'post:post' post.pk %}">
+        <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="card-img-top">
+    </a>
+    {% endif %}
+    <div class="card-body">
+        <h1 class="h3">{{ post.title_post }}</h1>
+        <p class="d-flex justify-content-around">
+            <small>
+                {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
+            </small>
 
-    <!-- Search form  -->
-    <div class="container pt-5">
-        <form action="{% url 'post:blog' %}" method="GET">
-            <div class="row" class="form-field">
-                <div class="form-floating col-12 col-md-6">
-                  <input name="search" type="text" class="form-control" id="search_field"
-                         placeholder="Digite sua pesquisa aqui"
-                         aria-label="Campo para pesquisa"
-                         value="{{ get_request.search.0 }}">
-                  <label for="search_field">Buscar por</label>
-                </div>
+            <small>
+                {{ post.views_post }} <i class="bi bi-eye-fill"></i>
+            </small>
 
-                <div class="form-floating col-12 col-md-3">
-                    <select name="category" class="form-select" id="category_field" aria-label="Categoria para pesquisa">
-                        <option value="0">Todas</option>
-                        {% for category in categories %}
-                        <option value="{{ category.pk }}" {% if category.pk == get_request.category.0 %}selected{% endif %}>
-                            {{ category.title_category }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <label for="category_field">Categoria</label>
-                </div>
-
-                <div class="form-floating col-12 col-md-3">
-                    <select name="order_by" class="form-select" id="order_by_field" aria-label="Ordenar pesquisa por">
-                        <option value="publicacao" {% if get_request.order_by.0 == "publicacao" %}selected{% endif %}>Data de publicação</option>
-                        <option value="avaliacao" {% if get_request.order_by.0 == "avaliacao" %}selected{% endif %}>Avaliação</option>
-                    </select>
-                    <label for="order_by_field">Ordenar por</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-12 mt-2 text-end">
-                    <input class="button-format" type="submit" value="Pesquisar">
-                </div>
-            </div>
-        </form>
+            <small>
+                {{ post.comments_post }} <i class="bi bi-chat-left-text-fill"></i>
+            </small>
+        </p>
+        <p>{{ post.excerpt_post }}</p>
+        <p class="text-end">
+            <small>
+                {{ post.published_date_post|naturalday|title }}
+            </small>
+        </p>
     </div>
-
-    <!-- List of posts -->
-    <div class="container card-columns pt-3 pb-3">
-
-        {% for post in posts %}
-        <article class="card dark-bg-color light-color">
-            {% if post.image_post %}
-            <a href="{% url 'post:post' post.pk %}">
-                <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="card-img-top">
-            </a>
-            {% endif %}
-            <div class="card-body">
-                <h1 class="h3">{{ post.title_post }}</h1>
-                <p class="d-flex justify-content-around">
-                    <small>
-                        {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
-                    </small>
-
-                    <small>
-                        {{ post.views_post }} <i class="bi bi-eye-fill"></i>
-                    </small>
-
-                    <small>
-                        {{ post.comments_post }} <i class="bi bi-chat-left-text-fill"></i>
-                    </small>
-                </p>
-                <p>{{ post.excerpt_post }}</p>
-                <p class="text-end">
-                    <small>
-                        {{ post.published_date_post|naturalday|title }}
-                    </small>
-                </p>
-            </div>
-            <div class="card-footer text-end">
-                <a href="{% url 'post:post' post.pk %}">
-                    <button class="gray-bg-color dark-color"><strong>Acessar</strong></button>
-                </a>
-            </div>
-        </article>
-        {% endfor %}
-
+    <div class="card-footer text-end">
+        <a href="{% url 'post:post' post.pk %}">
+            <button class="gray-bg-color dark-color"><strong>Acessar</strong></button>
+        </a>
     </div>
-    <div class="container pb-5">
-        {% include 'partials/_pagination.html' %}
-    </div>
-</section>
+</article>
+{% endfor %}
+
 {% endblock %}

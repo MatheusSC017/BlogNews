@@ -35,6 +35,9 @@
                     </a>
 
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        {% if perms.post.view_post %}
+                        <li><a class="dropdown-item" href="{% url 'post:user_blog' %}">Meus Posts</a></li>
+                        {% endif %}
                         <li><a class="dropdown-item" href="{% url 'user:logout' %}">Sair</a></li>
                     </ul>
                 </li>
