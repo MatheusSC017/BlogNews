@@ -6,7 +6,7 @@ from blog.views import Home
 from .views import Login, Register
 
 
-class RegisterPageTest(TestCase):
+class RegisterPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
@@ -56,7 +56,7 @@ class RegisterPageTest(TestCase):
         return response
 
 
-class LoginPageTest(TestCase):
+class LoginPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
@@ -91,7 +91,7 @@ class LoginPageTest(TestCase):
         self.assertEqual(str(messages[0]), 'Usuário ou senha incorretos')
 
 
-class LogoutPageTest(TestCase):
+class LogoutPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')

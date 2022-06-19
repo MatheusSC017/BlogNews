@@ -323,14 +323,15 @@ class RegisterPost(LoginRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        post = form.save(commit=False)
-        post.user_post = request.user
         if form.is_valid():
+            post = form.save(commit=False)
+            post.user_post = request.user
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
 
     def get_success_url(self, *args, **kwargs):
+        messages.success(self.request, 'Post adicionado')
         return reverse('post:user_blog')
 
 
@@ -346,4 +347,5 @@ class UpdatePost(LoginRequiredMixin, UpdateView):
         return dispatch
 
     def get_success_url(self, *args, **kwargs):
+        messages.success(self.request, 'Post atualizado')
         return reverse('post:user_blog')

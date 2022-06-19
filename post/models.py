@@ -32,6 +32,8 @@ class Post(models.Model):
     user_post = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuário')
 
     def save(self, *args, **kwargs):
+        self.edition_date_post = timezone.now()
+
         super().save(*args, **kwargs)
 
         if self.image_post:

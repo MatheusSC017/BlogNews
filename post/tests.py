@@ -1,14 +1,15 @@
 from django.shortcuts import reverse
 from django.test import Client, TestCase
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.messages import get_messages
 from .models import Category, Post, RattingUserPost
 from comment.models import Comment
 from .views import Post as PostView, Blog
 from user.views import Login
+from .forms import PostForm
 
 
-class BlogPageTest(TestCase):
+class BlogPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.py_category = Category.objects.create(title_category='Python')
@@ -114,7 +115,7 @@ class BlogPageTest(TestCase):
         return [_.pk for _ in response.context.get('posts')]
 
 
-class PostPageTest(TestCase):
+class PostPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.py_category = Category.objects.create(title_category='Python')
@@ -197,43 +198,43 @@ class PostPageTest(TestCase):
 
     def test_comment_update_with_user_logged_in(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
-        action_parameter = {'comment': 'Comment_test', 'comment-pk': self.comment.pk, 'action': 'update-comment', }
+        action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário editado')
 
     def test_comment_update_with_other_user_logged_in(self):
         user_parameter = {'username': 'username_test2', 'password': 'password_test2', }
-        action_parameter = {'comment': 'Comment_test', 'comment-pk': self.comment.pk, 'action': 'update-comment', }
+        action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
 
     def test_comment_update_with_invalid_pk(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
-        action_parameter = {'comment-pk': '', 'comment': 'Comment_test', 'action': 'update-comment', }
+        action_parameter = {'primary-key': '', 'comment': 'Comment_test', 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
 
     def test_update_comment_other_post(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
-        action_parameter = {'comment': 'Comment_test', 'comment-pk': self.comment.pk, 'action': 'update-comment', }
+        action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
                                                          'Comentário inválido', self.post3.pk)
 
     def test_comment_delete_with_user_logged_in(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
-        action_parameter = {'comment-pk': self.comment.pk, 'action': 'delete-comment', }
+        action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário deletado')
 
     def test_comment_delete_with_other_user_logged_in(self):
         user_parameter = {'username': 'username_test2', 'password': 'password_test2', }
-        action_parameter = {'comment-pk': self.comment.pk, 'action': 'delete-comment', }
+        action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
 
     def test_comment_delete_with_invalid_pk(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
-        action_parameter = {'comment-pk': '', 'action': 'delete-comment', }
+        action_parameter = {'primary-key': '', 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
 
     def test_delete_comment_other_post(self):
         user_parameter = {'username': 'username_test', 'password': 'password_test', }
-        action_parameter = {'comment-pk': self.comment.pk, 'action': 'delete-comment', }
+        action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
                                                          'Comentário inválido', self.post3.pk)
 
@@ -261,3 +262,156 @@ class PostPageTest(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), message)
+
+
+class UserBlogPageTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.py_category = Category.objects.create(title_category='Python')
+        self.django_category = Category.objects.create(title_category='Django')
+
+        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
+        self.user_without_permissions = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
+
+        content_type = ContentType.objects.get_for_model(Post)
+        post_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in post_permissions:
+            self.user.user_permissions.add(permission)
+
+        self.post1 = Post.objects.create(title_post='Python Frameworks',
+                                         excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
+                                                      'python',
+                                         description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
+                                         category_post=self.py_category,
+                                         published_date_post='2022-05-21',
+                                         user_post=self.user)
+        self.post2 = Post.objects.create(title_post='Django',
+                                         excerpt_post='Tutorial interativo do framework django',
+                                         description_post='Informações diversas sobre o framework e suas '
+                                                          'funcionalidades',
+                                         category_post=self.django_category,
+                                         published_date_post='2022-06-01',
+                                         user_post=self.user,
+                                         published_post=False)
+
+    def test_connection_and_context_of_page_with_user_logged_in(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.get(reverse('post:user_blog'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('posts', response.context)
+
+    def test_connection_page_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.get(reverse('post:user_blog'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_connection_page_with_user_logged_out(self):
+        response = self.client.get(reverse('post:user_blog'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_data_received_user_post_page(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.get(reverse('post:user_blog'))
+        order = [_.pk for _ in response.context.get('posts')]
+        self.assertEqual([self.post2.pk, self.post1.pk], order)
+
+    def test_unpublish_post(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post1.pk, })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('post:user_blog'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Post despublicado')
+
+    def test_publish_post(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post2.pk, })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('post:user_blog'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Post publicado')
+
+
+class UserCreatePostPageTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
+
+        self.category = Category.objects.create(title_category='register_test')
+
+        content_type = ContentType.objects.get_for_model(Post)
+        post_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in post_permissions:
+            self.user.user_permissions.add(permission)
+
+    def test_post_create_connection(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.get(reverse('post:register_post'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_create_connection_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.get(reverse('post:register_post'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_create_connection_with_user_loggout(self):
+        response = self.client.get(reverse('post:register_post'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_post_create(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        parameters = {'title_post': 'register_test',
+                      'excerpt_post': 'register_test_excerpt_post',
+                      'description_post': 'register_test_description_post',
+                      'category_post': self.category,
+                      'image_post': '', }
+
+
+class UserUpdatePostPageTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
+
+        self.category1 = Category.objects.create(title_category='post_test')
+        self.category2 = Category.objects.create(title_category='update_test')
+
+        content_type = ContentType.objects.get_for_model(Post)
+        post_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in post_permissions:
+            self.user.user_permissions.add(permission)
+
+        self.post = Post.objects.create(title_post='post_test',
+                                        excerpt_post='post_test',
+                                        description_post='post_test',
+                                        category_post=self.category1,
+                                        user_post=self.user)
+
+    def test_post_update_connection(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_update_connection_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_update_connection_with_user_loggout(self):
+        response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
+        self.assertEqual(response.status_code, 302)

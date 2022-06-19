@@ -1,5 +1,4 @@
 from django.forms import ModelForm
-from django.utils import timezone
 from django_summernote.widgets import SummernoteWidget
 from .models import Post
 
@@ -37,7 +36,6 @@ class PostForm(ModelForm):
                 'A descrição deve possuir ao menos 20 caracteres.'
             )
 
-        self.cleaned_data['edition_date_post'] = timezone.now()
         return super().clean()
 
     class Meta:
