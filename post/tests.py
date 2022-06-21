@@ -6,7 +6,6 @@ from .models import Category, Post, RattingUserPost
 from comment.models import Comment
 from .views import Post as PostView, Blog
 from user.views import Login
-from .forms import PostForm
 
 
 class BlogPageTestCase(TestCase):
@@ -112,7 +111,7 @@ class BlogPageTestCase(TestCase):
 
     def template_post_data_order(self, parameter={}):
         response = self.client.get(reverse('post:blog'), parameter)
-        return [_.pk for _ in response.context.get('posts')]
+        return [post.pk for post in response.context.get('posts')]
 
 
 class PostPageTestCase(TestCase):
@@ -375,8 +374,14 @@ class UserCreatePostPageTestCase(TestCase):
         parameters = {'title_post': 'register_test',
                       'excerpt_post': 'register_test_excerpt_post',
                       'description_post': 'register_test_description_post',
-                      'category_post': self.category,
+                      'category_post': str(self.category.pk),
                       'image_post': '', }
+        response = self.client.post(reverse('post:register_post'), parameters)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('post:user_blog'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Post adicionado')
 
 
 class UserUpdatePostPageTestCase(TestCase):
@@ -415,3 +420,18 @@ class UserUpdatePostPageTestCase(TestCase):
     def test_post_update_connection_with_user_loggout(self):
         response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
         self.assertEqual(response.status_code, 302)
+
+    def test_post_update(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        parameters = {'title_post': 'update_test',
+                      'excerpt_post': 'update_test_excerpt_post',
+                      'description_post': 'update_test_description_post',
+                      'category_post': str(self.category2.pk),
+                      'image_post': '', }
+        response = self.client.post(reverse('post:update_post', args=[self.post.pk, ]), parameters)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('post:user_blog'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Post atualizado')

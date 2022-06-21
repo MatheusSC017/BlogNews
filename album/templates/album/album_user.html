@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %} | Albuns {% endblock %}
+
+{% block content %}
+<div class="container p-5">
+    <div class="row">
+        <div class="col">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <td>Album</td>
+                        <td>Opções</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for album in albuns %}
+                    <tr>
+                        <th>{{ album.pk }}</th>
+                        <td>{{ album.title_album }}</td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -15,7 +15,7 @@
                     <a class="nav-link" href="{% url 'post:blog' %}"><i class="bi bi-newspaper"></i> Blog</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="galeria.html"><i class="bi bi-image-fill"></i> Galeria</a>
+                    <a class="nav-link" href="{% url 'album:album' %}"><i class="bi bi-image-fill"></i> Galeria</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="pesquisas.html"><i class="bi bi-question"></i> Pesquisas</a>
@@ -37,6 +37,9 @@
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                         {% if perms.post.view_post %}
                         <li><a class="dropdown-item" href="{% url 'post:user_blog' %}">Meus Posts</a></li>
+                        {% endif %}
+                        {% if perms.album.view_album %}
+                        <li><a class="dropdown-item" href="{% url 'album:user_album' %}">Meus Albuns</a></li>
                         {% endif %}
                         <li><a class="dropdown-item" href="{% url 'user:logout' %}">Sair</a></li>
                     </ul>

@@ -133,3 +133,8 @@ local_settings
 
 # IDE date
 .idea/
+
+# Media
+.media/albuns/
+.media/post/
+.media/django.summernote

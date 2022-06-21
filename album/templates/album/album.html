@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %} | Albuns {% endblock %}
+
+{% block content %}
+<section class="container-fluid landing-item gray-bg-color">
+    <h1 class="pt-5 ps-5 dark-color">Albuns</h1>
+    <div class="row row-cols-1 row-cols-lg-2 justify-content-around">
+        {% for album in albuns %}
+        <div class="col p-2">
+            <article class="dark-bg-color album-item rounded-3 p-3 ms-auto me-auto">
+                <div>
+                    <h2 class="h5 mb-3">
+                        {{ album.album.title_album }}
+                    </h2>
+                </div>
+                <div class="d-flex justify-content-around">
+                    <div class="album-primary-images gallery-image d-flex">
+                        <img src="{{ album.images.0.image.url }}" alt="" class="img-fluid border border-light">
+                    </div>
+                    <div class="album-secondary-images d-flex flex-column gallery-image">
+                        <img src="{{ album.images.1.image.url }}" alt="" class="img-fluid border border-light">
+                        <img src="{{ album.images.2.image.url }}" alt="" class="img-fluid border border-light">
+                    </div>
+                </div>
+                <div class="text-end mt-1">
+                    <a href="album.html">
+                        <button class="gray-bg-color p-2">
+                            <strong>
+                                Acessar
+                            </strong>
+                        </button>
+                    </a>
+                </div>
+            </article>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

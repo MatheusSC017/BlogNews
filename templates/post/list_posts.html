@@ -11,7 +11,7 @@
     <div class="container pt-5">
         <form action="{% url 'post:blog' %}" method="GET">
             <div class="row" class="form-field">
-                <div class="form-floating col-12 col-md-6">
+                <div class="form-floating col-12 col-md-6 pb-2">
                   <input name="search" type="text" class="form-control" id="search_field"
                          placeholder="Digite sua pesquisa aqui"
                          aria-label="Campo para pesquisa"
@@ -19,7 +19,7 @@
                   <label for="search_field">Buscar por</label>
                 </div>
 
-                <div class="form-floating col-12 col-md-3">
+                <div class="form-floating col-12 col-md-3 pb-2">
                     <select name="category" class="form-select" id="category_field" aria-label="Categoria para pesquisa">
                         <option value="0">Todas</option>
                         {% for category in categories %}
@@ -31,7 +31,7 @@
                     <label for="category_field">Categoria</label>
                 </div>
 
-                <div class="form-floating col-12 col-md-3">
+                <div class="form-floating col-12 col-md-3 pb-2">
                     <select name="order_by" class="form-select" id="order_by_field" aria-label="Ordenar pesquisa por">
                         <option value="publicacao" {% if get_request.order_by.0 == "publicacao" %}selected{% endif %}>Data de publicação</option>
                         <option value="avaliacao" {% if get_request.order_by.0 == "avaliacao" %}selected{% endif %}>Avaliação</option>

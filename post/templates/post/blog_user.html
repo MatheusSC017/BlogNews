@@ -5,9 +5,11 @@
 {% block header %}
 <div class="pt-5 ps-5">
     <h1 class="dark-color">Post</h1>
-    <a href="{% url 'post:register_post' %}">
-        <button class="btn button-format">Cadastrar</button>
-    </a>
+    <div class="text-end pe-5">
+        <a href="{% url 'post:register_post' %}">
+            <button class="btn button-format">Cadastrar</button>
+        </a>
+    </div>
 </div>
 {% endblock %}
 

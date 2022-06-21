@@ -1,10 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import User
 from utils.utils import resize_image
 
 
 class Album(models.Model):
     title_album = models.CharField(max_length=50, verbose_name='título')
     published_album = models.BooleanField(default=True, verbose_name='publicar')
+    user_album = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='usuário')
 
     def __str__(self):
         return self.title_album
@@ -14,7 +16,7 @@ class Album(models.Model):
 
 
 def album_direcory_path(instance, filename):
-    return f'album_{instance.album_image.id}/%Y/%m/{filename}'
+    return f'albuns/album_{instance.album_image.id}/{filename}'
 
 
 class Image(models.Model):

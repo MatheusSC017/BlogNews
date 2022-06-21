@@ -281,23 +281,29 @@ class Post(DetailView):
 
 
 class BlogUser(LoginRequiredMixin, BlogTemplate):
+    """ List the user posts """
     template_name = 'post/blog_user.html'
     login_url = '/usuario/login/'
 
     def dispatch(self, request, *args, **kwargs):
+        """ Check the user permissions """
         dispatch = super().dispatch(request, *args, **kwargs)
         if not request.user.has_perm('post.view_post'):
             return self.handle_no_permission()
         return dispatch
 
     def get_queryset(self, *args, **kwargs):
+        """ Select only the user posts """
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(user_post=self.request.user)
         return qs
 
     def post(self, *args, **kwargs):
+        """ Publish or unpublish the post """
         try:
-            post = get_object_or_404(PostModel, pk=self.request.POST['primary-key'])
+            post = get_object_or_404(PostModel,
+                                     pk=self.request.POST['primary-key'],
+                                     user_post=self.request.user.pk)
             post.published_post = not post.published_post
             if post.published_post:
                 messages.success(self.request, 'Post publicado')
@@ -311,17 +317,20 @@ class BlogUser(LoginRequiredMixin, BlogTemplate):
 
 
 class RegisterPost(LoginRequiredMixin, CreateView):
+    """ Page to register the Post """
     template_name = 'post/post_user.html'
     model = PostModel
     form_class = PostForm
 
     def dispatch(self, request, *args, **kwargs):
+        """ Check the permissions """
         dispatch = super().dispatch(request, *args, **kwargs)
         if not request.user.has_perm('post.add_post'):
             return self.handle_no_permission()
         return dispatch
 
     def post(self, request, *args, **kwargs):
+        """ Includes the user and check the form """
         form = self.get_form()
         if form.is_valid():
             post = form.save(commit=False)
@@ -331,21 +340,25 @@ class RegisterPost(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
 
     def get_success_url(self, *args, **kwargs):
+        """ redirects to posts page if registration was successful """
         messages.success(self.request, 'Post adicionado')
         return reverse('post:user_blog')
 
 
 class UpdatePost(LoginRequiredMixin, UpdateView):
+    """ Update the post """
     template_name = 'post/post_user.html'
     model = PostModel
     form_class = PostForm
 
     def dispatch(self, request, *args, **kwargs):
+        """ Check the user permissions """
         dispatch = super().dispatch(request, *args, **kwargs)
         if not request.user.has_perm('post.change_post'):
             return self.handle_no_permission()
         return dispatch
 
     def get_success_url(self, *args, **kwargs):
+        """ Redirect the user to posts page """
         messages.success(self.request, 'Post atualizado')
         return reverse('post:user_blog')
