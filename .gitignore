@@ -137,4 +137,4 @@ local_settings
 # Media
 media/albuns/
 media/post/
-media/django.summernote
+media/django.summernote/
