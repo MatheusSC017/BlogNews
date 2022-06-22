@@ -1,8 +1,10 @@
-from django.shortcuts import reverse
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.shortcuts import reverse, redirect, get_object_or_404
+from django.views.generic import ListView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from . import forms
 from . import models
 
@@ -40,6 +42,7 @@ class AlbumUser(LoginRequiredMixin, ListView):
     model = models.Album
     paginate_by = 10
     context_object_name = 'albuns'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.has_perm('album.view_album'):
@@ -61,6 +64,7 @@ class AlbumCreate(LoginRequiredMixin, CreateView):
     template_name = 'album/album_create.html'
     model = models.Album
     form_class = forms.AlbumForm
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.has_perm('album.add_album'):
@@ -81,9 +85,28 @@ class AlbumCreate(LoginRequiredMixin, CreateView):
         return reverse('album:user_album')
 
 
-class AlbumUpdate(LoginRequiredMixin, UpdateView):
-    pass
+@login_required
+def album_update(request):
+    if not request.user.has_perm('album.change_album'):
+        raise PermissionDenied('Necessário usuário autorizado')
 
+    pk = request.POST.get('primary-key')
+    form = forms.AlbumForm(request.POST)
+    if pk is not None:
+        album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+        if form.is_valid():
+            album_form = form.save(commit=False)
+            album_form.pk = album.pk
+            album_form.user_album = album.user_album
+            album_form.save()
+            messages.success(request, 'Álbum editado')
+            return redirect(reverse('album:user_album'))
+        else:
+            messages.error(request, 'Dados incorretos')
+            return redirect(reverse('album:user_album'))
+    else:
+        messages.error(request, 'Álbum não encontrado')
+        return redirect(reverse('album:user_album'))
 
 class AlbumDelete(LoginRequiredMixin, DeleteView):
     pass

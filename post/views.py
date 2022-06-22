@@ -284,6 +284,7 @@ class BlogUser(LoginRequiredMixin, BlogTemplate):
     """ List the user posts """
     template_name = 'post/blog_user.html'
     login_url = '/usuario/login/'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def dispatch(self, request, *args, **kwargs):
         """ Check the user permissions """
@@ -321,6 +322,7 @@ class RegisterPost(LoginRequiredMixin, CreateView):
     template_name = 'post/post_user.html'
     model = PostModel
     form_class = PostForm
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def dispatch(self, request, *args, **kwargs):
         """ Check the permissions """
@@ -350,6 +352,7 @@ class UpdatePost(LoginRequiredMixin, UpdateView):
     template_name = 'post/post_user.html'
     model = PostModel
     form_class = PostForm
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def dispatch(self, request, *args, **kwargs):
         """ Check the user permissions """

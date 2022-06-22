@@ -114,3 +114,55 @@ class AlbumCreatePageTestCase(TestCase):
                                                                     'published_album': 'False', })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, views.AlbumUser.as_view().__name__)
+
+
+class AlbumUpdateMethodTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
+
+        content_type = ContentType.objects.get_for_model(models.Album)
+        album_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in album_permissions:
+            self.user.user_permissions.add(permission)
+
+        self.album = models.Album.objects.create(title_album='Test Album',
+                                                 user_album=self.user)
+
+    def test_update_album_without_user(self):
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+                                                                    'title_album': 'test Album 2', })
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_album_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+                                                                    'title_album': 'test Album 2', })
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_album(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+                                                                    'title_album': 'test Album 2',
+                                                                    'published_album': False, })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('album:user_album'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Álbum editado')
+
+    def test_update_album_with_invalid_data(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+                                                                    'title_album': 'test',
+                                                                    'published_album': False, })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('album:user_album'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Dados incorretos')

@@ -69,7 +69,7 @@
 <section id="popup" style="display: none">
     <div class="dark-background"></div>
     <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="update-album-form">
-        <form action="#" method="POST" class="form-field">
+        <form action="{% url 'album:album_update' %}" method="POST" class="form-field">
 
             <div class="form-floating">
                 {{ album_form.title_album }}
