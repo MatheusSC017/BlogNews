@@ -85,7 +85,7 @@ class AlbumCreate(LoginRequiredMixin, CreateView):
         return reverse('album:user_album')
 
 
-@login_required
+@login_required(login_url='/usuario/login/')
 def album_update(request):
     if not request.user.has_perm('album.change_album'):
         raise PermissionDenied('Necessário usuário autorizado')
@@ -108,5 +108,18 @@ def album_update(request):
         messages.error(request, 'Álbum não encontrado')
         return redirect(reverse('album:user_album'))
 
-class AlbumDelete(LoginRequiredMixin, DeleteView):
-    pass
+
+@login_required(login_url='/usuario/login/')
+def album_delete(request):
+    if not request.user.has_perm('album.delete_album'):
+        raise PermissionDenied('Necessário usuário autorizado')
+
+    pk = request.POST.get('primary-key')
+    if pk is not None:
+        album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+        album.delete()
+        messages.error(request, 'Álbum deletado')
+        return redirect(reverse('album:user_album'))
+    else:
+        messages.error(request, 'Álbum não encontrado')
+        return redirect(reverse('album:user_album'))

@@ -58,6 +58,10 @@ class UserAlbumPageTestCase(TestCase):
         for permission in album_permissions:
             self.user.user_permissions.add(permission)
 
+    def test_album_page_without_user(self):
+        response = self.client.get(reverse('album:user_album'))
+        self.assertEqual(response.status_code, 302)
+
     def test_album_page_connection_and_context(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
@@ -83,6 +87,10 @@ class AlbumCreatePageTestCase(TestCase):
         album_permissions = Permission.objects.filter(content_type=content_type)
         for permission in album_permissions:
             self.user.user_permissions.add(permission)
+
+    def test_album_create_without_user(self):
+        response = self.client.get(reverse('album:album_create'))
+        self.assertEqual(response.status_code, 302)
 
     def test_album_create_page_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -166,3 +174,39 @@ class AlbumUpdateMethodTestCase(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Dados incorretos')
+
+
+class AlbumDeleteMethodTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
+
+        content_type = ContentType.objects.get_for_model(models.Album)
+        album_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in album_permissions:
+            self.user.user_permissions.add(permission)
+
+        self.album = models.Album.objects.create(title_album='Test Album',
+                                                 user_album=self.user)
+
+    def test_album_delete_without_user(self):
+        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
+        self.assertEqual(response.status_code, 302)
+
+    def test_album_delete_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
+        self.assertEqual(response.status_code, 403)
+
+    def test_album_delete(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('album:user_album'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Álbum deletado')

@@ -99,7 +99,7 @@
         </form>
     </div>
     <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-album-form">
-        <form action="#comments-post" method="POST" class="form-field">
+        <form action="{% url 'album:album_delete' %}" method="POST" class="form-field">
 
             <input type="hidden" name="primary-key">
 
