@@ -10,6 +10,18 @@ function commentField(pk) {
     document.querySelector('#update-comment-form textarea').value = comment
 }
 
+function albumFields(pk) {
+    title = document.querySelector('#album-' + pk + '> td:nth-child(2)').innerText
+    document.querySelector('#update-album-form input[type="text"]').value = title
+
+    published = document.querySelector('#album-' + pk + '> td:nth-child(3)').innerText
+    published_field = document.querySelector('#update-album-form input[type="checkbox"]')
+    published_field.checked = false
+    if (published == 'Sim') {
+        published_field.checked = true
+    }
+}
+
 function pkField(form, pk) {
     document.querySelector('#' + form + ' input[name="primary-key"]').value = pk
 }

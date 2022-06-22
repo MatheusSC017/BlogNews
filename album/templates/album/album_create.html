@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %} | Cadastrar álbum{% endblock %}
+
+{% block content %}
+
+<section class="container p-5">
+    <div class="row">
+        <div class="col">
+            <h1 class="h3">Cadastrar Álbum</h1>
+        </div>
+    </div>
+    <div class="row gray-bg-color rounded p-3">
+        <div class="col">
+            <form action="#" method="POST">
+
+                <div class="form-floating mb-3">
+                    {{ form.title_album }}
+                    {{ form.title_album.label_tag }}
+                    <div class="secondary-color">
+                        {{ form.title_album.errors }}
+                    </div>
+                </div>
+
+                <div class="form-check">
+                    {{ form.published_album }}
+                    {{ form.published_album.label_tag }}
+                </div>
+
+                {% csrf_token %}
+                <div class="text-end">
+                    <button class="btn button-format">
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

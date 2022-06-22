@@ -3,7 +3,21 @@
 {% block title %} | Albuns {% endblock %}
 
 {% block content %}
-<div class="container p-5">
+<section class="container-fluid p-5 gray-bg-color">
+    <div class="row pb-3">
+        <div class="col col-md-6 d-none d-md-block">
+            <h1>
+                Albuns
+            </h1>
+        </div>
+        <div class="col col-md-6 text-end">
+            <a href="{% url 'album:album_create' %}">
+                <button class="btn button-format">
+                    Cadastrar
+                </button>
+            </a>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <table class="table table-dark table-striped">
@@ -11,20 +25,95 @@
                     <tr>
                         <th>#</th>
                         <td>Album</td>
+                        <td>Publicado</td>
                         <td>Opções</td>
                     </tr>
                 </thead>
                 <tbody>
                     {% for album in albuns %}
-                    <tr>
+                    <tr id="album-{{ album.pk }}">
                         <th>{{ album.pk }}</th>
                         <td>{{ album.title_album }}</td>
-                        <td></td>
+                        <td>
+                            {% if album.published_album %}
+                                Sim
+                            {% else %}
+                                Não
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button onclick="popupForm('update-album-form', 1);
+                                             albumFields({{ album.pk }});
+                                             pkField('update-album-form', {{ album.pk }})">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button onclick="popupForm('delete-album-form', 1);
+                                             pkField('delete-album-form', {{ album.pk }})">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-</div>
+    <div class="row">
+        <div class="col">
+            {% include 'partials/_pagination.html' %}
+        </div>
+    </div>
+</section>
+
+<!-- Form Create/Update/Delete -->
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="update-album-form">
+        <form action="#" method="POST" class="form-field">
+
+            <div class="form-floating">
+                {{ album_form.title_album }}
+                {{ album_form.title_album.label_tag }}
+                <div class="secondary-color">
+                    {{ album_form.title_album.errors }}
+                </div>
+            </div>
+
+            <div class="form-check">
+                {{ album_form.published_album }}
+                {{ album_form.published_album.label_tag }}
+            </div>
+
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('update-album-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-album-form">
+        <form action="#comments-post" method="POST" class="form-field">
+
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('delete-album-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
 {% endblock %}

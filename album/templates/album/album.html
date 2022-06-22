@@ -3,8 +3,8 @@
 {% block title %} | Albuns {% endblock %}
 
 {% block content %}
-<section class="container-fluid landing-item gray-bg-color">
-    <h1 class="pt-5 ps-5 dark-color">Albuns</h1>
+<section class="container-fluid landing-item gray-bg-color p-3">
+    <h1 class="pt-3 ps-5 dark-color">Albuns</h1>
     <div class="row row-cols-1 row-cols-lg-2 justify-content-around">
         {% for album in albuns %}
         <div class="col p-2">
@@ -35,6 +35,11 @@
             </article>
         </div>
         {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col ps-5">
+            {% include 'partials/_pagination.html' %}
+        </div>
     </div>
 </section>
 {% endblock %}

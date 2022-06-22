@@ -1,13 +1,12 @@
-from django.urls import path, include
-from .views import Album, AlbumUser
+from django.urls import path
+from . import views
 
 app_name = 'album'
 
-user_patterns = [
-    path('', AlbumUser.as_view(), name='user_album')
-]
-
 urlpatterns = [
-    path('', Album.as_view(), name='album'),
-    path('usuario/', include(user_patterns)),
+    path('', views.Album.as_view(), name='album'),
+    path('meus_albuns/', views.AlbumUser.as_view(), name='user_album'),
+    path('cadastrar/', views.AlbumCreate.as_view(), name='album_create'),
+    path('atualizar/<int:pk>/', views.AlbumUpdate.as_view(), name='album_update'),
+    path('deletar/<int:pk>/', views.AlbumDelete.as_view(), name='album_delete'),
 ]

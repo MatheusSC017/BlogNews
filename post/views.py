@@ -333,8 +333,8 @@ class RegisterPost(LoginRequiredMixin, CreateView):
         """ Includes the user and check the form """
         form = self.get_form()
         if form.is_valid():
-            post = form.save(commit=False)
-            post.user_post = request.user
+            form = form.save(commit=False)
+            form.user_post = request.user
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

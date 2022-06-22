@@ -4,10 +4,10 @@
 
 {% block content %}
 
-<section class="container-fluid p-5">
+<section class="container-fluid p-5 gray-bg-color">
     <div class="row">
         <div class="col-xl"></div>
-        <div class="col-xl-8 p-3 dark-color gray-bg-color rounded">
+        <div class="col-xl-8 p-3 dark-color dark-bg-color rounded">
             <form method="POST" action="#" class="form-field" enctype="multipart/form-data">
                 {% for field in form %}
                     <div class="{% if field != form.image_post and field != form.description_post %}form-floating{% endif %}
