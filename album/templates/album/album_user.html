@@ -42,6 +42,11 @@
                             {% endif %}
                         </td>
                         <td>
+                            <a href="{% url 'album:user_images' album.pk %}">
+                                <button>
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
+                            </a>
                             <button onclick="popupForm('update-album-form', 1);
                                              albumFields({{ album.pk }});
                                              pkField('update-album-form', {{ album.pk }})">

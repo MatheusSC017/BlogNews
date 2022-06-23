@@ -283,7 +283,6 @@ class Post(DetailView):
 class BlogUser(LoginRequiredMixin, BlogTemplate):
     """ List the user posts """
     template_name = 'post/blog_user.html'
-    login_url = '/usuario/login/'
     permission_denied_message = 'Necessário usuário autorizado'
 
     def dispatch(self, request, *args, **kwargs):

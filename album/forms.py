@@ -26,4 +26,6 @@ class AlbumForm(forms.ModelForm):
 
 
 class ImageForm(forms.Form):
-    image_field = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    image_field = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True,
+                                                                          'class': 'form-control',
+                                                                          'placeholder': 'Cadastrar imagens'}))

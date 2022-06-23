@@ -1,10 +1,11 @@
 from django.shortcuts import reverse, redirect, get_object_or_404
-from django.views.generic import ListView, CreateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 from . import forms
 from . import models
 
@@ -85,7 +86,7 @@ class AlbumCreate(LoginRequiredMixin, CreateView):
         return reverse('album:user_album')
 
 
-@login_required(login_url='/usuario/login/')
+@login_required(login_url=settings.LOGIN_URL)
 def album_update(request):
     if not request.user.has_perm('album.change_album'):
         raise PermissionDenied('Necessário usuário autorizado')
@@ -109,7 +110,7 @@ def album_update(request):
         return redirect(reverse('album:user_album'))
 
 
-@login_required(login_url='/usuario/login/')
+@login_required(login_url=settings.LOGIN_URL)
 def album_delete(request):
     if not request.user.has_perm('album.delete_album'):
         raise PermissionDenied('Necessário usuário autorizado')
@@ -123,3 +124,22 @@ def album_delete(request):
     else:
         messages.error(request, 'Álbum não encontrado')
         return redirect(reverse('album:user_album'))
+
+
+class AlbumImagesUser(LoginRequiredMixin, DetailView):
+    template_name = 'album/album_images.html'
+    model = models.Album
+    context_object_name = 'album'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.has_perm('album.view_image'):
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        context['images'] = models.Image.objects.filter(album_image=context.get('album').pk)
+        context['image_form'] = forms.ImageForm()
+
+        return context
