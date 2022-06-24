@@ -9,7 +9,7 @@
         <div class="col-xl-10 pt-5 pb-5">
             <h1 class="text-center">{{ album.title_album }}</h1>
 
-            <form action="" method="POST" class="form-field">
+            <form action="{% url 'album:images_create' album.pk %}" method="POST" class="form-field" enctype="multipart/form-data">
 
                 <div class="mb-3">
                     {{ image_form.image_field }}
@@ -26,9 +26,17 @@
                 </div>
             </form>
 
-            <div class="container-fluid card-columns pt-3 pb-3">
+            <div class="container-fluid card-columns pt-3 pb-3 text-center">
                 {% for image in images %}
-                <div class="card gallery-image">
+                <div class="card gallery-image position-relative">
+                    <div class="button-options">
+                        <button>
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button>
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
                     <img src="{{ image.image.url }}"
                          alt="{{ image.title_image }}"
                          title="{{ image.title_image }}"

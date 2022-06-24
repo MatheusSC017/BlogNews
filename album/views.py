@@ -1,5 +1,6 @@
 from django.shortcuts import reverse, redirect, get_object_or_404
-from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic import View, ListView, CreateView, DetailView
+from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
@@ -143,3 +144,26 @@ class AlbumImagesUser(LoginRequiredMixin, DetailView):
         context['image_form'] = forms.ImageForm()
 
         return context
+
+
+class UploadImages(LoginRequiredMixin, View, FormMixin):
+    form_class = forms.ImageForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.has_perm('album.add_image'):
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        album = get_object_or_404(models.Album, pk=kwargs.get('pk'), user_album=request.user.pk)
+        if form.is_valid():
+            files = request.FILES.getlist('image_field')
+            for f in files:
+                models.Image.objects.create(album_image=album,
+                                            image=f)
+            messages.success(self.request, 'Imagens cadastradas')
+            return redirect(reverse('album:user_images', args=[album.pk, ]))
+        else:
+            messages.error(self.request, 'Erro no cadastramento')
+            return redirect(reverse('album:user_images', args=[album.pk, ]))

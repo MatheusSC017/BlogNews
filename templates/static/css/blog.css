@@ -370,7 +370,7 @@ label.star:before {
     transform: translate(-50%, -50%);
 }
 
-.comment-options {
+.button-options {
     position: absolute;
     z-index: 1;
     left: 100%;
@@ -378,7 +378,7 @@ label.star:before {
     transform: translate(-100%, 0);
 }
 
-.comment-options button {
+.button-options button {
     display: inline;
     float: left;
 }

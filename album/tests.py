@@ -247,3 +247,48 @@ class UserImagePageTestCase(TestCase):
         self.assertIn('images', response.context)
         self.assertIn('image_form', response.context)
         self.assertEqual(len(response.context.get('images')), 2)
+
+
+class ImageCreateClassTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
+
+        content_type = ContentType.objects.get_for_model(models.Image)
+        image_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in image_permissions:
+            self.user.user_permissions.add(permission)
+
+        self.album = models.Album.objects.create(title_album='Album test',
+                                                 user_album=self.user)
+
+    def test_create_image_class_without_user(self):
+        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+            image = SimpleUploadedFile('image.jpg', img.read())
+        response = self.client.post(reverse('album:images_create', args=[self.album.pk, ]),
+                                    {'image_field': [image, ], })
+        self.assertEqual(response.status_code, 302)
+
+    def test_create_image_class_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+            image = SimpleUploadedFile('image.jpg', img.read())
+        response = self.client.post(reverse('album:images_create', args=[self.album.pk, ]),
+                                    {'image_field': [image, ], })
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_image_class(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+            image = SimpleUploadedFile('image.jpg', img.read())
+        response = self.client.post(reverse('album:images_create', args=[self.album.pk, ]),
+                                    {'image_field': [image, ], })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Imagens cadastradas')

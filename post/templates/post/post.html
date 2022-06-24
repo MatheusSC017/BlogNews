@@ -112,7 +112,7 @@
             {% for comment in comments %}
             <section class="border-bottom comment position-relative" id="comment-{{ comment.pk }}">
                 {% if comment.user_comment == user %}
-                <div class="comment-options">
+                <div class="button-options">
                     <button onclick="popupForm('update-comment-form', 1);
                                                 commentField({{ comment.pk }});
                                                 pkField('update-comment-form', {{ comment.pk }})">
