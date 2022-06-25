@@ -190,4 +190,12 @@ def image_update_title(request, pk):
 
 @login_required(login_url=settings.LOGIN_URL)
 def image_delete(request, pk):
-    pass
+    if not request.user.has_perm('album.delete_image'):
+        raise PermissionDenied('Necessário usuário autorizado')
+
+    album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+    image_pk = request.POST.get('primary-key')
+    image = get_object_or_404(models.Image, pk=image_pk, album_image=album.pk)
+    image.delete()
+    messages.success(request, 'Imagem deletada')
+    return redirect(reverse('album:user_images', args=[album.pk, ]))
