@@ -28,12 +28,15 @@
 
             <div class="container-fluid card-columns pt-3 pb-3 text-center">
                 {% for image in images %}
-                <div class="card gallery-image position-relative">
+                <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
                     <div class="button-options">
-                        <button>
+                        <button onclick="popupForm('update-image-form', 1);
+                                         pkField('update-image-form', {{ image.pk }});
+                                         imageFields({{ image.pk }})">
                             <i class="bi bi-pencil-fill"></i>
                         </button>
-                        <button>
+                        <button onclick="popupForm('delete-image-form', 1);
+                                         pkField('delete-image-form', {{ image.pk }})">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
@@ -46,6 +49,56 @@
             </div>
         </div>
         <div class="col-xl"></div>
+    </div>
+</section>
+
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="update-image-form">
+        <form action="{% url 'album:image_update' album.pk %}" method="POST" class="form-field">
+
+            <div class="form-floating">
+                <input class="form-control"
+                       type="text"
+                       name="title_image"
+                       id="title-image-id"
+                       placeholder="Título da imagem">
+                <label class="form-label"
+                       for="title-image-id">
+                    Título da imagem
+                </label>
+            </div>
+
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('update-image-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-image-form">
+        <form action="{% url 'album:image_delete' album.pk %}" method="POST" class="form-field">
+
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('delete-image-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+            </div>
+        </form>
     </div>
 </section>
 {% endblock %}

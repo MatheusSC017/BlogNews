@@ -22,6 +22,11 @@ function albumFields(pk) {
     }
 }
 
+function imageFields(pk) {
+    title = document.querySelector('#image-' + pk + ' img').getAttribute('title')
+    document.querySelector('#title-image-id').value = title
+}
+
 function pkField(form, pk) {
     document.querySelector('#' + form + ' input[name="primary-key"]').value = pk
 }

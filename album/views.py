@@ -167,3 +167,27 @@ class UploadImages(LoginRequiredMixin, View, FormMixin):
         else:
             messages.error(self.request, 'Erro no cadastramento')
             return redirect(reverse('album:user_images', args=[album.pk, ]))
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def image_update_title(request, pk):
+    if not request.user.has_perm('album.change_image'):
+        raise PermissionDenied('Necessário usuário autorizado')
+
+    album = get_object_or_404(models.Album, pk=pk, user_album=request.user.pk)
+    image_pk = request.POST.get('primary-key')
+    title = request.POST.get('title_image')
+    if len(title) < 5:
+        messages.error(request, 'Título deve possuir ao menos 5 caracteres')
+        return redirect(reverse('album:user_images', args=[album.pk, ]))
+
+    image = get_object_or_404(models.Image, pk=image_pk, album_image=album.pk)
+    image.title_image = title
+    image.save()
+    messages.success(request, 'Título editado')
+    return redirect(reverse('album:user_images', args=[album.pk, ]))
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def image_delete(request, pk):
+    pass

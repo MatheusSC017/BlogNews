@@ -292,3 +292,63 @@ class ImageCreateClassTestCase(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Imagens cadastradas')
+
+
+class ImageUpdateMethodTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
+
+        content_type = ContentType.objects.get_for_model(models.Image)
+        image_permissions = Permission.objects.filter(content_type=content_type)
+        for permission in image_permissions:
+            self.user.user_permissions.add(permission)
+
+        self.album = models.Album.objects.create(title_album='Album test',
+                                                 user_album=self.user)
+
+        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+            image = SimpleUploadedFile('image.jpg', img.read())
+        self.image = models.Image.objects.create(title_image='Image test',
+                                                 image=image,
+                                                 album_image=self.album)
+
+    def test_update_image_without_user(self):
+        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
+                                    {'primary-key': self.image.pk,
+                                     'title_image': 'Image title', })
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_image_with_user_without_permission(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
+                                    {'primary-key': self.image.pk,
+                                     'title_image': 'Image title', })
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_image(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
+                                    {'primary-key': self.image.pk,
+                                     'title_image': 'Image title', })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Título editado')
+
+    def test_update_image_with_invalid_data(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
+                                    {'primary-key': self.image.pk,
+                                     'title_image': 'Test', })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Título deve possuir ao menos 5 caracteres')
