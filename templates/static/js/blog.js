@@ -17,16 +17,28 @@ function albumFields(pk) {
     published = document.querySelector('#album-' + pk + '> td:nth-child(3)').innerText
     published_field = document.querySelector('#update-album-form input[type="checkbox"]')
     published_field.checked = false
-    if (published == 'Sim') {
+    if (published == 'Sim')
         published_field.checked = true
-    }
 }
 
 function imageFields(pk) {
     title = document.querySelector('#image-' + pk + ' img').getAttribute('title')
-    document.querySelector('#title-image-id').value = title
+    document.getElementById('title-image-id').value = title
 }
 
 function pkField(form, pk) {
     document.querySelector('#' + form + ' input[name="primary-key"]').value = pk
+}
+
+function checkboxSelection(pk) {
+    visible_state = ['visible', 'hidden']
+    checkbox_element = document.getElementById('check-delete-' + pk)
+    checkbox_state = checkbox_element.checked
+    checkbox_element.checked = !checkbox_state
+    document.getElementById('checked-icon-delete-' + pk).style.visibility = visible_state[Number(checkbox_state)]
+    return false
+}
+
+function confirmAction() {
+    return confirm('Deseja apagar os itens selecionados?')
 }

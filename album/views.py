@@ -199,3 +199,17 @@ def image_delete(request, pk):
     image.delete()
     messages.success(request, 'Imagem deletada')
     return redirect(reverse('album:user_images', args=[album.pk, ]))
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def multiple_image_delete(request, pk):
+    if not request.user.has_perm('album.delete_image'):
+        raise PermissionDenied('Necessário usuário autorizado')
+
+    images_pk = request.POST.getlist('delete-items') or []
+    if len(images_pk):
+        album = get_object_or_404(models.Album, pk=pk, user_album=request.user.pk)
+        images = models.Image.objects.filter(pk__in=images_pk, album_image=album.pk)
+        images.delete()
+        messages.success(request, "Imagens excluidas")
+    return redirect(reverse('album:user_images', args=[pk, ]))

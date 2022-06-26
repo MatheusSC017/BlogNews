@@ -378,11 +378,6 @@ label.star:before {
     transform: translate(-100%, 0);
 }
 
-.button-options button {
-    display: inline;
-    float: left;
-}
-
 /* Messages */
 .toast {
     z-index: 20;

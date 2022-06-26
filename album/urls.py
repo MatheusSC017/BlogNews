@@ -11,7 +11,8 @@ albuns_patterns = [
     path('<int:pk>/', views.AlbumImagesUser.as_view(), name='user_images'),
     path('<int:pk>/cadastrar/', views.UploadImages.as_view(), name='images_create'),
     path('<int:pk>/atualizar/', views.image_update_title, name='image_update'),
-    path('<int:pk>/deletar/', views.image_delete, name='image_delete')
+    path('<int:pk>/deletar/', views.image_delete, name='image_delete'),
+    path('<int:pk>/deletar/imagens/', views.multiple_image_delete, name='images_delete'),
 ]
 
 urlpatterns = [

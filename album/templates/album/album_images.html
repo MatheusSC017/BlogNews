@@ -27,25 +27,44 @@
             </form>
 
             <div class="container-fluid card-columns pt-3 pb-3 text-center">
-                {% for image in images %}
-                <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
-                    <div class="button-options">
-                        <button onclick="popupForm('update-image-form', 1);
-                                         pkField('update-image-form', {{ image.pk }});
-                                         imageFields({{ image.pk }})">
-                            <i class="bi bi-pencil-fill"></i>
-                        </button>
-                        <button onclick="popupForm('delete-image-form', 1);
-                                         pkField('delete-image-form', {{ image.pk }})">
-                            <i class="bi bi-x-lg"></i>
+                <form method="POST" action="{% url 'album:images_delete' album.pk %}">
+                    {% for image in images %}
+                    <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
+                        <div class="button-options">
+                            <button onclick="popupForm('update-image-form', 1);
+                                             pkField('update-image-form', {{ image.pk }});
+                                             imageFields({{ image.pk }})">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button onclick="popupForm('delete-image-form', 1);
+                                             pkField('delete-image-form', {{ image.pk }})">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                            <input type="checkbox"
+                                   name="delete-items"
+                                   value="{{ image.pk }}"
+                                   style="display: none"
+                                   id="check-delete-{{ image.pk }}">
+                            <button onclick="return checkboxSelection({{ image.pk }})">
+                                    <i class="bi bi-check-lg"
+                                       id="checked-icon-delete-{{ image.pk }}"
+                                       style="visibility: hidden"></i>
+                                </label>
+                            </button>
+                        </div>
+                        <img src="{{ image.image.url }}"
+                             alt="{{ image.title_image }}"
+                             title="{{ image.title_image }}"
+                             class="card-img-top">
+                    </div>
+                    {% endfor %}
+                    {% csrf_token %}
+                    <div class="text-end">
+                        <button class="btn button-format" onclick="return confirmAction()">
+                            Deletar
                         </button>
                     </div>
-                    <img src="{{ image.image.url }}"
-                         alt="{{ image.title_image }}"
-                         title="{{ image.title_image }}"
-                         class="card-img-top">
-                </div>
-                {% endfor %}
+                </form>
             </div>
         </div>
         <div class="col-xl"></div>
