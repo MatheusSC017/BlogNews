@@ -6,7 +6,6 @@ from pathlib import Path
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User, Permission, ContentType
 from . import models
-from . import views
 
 
 class AlbumPageTestCase(TestCase):
@@ -44,6 +43,30 @@ class AlbumPageTestCase(TestCase):
         response = self.client.get(reverse('album:album'))
         order = [album.get('album').pk for album in response.context.get('albuns')]
         self.assertEqual([self.album1.pk, ], order)
+
+
+class ImagePageTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
+
+        self.album = models.Album.objects.create(title_album='Album test',
+                                                 user_album=self.user)
+
+        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+            image = SimpleUploadedFile('image.jpg', img.read())
+        for _ in range(5):
+            models.Image.objects.create(title_image='Image test',
+                                        image=image,
+                                        album_image=self.album)
+
+    def test_image_page_connection_context_and_data(self):
+        response = self.client.get(reverse('album:image', args=[self.album.pk, ]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('album', response.context)
+        self.assertIn('images', response.context)
+        self.assertEqual(len(response.context.get('images')), 5)
 
 
 class UserAlbumPageTestCase(TestCase):

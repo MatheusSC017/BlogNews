@@ -17,5 +17,6 @@ albuns_patterns = [
 
 urlpatterns = [
     path('', views.Album.as_view(), name='album'),
+    path('<int:pk>/', views.AlbumImages.as_view(), name='image'),
     path('meus_albuns/', include(albuns_patterns)),
 ]

@@ -271,6 +271,7 @@ p {
 }
 
 .album-secondary-images img {
+    min-height: 50%;
     max-width: 200px;
     max-height: 200px;
 }

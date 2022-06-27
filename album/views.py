@@ -39,6 +39,29 @@ class Album(ListView):
         return context
 
 
+class AlbumImages(DetailView):
+    template_name = 'album/images.html'
+    model = models.Album
+    context_object_name = 'album'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['images'] = models.Image.objects.filter(album_image=context.get('album').pk)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+
+        if not context['album'].published_album:
+            return redirect(reverse('album:album'))
+
+        if context['images'].count() < 3:
+            return redirect(reverse('album:album'))
+
+        return self.render_to_response(context)
+
+
 class AlbumUser(LoginRequiredMixin, ListView):
     template_name = 'album/album_user.html'
     model = models.Album
