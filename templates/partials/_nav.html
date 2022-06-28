@@ -41,6 +41,9 @@
                         {% if perms.album.view_album %}
                         <li><a class="dropdown-item" href="{% url 'album:user_album' %}">Meus Albuns</a></li>
                         {% endif %}
+                        {% if perms.search.view_search %}
+                        <li><a class="dropdown-item" href="{% url 'search:user_search' %}">Minhas Pesquisas</a></li>
+                        {% endif %}
                         <li><a class="dropdown-item" href="{% url 'user:update' %}">Meus dados</a></li>
                         <li><a class="dropdown-item" href="{% url 'user:logout' %}">Sair</a></li>
                     </ul>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %} | Minha pesquisas{% endblock %}
+
+{% block content %}
+
+<section class="container-fluid gray-bg-color pt-5 pb-5">
+    <div class="row pb-3">
+        <div class="col col-md-6 d-none d-md-block">
+            <h1>
+                Pesquisas
+            </h1>
+        </div>
+        <div class="col col-md-6 text-end">
+            <a href="#">
+                <button class="btn button-format">
+                    Cadastrar
+                </button>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <td>Descrição</td>
+                        <td class="d-none d-md-table-cell">Data de publicação</td>
+                        <td class="d-none d-md-table-cell">Data de termino</td>
+                        <td>Publicado</td>
+                        <td>Opções</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for search in searches %}
+                    <tr>
+                        <th>{{ search.pk }}</th>
+                        <td>{{ search.description_search }}</td>
+                        <td class="d-none d-md-table-cell">{{ search.publication_date_search }}</td>
+                        <td class="d-none d-md-table-cell">{{ search.finish_date_search }}</td>
+                        <td>
+                            {% if search.published_search %}
+                                Sim
+                            {% else %}
+                                Não
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button>
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button>
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {% include 'partials/_pagination.html' %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

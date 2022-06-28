@@ -11,7 +11,7 @@ class PostAdmin(summer_admin.SummernoteModelAdmin):
     list_editable = ('published_post',)
     search_fields = ('title_post', 'album_post',)
     ordering = ('edition_date_post', 'published_date_post',)
-    list_per_page = 30
+    list_per_page = 50
     summernote_fields = ('description_post',)
 
 

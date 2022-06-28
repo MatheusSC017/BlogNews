@@ -11,6 +11,7 @@ from django.conf import settings
 from .forms import UserCreationFormBlog, UserChangeFormBlog
 from post.models import Post
 from album.models import Album, Image
+from search.models import Search, Option
 
 
 class Login(View, TemplateResponseMixin):
@@ -68,7 +69,7 @@ class Register(CreateView):
     def get_success_url(self):
         """ Add the permissions of the user and redirect to login page """
         if self.request.POST.get('checkpermissions'):
-            models_permissions = [Post, Album, Image]
+            models_permissions = [Post, Album, Image, Search, Option, ]
             for model in models_permissions:
                 content_type = ContentType.objects.get_for_model(model)
                 post_permissions = Permission.objects.filter(content_type=content_type)
