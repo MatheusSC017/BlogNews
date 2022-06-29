@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %} | Cadastrar pesquisa{% endblock %}
+
+{% block content %}
+
+<section class="container-fluid p-5 gray-bg-color">
+    <div class="row">
+        <div class="col-xl"></div>
+        <div class="col-xl-8 p-3 dark-color dark-bg-color rounded">
+            <form method="POST" action="#" class="form-field">
+                {% for field in form %}
+                    <div class="form-floating mb-3">
+                        {{ field }}
+                        <label class="form-label light-color" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <div class="secondary-color">
+                            {{ field.errors }}
+                        </div>
+                        {% if field.help_text %}
+                        <p class="help primary-color">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <h1 class="light-color h3">Alternativas</h1>
+                {{ option_form.management_form }}
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <td>Alternativa</td>
+                            <td class="text-center">Deletar</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for option in option_form %}
+                        <tr id="album-{{ album.pk }}">
+                            <td class="form-floating">
+                                {{ option.response_option }}
+                                <label class="label-form" for="{{ option.response_option.id_for_label }}">
+                                    {{ option.response_option.label }}
+                                </label>
+                            </td>
+                            <td class="text-center">
+                                {% if option_form.can_delete %}
+                                    {{ option.DELETE }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% csrf_token %}
+
+                <div class="text-end mt-3">
+                    <a href="{% url 'search:user_search' %}">
+                        <div class="btn button-format">
+                            Voltar
+                        </div>
+                    </a>
+                    <button class="btn button-format">
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-xl"></div>
+    </div>
+</section>
+
+{% endblock %}

@@ -5,8 +5,8 @@ app_name = 'post'
 
 post_patterns = [
     path('', views.BlogUser.as_view(), name='user_blog'),
-    path('cadastrar/', views.RegisterPost.as_view(), name='register_post'),
-    path('atualizar/<int:pk>/', views.UpdatePost.as_view(), name='update_post'),
+    path('cadastrar/', views.RegisterPost.as_view(), name='post_create'),
+    path('atualizar/<int:pk>/', views.UpdatePost.as_view(), name='post_update'),
 ]
 
 urlpatterns = [

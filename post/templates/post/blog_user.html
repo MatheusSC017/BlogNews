@@ -6,7 +6,7 @@
 <div class="pt-5 ps-5">
     <h1 class="dark-color">Post</h1>
     <div class="text-end pe-5">
-        <a href="{% url 'post:register_post' %}">
+        <a href="{% url 'post:post_create' %}">
             <button class="btn button-format">Cadastrar</button>
         </a>
     </div>
@@ -43,6 +43,11 @@
         </p>
     </div>
     <div class="card-footer text-end">
+        <a href="{% url 'post:post_update' post.pk %}">
+            <button class="btn button-format">
+                <strong>Editar</strong>
+            </button>
+        </a>
         <button class="btn button-format"
                 onclick="popupForm('delete-post-form', 1); pkField('delete-post-form', {{ post.pk }})">
             {% if post.published_post %}
@@ -51,12 +56,6 @@
             <strong>Ativar</strong>
             {% endif %}
         </button>
-
-        <a href="{% url 'post:update_post' post.pk %}">
-            <button class="btn button-format">
-                <strong>Editar</strong>
-            </button>
-        </a>
     </div>
 </article>
 {% endfor %}

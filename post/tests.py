@@ -355,17 +355,17 @@ class UserCreatePostPageTestCase(TestCase):
     def test_post_create_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.get(reverse('post:register_post'))
+        response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 200)
 
     def test_post_create_connection_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.get(reverse('post:register_post'))
+        response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 403)
 
     def test_post_create_connection_with_user_loggout(self):
-        response = self.client.get(reverse('post:register_post'))
+        response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 302)
 
     def test_post_create(self):
@@ -376,7 +376,7 @@ class UserCreatePostPageTestCase(TestCase):
                       'description_post': 'register_test_description_post',
                       'category_post': str(self.category.pk),
                       'image_post': '', }
-        response = self.client.post(reverse('post:register_post'), parameters)
+        response = self.client.post(reverse('post:post_create'), parameters)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))
@@ -408,17 +408,17 @@ class UserUpdatePostPageTestCase(TestCase):
     def test_post_update_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
+        response = self.client.get(reverse('post:post_update', args=[self.post.pk, ]))
         self.assertEqual(response.status_code, 200)
 
     def test_post_update_connection_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
+        response = self.client.get(reverse('post:post_update', args=[self.post.pk, ]))
         self.assertEqual(response.status_code, 403)
 
     def test_post_update_connection_with_user_loggout(self):
-        response = self.client.get(reverse('post:update_post', args=[self.post.pk, ]))
+        response = self.client.get(reverse('post:post_update', args=[self.post.pk, ]))
         self.assertEqual(response.status_code, 302)
 
     def test_post_update(self):
@@ -429,7 +429,7 @@ class UserUpdatePostPageTestCase(TestCase):
                       'description_post': 'update_test_description_post',
                       'category_post': str(self.category2.pk),
                       'image_post': '', }
-        response = self.client.post(reverse('post:update_post', args=[self.post.pk, ]), parameters)
+        response = self.client.post(reverse('post:post_update', args=[self.post.pk, ]), parameters)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))

@@ -2,4 +2,79 @@
 
 {% block title %} | {% endblock %}
 
-{% block content %}{% endblock %}
+{% block content %}
+
+<section class="container-fluid landing-item gray-bg-color pt-5 pb-5">
+    <div class="row">
+        <div class="col-xl"></div>
+        <div class="col-xl-10 border border-dark p-5">
+            <form action="#">
+                <h1 class="h2 pb-3">
+                    Pesquisa: Pergunta sobre algum tema que foi tratado no blog ou com base em algum assunto social do momento
+                </h1>
+                <div class="h5 pb-3">
+                    <input type="radio" id="alternative1" name="customRadio" class="alternative-question d-none">
+                    <label class="alternative-question d-flex" for="alternative1">
+                        <div>
+                            <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
+                        </div>
+                        <div class="ms-auto aligment-center">
+                            <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="h5 pb-3">
+                    <input type="radio" id="alternative2" name="customRadio" class="alternative-question d-none">
+                    <label class="alternative-question d-flex" for="alternative2">
+                        <div>
+                            <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
+                        </div>
+                        <div class="ms-auto aligment-center">
+                            <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="h5 pb-3">
+                    <input type="radio" id="alternative3" name="customRadio" class="alternative-question d-none">
+                    <label class="alternative-question d-flex" for="alternative3">
+                        <div>
+                            <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
+                        </div>
+                        <div class="ms-auto aligment-center">
+                            <div class="alternative-counter secondary-bg-color light-color text-center p-2 rounded rounded-circle">999</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="h5 pb-3">
+                    <input type="radio" id="alternative4" name="customRadio" class="alternative-question d-none">
+                    <label class="alternative-question d-flex" for="alternative4">
+                        <div>
+                            <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
+                        </div>
+                        <div class="ms-auto aligment-center">
+                            <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="h5 pb-3">
+                    <input type="radio" id="alternative5" name="customRadio" class="alternative-question d-none">
+                    <label class="alternative-question d-flex" for="alternative5">
+                        <div>
+                            <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
+                        </div>
+                        <div class="ms-auto aligment-center">
+                            <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="text-end">
+                    <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Enviar">
+                </div>
+            </form>
+        </div>
+        <div class="col-xl"></div>
+    </div>
+</section>
+
+{% endblock %}
