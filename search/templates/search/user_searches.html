@@ -52,7 +52,8 @@
                                     <i class="bi bi-pencil-fill"></i>
                                 </button>
                             </a>
-                            <button>
+                            <button onclick="popupForm('delete-search-form', 1);
+                                             pkField('delete-search-form', {{ search.pk }})">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </td>
@@ -69,4 +70,21 @@
     </div>
 </section>
 
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-search-form">
+
+            <button class="btn button-format secondary-bg-color"
+                onclick="popupForm('delete-search-form', 0)">
+                Cancelar
+            </button>
+            <form action="{% url 'search:search_delete' %}" method="POST" class="d-inline">
+                <input type="hidden" name="primary-key">
+                {% csrf_token %}
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+            </form>
+    </div>
+</section>
 {% endblock %}

@@ -10,6 +10,7 @@
         <div class="col-xl-8 p-3 dark-color dark-bg-color rounded">
             <form method="POST" action="#" class="form-field">
                 {% for field in form %}
+                    {% if field != form.published_search %}
                     <div class="form-floating mb-3">
                         {{ field }}
                         <label class="form-label light-color" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -20,6 +21,12 @@
                         <p class="help primary-color">{{ field.help_text|safe }}</p>
                         {% endif %}
                     </div>
+                    {% else %}
+                        <div class="form-check">
+                            {{ field }}
+                            <label class="form-check-label light-color" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    {% endif %}
                 {% endfor %}
 
                 <h1 class="light-color h3">Alternativas</h1>
@@ -54,12 +61,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <div class="secondary-color">
-                    {% for error in option_form.errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-
                 {% csrf_token %}
 
                 <div class="text-end mt-3">

@@ -1,5 +1,6 @@
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
@@ -109,3 +110,13 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     def get_success_url(self):
         messages.success(self.request, 'Pesquisa atualizada')
         return reverse('search:user_search')
+
+
+@login_required(login_url=settings.LOGIN_URL)
+@permission_required(perm='search.delete_search')
+def delete_search(request):
+    if request.POST:
+        search = get_object_or_404(models.Search, pk=request.POST.get('primary-key'), user_search=request.user)
+        search.delete()
+        messages.success(request, 'Pesquisa deletada')
+    return redirect(reverse('search:user_search'))

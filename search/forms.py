@@ -7,13 +7,14 @@ class SearchForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field in self.fields:
+        for field in ['description_search', 'publication_date_search', 'finish_date_search', ]:
             self.fields[field].widget.attrs['class'] = 'form-control'
             self.fields[field].widget.attrs['placeholder'] = self.fields[field].label
+        self.fields['published_search'].widget.attrs['class'] = 'form-check-input'
 
     class Meta:
         model = Search
-        fields = ['description_search', 'publication_date_search', 'finish_date_search', ]
+        fields = ['description_search', 'publication_date_search', 'finish_date_search', 'published_search']
 
 
 class OptionForm(forms.ModelForm):
