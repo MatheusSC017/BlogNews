@@ -6,222 +6,60 @@
 
 <section class="container-fluid landing-item gray-bg-color">
     <div class="row row-cols-1 p-5">
+        {% for search in searches %}
         <article class="col border border-dark p-3 mb-5">
-            <div class="d-flex">
+            <div class="d-flex position-relative">
                 <div>
-                    <h1 class="h4 dark-color">Pesquisa: Pergunta sobre algum tema que foi tratado no blog ou com base em algum assunto social do momento</h1>
+                    <h1 class="h4 dark-color">{{ search.search.description_search }}</h1>
                 </div>
-                <div>
-                    <strong class="rotate-45 search-status dark-color text-center p-2 secondary-bg-color rounded rounded-circle">Aberto</strong>
+                <div class="button-options">
+                    {% if search.status %}
+                        <strong class="rotate-45 search-status dark-color text-center p-2 primary-bg-color rounded rounded-circle">
+                            Aberta
+                        </strong>
+                   {% else %}
+                        <strong class="rotate-45 search-status light-color text-center p-2 secondary-bg-color rounded rounded-circle">
+                            Fechada
+                        </strong>
+                   {% endif %}
+
                 </div>
             </div>
+
+            {% for option in search.options %}
             <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
                 <div class="me-2">
-                    <h2 class="h6">Alternativa de resposta para a questão acima, de acordo com as possibilidades constatadas</h2>
+                    <h2 class="h6">{{ option.response_option }}</h2>
                 </div>
                 <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">127</div>
+                    {% if option.vote_option == search.max_vote.vote_option__max %}
+                        <div class="alternative-counter primary-bg-color dark-color text-center p-2 rounded rounded-circle">
+                            {{ option.vote_option }}
+                        </div>
+                    {% else %}
+                        <div class="alternative-counter secondary-bg-color light-color text-center p-2 rounded rounded-circle">
+                            {{ option.vote_option }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">267</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter secondary-bg-color dark-color text-center p-2 rounded rounded-circle">317</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
-                </div>
-            </div>
+            {% endfor %}
+
             <div class="text-end">
                 <a href="pergunta.html">
-                    <button class="mt-3 rounded gray-bg-color dark-color"><strong>Responder</strong></button>
+                    <button class="mt-3 rounded gray-bg-color dark-color">
+                        <strong>
+                            {% if search.status %}
+                                Responder
+                            {% else %}
+                                Visualizar
+                            {% endif %}
+                        </strong>
+                    </button>
                 </a>
             </div>
         </article>
-
-        <article class="col border border-dark p-3 mb-5">
-            <div class="d-flex">
-                <div>
-                    <h1 class="h4 dark-color">Pesquisa: Pergunta sobre algum tema que foi tratado no blog ou com base em algum assunto social do momento</h1>
-                </div>
-                <div>
-                    <strong class="rotate-45 search-status light-color text-center p-2 primary-bg-color rounded rounded-circle">Fechado</strong>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Alternativa de resposta para a questão acima, de acordo com as possibilidades constatadas</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">127</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">267</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter secondary-bg-color dark-color text-center p-2 rounded rounded-circle">317</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
-                </div>
-            </div>
-            <div class="text-end">
-                <button class="mt-3 rounded gray-bg-color dark-color"><strong>Visualizar</strong></button>
-            </div>
-        </article>
-
-        <article class="col border border-dark p-3 mb-5">
-            <div class="d-flex">
-                <div>
-                    <h1 class="h4 dark-color">Pesquisa: Pergunta sobre algum tema que foi tratado no blog ou com base em algum assunto social do momento</h1>
-                </div>
-                <div>
-                    <strong class="rotate-45 search-status dark-color text-center p-2 secondary-bg-color rounded rounded-circle">Aberto</strong>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Alternativa de resposta para a questão acima, de acordo com as possibilidades constatadas</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">127</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">267</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter secondary-bg-color dark-color text-center p-2 rounded rounded-circle">317</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
-                </div>
-            </div>
-            <div class="text-end">
-                <button class="mt-3 rounded gray-bg-color dark-color"><strong>Responder</strong></button>
-            </div>
-        </article>
-
-        <article class="col border border-dark p-3 mb-5">
-            <div class="d-flex">
-                <div>
-                    <h1 class="h4 dark-color">Pesquisa: Pergunta sobre algum tema que foi tratado no blog ou com base em algum assunto social do momento</h1>
-                </div>
-                <div>
-                    <strong class="rotate-45 search-status dark-color text-center p-2 secondary-bg-color rounded rounded-circle">Aberto</strong>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter secondary-bg-color dark-color text-center p-2 rounded rounded-circle">317</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
-                </div>
-            </div>
-            <div class="text-end">
-                <button class="mt-3 rounded gray-bg-color dark-color"><strong>Responder</strong></button>
-            </div>
-        </article>
-
-        <article class="col border border-dark p-3 mb-5">
-            <div class="d-flex">
-                <div>
-                    <h1 class="h4 dark-color">Pesquisa: Pergunta sobre algum tema que foi tratado no blog ou com base em algum assunto social do momento</h1>
-                </div>
-                <div>
-                    <strong class="rotate-45 search-status light-color text-center p-2 primary-bg-color rounded rounded-circle">Fechado</strong>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Alternativa de resposta para a questão acima, de acordo com as possibilidades constatadas</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">127</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">267</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter secondary-bg-color dark-color text-center p-2 rounded rounded-circle">317</div>
-                </div>
-            </div>
-            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
-                <div class="me-2">
-                    <h2 class="h6"> Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</h2>
-                </div>
-                <div class="ms-auto aligment-center">
-                    <div class="alternative-counter primary-bg-color light-color text-center p-2 rounded rounded-circle">67</div>
-                </div>
-            </div>
-            <div class="text-end">
-                <button class="mt-3 rounded gray-bg-color dark-color"><strong>Visualizar</strong></button>
-            </div>
-        </article>
-
+        {% endfor %}
     </div>
 </section>
 

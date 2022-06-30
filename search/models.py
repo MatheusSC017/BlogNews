@@ -20,7 +20,7 @@ class Search(models.Model):
 
 
 class Option(models.Model):
-    response_option = models.TextField(max_length=300, verbose_name='opção')
+    response_option = models.CharField(max_length=300, verbose_name='opção')
     vote_option = models.PositiveIntegerField(default=0, verbose_name='número de votos')
     search_option = models.ForeignKey(Search, on_delete=models.CASCADE, verbose_name='pesquisa')
 

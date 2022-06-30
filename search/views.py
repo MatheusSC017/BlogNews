@@ -1,10 +1,42 @@
 from django.views.generic import ListView, CreateView, UpdateView
+from django.db.models import Max
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
+from django.utils import timezone
 from . import models, forms
+
+
+class Searches(ListView):
+    template_name = 'search/searches.html'
+    model = models.Search
+    context_object_name = 'searches'
+    paginate_by = 5
+    ordering = ['-publication_date_search', 'finish_date_search', ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        qs = qs.filter(published_search=True,
+                       publication_date_search__lte=timezone.now())
+
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        searches = list()
+        for search in context['searches']:
+            options = models.Option.objects.filter(search_option=search.pk)
+            searches.append({'search': search,
+                             'options': options,
+                             'status': (search.finish_date_search > timezone.now()),
+                             'max_vote': options.aggregate(Max('vote_option'))})
+        context['searches'] = searches
+
+        return context
 
 
 class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -12,7 +44,7 @@ class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = models.Search
     paginate_by = 20
     context_object_name = 'searches'
-    ordering = ['publication_date_search', 'finish_date_search']
+    ordering = ['-published_search', '-publication_date_search', 'finish_date_search']
     login_url = settings.LOGIN_URL
     permission_required = 'search.view_search'
 

@@ -22,14 +22,23 @@ class SearchTestCase(TestCase):
             self.other_user.user_permissions.add(permission)
 
         self.search1 = models.Search.objects.create(description_search='Pegunta 1',
+                                                    publication_date_search=timezone.now(),
                                                     finish_date_search=timezone.now() + timezone.timedelta(days=30),
                                                     user_search=self.user)
         self.search2 = models.Search.objects.create(description_search='Pegunta 2',
+                                                    publication_date_search=timezone.now() - timezone.timedelta(
+                                                        days=20),
                                                     finish_date_search=timezone.now() + timezone.timedelta(days=10),
                                                     user_search=self.other_user)
         self.search3 = models.Search.objects.create(description_search='Pegunta 3',
                                                     finish_date_search=timezone.now() + timezone.timedelta(days=5),
-                                                    user_search=self.user)
+                                                    user_search=self.user,
+                                                    published_search=False)
+        self.search4 = models.Search.objects.create(description_search='Pegunta 4',
+                                                    publication_date_search=timezone.now() + timezone.timedelta(
+                                                        days=20),
+                                                    finish_date_search=timezone.now() + timezone.timedelta(days=50),
+                                                    user_search=self.other_user)
         self.option1 = models.Option.objects.create(response_option='Resposta 1',
                                                     search_option=self.search1)
         self.option2 = models.Option.objects.create(response_option='Resposta 2',
@@ -42,6 +51,21 @@ class SearchTestCase(TestCase):
                                                     search_option=self.search3)
         self.option6 = models.Option.objects.create(response_option='Resposta 2',
                                                     search_option=self.search3)
+        self.option7 = models.Option.objects.create(response_option='Resposta 1',
+                                                    search_option=self.search4)
+        self.option8 = models.Option.objects.create(response_option='Resposta 2',
+                                                    search_option=self.search4)
+
+
+class SearchPageTestCase(SearchTestCase):
+    def test_user_search_page_connection_and_context(self):
+        response = self.client.get(reverse('search:search'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, views.Searches.as_view().__name__)
+        self.assertIn('searches', response.context)
+        self.assertEqual(len(response.context.get('searches')), 2)
+        self.assertEqual(response.context.get('searches')[0].get('search').pk, self.search1.pk)
+        self.assertEqual(response.context.get('searches')[1].get('search').pk, self.search2.pk)
 
 
 class UserSearchPageTestCase(SearchTestCase):
