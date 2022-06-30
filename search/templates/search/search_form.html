@@ -39,16 +39,26 @@
                                 <label class="label-form" for="{{ option.response_option.id_for_label }}">
                                     {{ option.response_option.label }}
                                 </label>
+                                <div class="secondary-color">
+                                    {{ option.response_option.errors }}
+                                </div>
                             </td>
                             <td class="text-center">
                                 {% if option_form.can_delete %}
                                     {{ option.DELETE }}
                                 {% endif %}
+                                {{ option.id }}
+                                {{ option.search_option }}
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <div class="secondary-color">
+                    {% for error in option_form.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
 
                 {% csrf_token %}
 

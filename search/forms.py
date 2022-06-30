@@ -19,12 +19,11 @@ class SearchForm(forms.ModelForm):
 class OptionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control'
-            self.fields[field].widget.attrs['placeholder'] = self.fields[field].label
+        self.fields['response_option'].widget.attrs['class'] = 'form-control'
+        self.fields['response_option'].widget.attrs['placeholder'] = self.fields['response_option'].label
 
     class Meta:
-        fields = ['response_option', ]
+        fields = ['pk', 'response_option', 'search_option']
 
 
 OptionInlineForm = forms.inlineformset_factory(Search,

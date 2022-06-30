@@ -47,9 +47,11 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button>
-                                <i class="bi bi-pencil-fill"></i>
-                            </button>
+                            <a href="{% url 'search:search_update' search.pk %}">
+                                <button>
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                            </a>
                             <button>
                                 <i class="bi bi-x-lg"></i>
                             </button>
