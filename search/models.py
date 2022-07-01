@@ -21,7 +21,6 @@ class Search(models.Model):
 
 class Option(models.Model):
     response_option = models.CharField(max_length=300, verbose_name='opção')
-    vote_option = models.PositiveIntegerField(default=0, verbose_name='número de votos')
     search_option = models.ForeignKey(Search, on_delete=models.CASCADE, verbose_name='pesquisa')
 
     def __str__(self):
@@ -29,3 +28,20 @@ class Option(models.Model):
 
     class Meta:
         verbose_name = 'alternativa'
+
+
+class VottingUserOption(models.Model):
+    user_votting = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='usuário')
+    option_votting = models.ForeignKey(Option, on_delete=models.CASCADE, verbose_name='alternativa')
+
+    class Meta:
+        verbose_name = 'voto'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user_votting', 'option_votting', ], name='user_option_vote'
+            )
+        ]
+
+    def __str__(self):
+        return self.user_votting.first_name + ' ' + self.user_votting.last_name +\
+               ' - ' + str(self.option_votting.search_option.description_search)

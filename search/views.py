@@ -1,5 +1,5 @@
-from django.views.generic import ListView, CreateView, UpdateView
-from django.db.models import Max
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.db.models import Max, Count
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
@@ -30,11 +30,71 @@ class Searches(ListView):
         searches = list()
         for search in context['searches']:
             options = models.Option.objects.filter(search_option=search.pk)
+            options = options.annotate(
+                vote_option=Count('vottinguseroption')
+            )
             searches.append({'search': search,
                              'options': options,
                              'status': (search.finish_date_search > timezone.now()),
                              'max_vote': options.aggregate(Max('vote_option'))})
         context['searches'] = searches
+
+        return context
+
+
+class Search(DetailView):
+    template_name = 'search/search.html'
+    model = models.Search
+    context_object_name = 'search'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+
+        if not context['search'].published_search or context['search'].publication_date_search > timezone.now():
+            return redirect(reverse('search:searches'))
+
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(reverse('user:login'))
+
+        search = get_object_or_404(models.Search,
+                                   pk=kwargs.get('pk'),
+                                   published_search=True,
+                                   publication_date_search__lte=timezone.now(),
+                                   finish_date_search__gte=timezone.now())
+        option = get_object_or_404(models.Option,
+                                   pk=request.POST['optionChoice'],
+                                   search_option=search.pk)
+        votting = models.VottingUserOption.objects.filter(user_votting=request.user.pk,
+                                                          option_votting__in=models.Option.objects.filter(
+                                                              search_option=search.pk
+                                                          ))
+        if votting.count() == 0:
+            models.VottingUserOption.objects.create(user_votting=request.user,
+                                                    option_votting=option)
+        else:
+            votting = votting[0]
+            votting.option_votting = option
+            votting.save()
+        messages.success(request, 'Obrigado pelo voto')
+        return redirect(reverse('search:search', args=[search.pk, ]))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        options = models.Option.objects.filter(search_option=context['search'].pk)
+        options = options.annotate(
+            vote_option=Count('vottinguseroption')
+        )
+        context['options'] = options
+        context['max_vote'] = options.aggregate(Max('vote_option'))
+        context['status'] = (context['search'].finish_date_search > timezone.now())
+        if self.request.user.is_authenticated:
+            context['vote'] = models.VottingUserOption.objects.filter(user_votting=self.request.user.pk,
+                                                                      option_votting__in=options)[0]
 
         return context
 

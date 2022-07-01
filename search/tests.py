@@ -28,7 +28,7 @@ class SearchTestCase(TestCase):
         self.search2 = models.Search.objects.create(description_search='Pegunta 2',
                                                     publication_date_search=timezone.now() - timezone.timedelta(
                                                         days=20),
-                                                    finish_date_search=timezone.now() + timezone.timedelta(days=10),
+                                                    finish_date_search=timezone.now() - timezone.timedelta(days=5),
                                                     user_search=self.other_user)
         self.search3 = models.Search.objects.create(description_search='Pegunta 3',
                                                     finish_date_search=timezone.now() + timezone.timedelta(days=5),
@@ -55,17 +55,84 @@ class SearchTestCase(TestCase):
                                                     search_option=self.search4)
         self.option8 = models.Option.objects.create(response_option='Resposta 2',
                                                     search_option=self.search4)
+        models.VottingUserOption.objects.create(user_votting=self.other_user,
+                                                option_votting=self.option2)
 
 
-class SearchPageTestCase(SearchTestCase):
+class SearchesPageTestCase(SearchTestCase):
     def test_user_search_page_connection_and_context(self):
-        response = self.client.get(reverse('search:search'))
+        response = self.client.get(reverse('search:searches'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, views.Searches.as_view().__name__)
         self.assertIn('searches', response.context)
         self.assertEqual(len(response.context.get('searches')), 2)
         self.assertEqual(response.context.get('searches')[0].get('search').pk, self.search1.pk)
         self.assertEqual(response.context.get('searches')[1].get('search').pk, self.search2.pk)
+
+
+class SearchPageTestCase(SearchTestCase):
+    def test_search_page_with_inactive_search(self):
+        response = self.client.get(reverse('search:search', args=[self.search3.pk, ]))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('search:searches'))
+
+    def test_search_page_with_future_search(self):
+        response = self.client.get(reverse('search:search', args=[self.search4.pk, ]))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('search:searches'))
+
+    def test_search_page_connection_and_context(self):
+        response = self.client.get(reverse('search:search', args=[self.search1.pk, ]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, views.Search.as_view().__name__)
+        self.assertIn('search', response.context)
+        self.assertIn('options', response.context)
+        self.assertEqual(len(response.context['options']), 2)
+        self.assertIn('max_vote', response.context)
+        self.assertIn('status', response.context)
+
+    def test_search_page_vote_with_inactive_search(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('search:search', args=[self.search3.pk, ]),
+                                    {'optionChoice': self.option6.pk})
+        self.assertEqual(response.status_code, 404)
+
+    def test_search_page_vote_with_future_search(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('search:search', args=[self.search4.pk, ]),
+                                    {'optionChoice': self.option7.pk})
+        self.assertEqual(response.status_code, 404)
+
+    def test_search_page_vote_finished_search(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('search:search', args=[self.search2.pk, ]),
+                                    {'optionChoice': self.option3.pk})
+        self.assertEqual(response.status_code, 404)
+
+    def test_search_page_new_vote(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.client.post(reverse('search:search', args=[self.search1.pk, ]),
+                                    {'optionChoice': self.option1.pk})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('search:search', args=[self.search1.pk, ]))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Obrigado pelo voto')
+
+    def test_search_page_update_vote(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test2',
+                                                 'password': 'password_test2', })
+        response = self.client.post(reverse('search:search', args=[self.search1.pk, ]),
+                                    {'optionChoice': self.option1.pk})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('search:search', args=[self.search1.pk, ]))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Obrigado pelo voto')
 
 
 class UserSearchPageTestCase(SearchTestCase):

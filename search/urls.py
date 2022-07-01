@@ -12,5 +12,6 @@ search_patterns = [
 
 urlpatterns = [
     path('minhas_pesquisas/', include(search_patterns)),
-    path('', views.Searches.as_view(), name='search'),
+    path('', views.Searches.as_view(), name='searches'),
+    path('<int:pk>/', views.Search.as_view(), name='search')
 ]

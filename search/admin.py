@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Search, Option
+from .models import Search, Option, VottingUserOption
 
 
 class OptionInlineAdmin(admin.TabularInline):
@@ -21,3 +21,4 @@ class SearchAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Search, SearchAdmin)
+admin.site.register(VottingUserOption)

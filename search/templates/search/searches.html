@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load convert_tags %}
 
 {% block title %} | Pesquisas{% endblock %}
 
@@ -32,13 +33,13 @@
                     <h2 class="h6">{{ option.response_option }}</h2>
                 </div>
                 <div class="ms-auto aligment-center">
-                    {% if option.vote_option == search.max_vote.vote_option__max %}
+                    {% if option.vote_option|to_int == search.max_vote.vote_option__max %}
                         <div class="alternative-counter primary-bg-color dark-color text-center p-2 rounded rounded-circle">
-                            {{ option.vote_option }}
+                            {{ option.vote_option|to_int }}
                         </div>
                     {% else %}
                         <div class="alternative-counter secondary-bg-color light-color text-center p-2 rounded rounded-circle">
-                            {{ option.vote_option }}
+                            {{ option.vote_option|to_int }}
                         </div>
                     {% endif %}
                 </div>
@@ -46,7 +47,7 @@
             {% endfor %}
 
             <div class="text-end">
-                <a href="pergunta.html">
+                <a href="{% url 'search:search' search.search.pk %}">
                     <button class="mt-3 rounded gray-bg-color dark-color">
                         <strong>
                             {% if search.status %}
