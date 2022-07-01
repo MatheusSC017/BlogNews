@@ -92,11 +92,23 @@ class UpdatePageTestCase(TestCase):
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Perfil editado')
 
-    def update_test(self, username='username_test'):
+    def test_update_user_password(self):
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test', })
+        response = self.update_test(password='password_test2',
+                                    password_confirm='password_test2')
+        self.assertEqual(response.status_code, 302)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(str(messages[1]), 'Perfil editado')
+
+    def update_test(self, username='username_test', password='', password_confirm=''):
         response = self.client.post(reverse('user:update'), {'username': username,
                                                              'first_name': 'username',
                                                              'last_name': 'test',
-                                                             'email': 'username@test.com', })
+                                                             'email': 'username@test.com',
+                                                             'password1': password,
+                                                             'password2': password_confirm})
         return response
 
 

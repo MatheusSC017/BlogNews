@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth import password_validation
+from django.contrib.auth import password_validation, login
+from django.core.exceptions import ValidationError
 
 
 class UserCreationFormBlog(UserCreationForm):
@@ -38,6 +39,25 @@ class UserCreationFormBlog(UserCreationForm):
 
 
 class UserChangeFormBlog(forms.ModelForm):
+    error_messages = {
+        'password_mismatch': 'As senhas informadas não coincidem.',
+    }
+
+    password1 = forms.CharField(
+        label='Senha',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        help_text=password_validation.password_validators_help_text_html(),
+        required=False
+    )
+    password2 = forms.CharField(
+        label='Confirme a senha',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        help_text='Digite a senha novamente para confirmação',
+        required=False
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
@@ -47,6 +67,37 @@ class UserChangeFormBlog(forms.ModelForm):
                 self.fields[field].widget.attrs['aria-describedby'] = field + 'Help'
                 self.fields[field].help_text = '<div id="' + field + 'Help" class="form-text">' + \
                                                self.fields[field].help_text + '</div>'
+        self.fields['first_name'].widget.attrs['required'] = True
+        self.fields['last_name'].widget.attrs['required'] = True
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+
+        password1 = cleaned_data['password1']
+        password2 = cleaned_data['password2']
+
+        if (password1 or password2) and not (password1 and password2):
+            self.add_error('password2', self.error_messages['password_mismatch'])
+
+        if password1 and password2:
+            if password1 == password2:
+                try:
+                    password_validation.validate_password(password1, self.instance)
+                except ValidationError as error:
+                    self.add_error('password1', error)
+            else:
+                self.add_error('password2', self.error_messages['password_mismatch'])
+
+        return super().clean()
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data['password1']
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+        return user
 
     class Meta:
         model = User
