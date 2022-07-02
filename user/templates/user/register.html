@@ -1,62 +1,26 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'user/form_user.html' %}
 
 {% block title %} | Cadastro{% endblock %}
 
-{% block content %}
-<section class="container p-5">
-    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
-        <div class="col d-flex">
-            <img src="{% get_media_prefix %}static/user_svg_image.svg" alt="" class="img-fluid align-middle">
-        </div>
-        <div class="col pt-3 pb-3 dark-color">
-            <h2 class="my-3">Cadastrar</h2>
+{% block action %}Cadastrar{% endblock %}
 
-            <form method="POST" action="#" class="form-field">
-                {% for field in form %}
-                    <div class="form-floating mb-3">
-                        {{ field }}
-                        {{ field.label_tag }}
-                        <div class="secondary-color">
-                        {{ field.errors }}
-                        </div>
-                        {% if field.help_text %}
-                        <p class="help primary-color">{{ field.help_text|safe }}</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+{% block additional_content %}
+<div class="form-check">
+    <input class="form-check-input border border-dark"
+           name="checkpermissions"
+           type="checkbox"
+           value="Aceitar"
+           id="contentCreator">
+    <label class="form-check-label" for="contentCreator">
+        Aceito os termos de uso para criação de conteúdo
+    </label>
+</div>
 
-                <div class="form-check">
-                    <input class="form-check-input border border-dark"
-                           name="checkpermissions"
-                           type="checkbox"
-                           value="Aceitar"
-                           id="contentCreator">
-                    <label class="form-check-label" for="contentCreator">
-                        Aceito os termos de uso para criação de conteúdo
-                    </label>
-                </div>
-
-                {% csrf_token %}
-
-                <div class="text-end">
-                    <a href="{% url 'user:login' %}">
-                        <strong>
-                            Login
-                        </strong>
-                    </a>
-                </div>
-
-                <div class="text-end mt-3">
-                    <button class="btn button-format">
-                        Enviar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
-<div class="container-fluid">
-    <div class="border-bottom border-light"></div>
+<div class="text-end">
+    <a href="{% url 'user:login' %}">
+        <strong>
+            Login
+        </strong>
+    </a>
 </div>
 {% endblock %}

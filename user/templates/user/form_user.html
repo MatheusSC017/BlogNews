@@ -10,7 +10,7 @@
         <div class="col pt-3 pb-3 dark-color">
             <h2 class="my-3">{% block action %}{% endblock %}</h2>
 
-            <form method="POST" action="#" class="form-field">
+            <form method="POST" action="" class="form-field">
                 {% for field in form %}
                     <div class="form-floating mb-3">
                         {{ field }}
@@ -24,7 +24,7 @@
                     </div>
                 {% endfor %}
 
-                {% block additional_fields %}{% endblock %}
+                {% block additional_content %}{% endblock %}
 
                 {% csrf_token %}
 
@@ -37,7 +37,4 @@
         </div>
     </div>
 </section>
-<div class="container-fluid">
-    <div class="border-bottom border-light"></div>
-</div>
 {% endblock %}

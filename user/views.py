@@ -2,13 +2,25 @@ from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import CreateView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Permission, ContentType
-from django.contrib.auth.views import FormView
+from django.contrib.auth.views import (
+    FormView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView
+)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, reverse
+from django.urls import reverse_lazy
 from django.contrib import messages
 from django.conf import settings
-from .forms import UserCreationFormBlog, UserChangeFormBlog
+from .forms import (
+    UserCreationFormBlog,
+    UserChangeFormBlog,
+    PasswordResetFormBlog,
+    SetPasswordFormBlog
+)
 from post.models import Post
 from album.models import Album, Image
 from search.models import Search, Option
@@ -104,3 +116,24 @@ class Update(LoginRequiredMixin, FormView):
         form.save()
         messages.success(self.request, "Perfil editado")
         return redirect(reverse('user:update'))
+
+
+class PasswordReset(PasswordResetView):
+    email_template_name = 'user/password_reset_email.html'
+    template_name = 'user/password_reset.html'
+    form_class = PasswordResetFormBlog
+    success_url = reverse_lazy('user:password_reset_done')
+
+
+class PasswordResetDone(PasswordResetDoneView):
+    template_name = 'user/password_reset_done.html'
+
+
+class PasswordResetConfirm(PasswordResetConfirmView):
+    template_name = 'user/password_reset_confirm.html'
+    form_class = SetPasswordFormBlog
+    success_url = reverse_lazy('user:password_reset_complete')
+
+
+class PasswordResetComplete(PasswordResetCompleteView):
+    template_name = 'user/password_reset_complete.html'
