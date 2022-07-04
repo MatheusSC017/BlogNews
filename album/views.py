@@ -1,11 +1,10 @@
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.views.generic import View, ListView, CreateView, DetailView
 from django.views.generic.edit import FormMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Count
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from . import forms
 from . import models
@@ -62,17 +61,14 @@ class AlbumImages(DetailView):
         return self.render_to_response(context)
 
 
-class AlbumUser(LoginRequiredMixin, ListView):
+class AlbumUser(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     template_name = 'album/album_user.html'
     model = models.Album
     paginate_by = 10
     context_object_name = 'albuns'
+    login_url = settings.LOGIN_URL
+    permission_required = 'album.view_album'
     permission_denied_message = 'Necessário usuário autorizado'
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.has_perm('album.view_album'):
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
@@ -85,16 +81,13 @@ class AlbumUser(LoginRequiredMixin, ListView):
         return context
 
 
-class AlbumCreate(LoginRequiredMixin, CreateView):
+class AlbumCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'album/album_create.html'
     model = models.Album
     form_class = forms.AlbumForm
+    login_url = settings.LOGIN_URL
+    permission_required = 'album.add_album'
     permission_denied_message = 'Necessário usuário autorizado'
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.has_perm('album.add_album'):
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -111,10 +104,8 @@ class AlbumCreate(LoginRequiredMixin, CreateView):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required(perm='album.change_album')
 def album_update(request):
-    if not request.user.has_perm('album.change_album'):
-        raise PermissionDenied('Necessário usuário autorizado')
-
     pk = request.POST.get('primary-key')
     form = forms.AlbumForm(request.POST)
     if pk is not None:
@@ -135,10 +126,8 @@ def album_update(request):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required(perm='album.delete_album')
 def album_delete(request):
-    if not request.user.has_perm('album.delete_album'):
-        raise PermissionDenied('Necessário usuário autorizado')
-
     pk = request.POST.get('primary-key')
     if pk is not None:
         album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
@@ -150,15 +139,13 @@ def album_delete(request):
         return redirect(reverse('album:user_album'))
 
 
-class AlbumImagesUser(LoginRequiredMixin, DetailView):
+class AlbumImagesUser(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     template_name = 'album/album_images.html'
     model = models.Album
     context_object_name = 'album'
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.has_perm('album.view_image'):
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+    login_url = settings.LOGIN_URL
+    permission_required = 'album.view_image'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -169,13 +156,11 @@ class AlbumImagesUser(LoginRequiredMixin, DetailView):
         return context
 
 
-class UploadImages(LoginRequiredMixin, View, FormMixin):
+class UploadImages(LoginRequiredMixin, PermissionRequiredMixin, View, FormMixin):
     form_class = forms.ImageForm
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.has_perm('album.add_image'):
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+    login_url = settings.LOGIN_URL
+    permission_required = 'album.add_image'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -193,10 +178,8 @@ class UploadImages(LoginRequiredMixin, View, FormMixin):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required(perm='album.change_image')
 def image_update_title(request, pk):
-    if not request.user.has_perm('album.change_image'):
-        raise PermissionDenied('Necessário usuário autorizado')
-
     album = get_object_or_404(models.Album, pk=pk, user_album=request.user.pk)
     image_pk = request.POST.get('primary-key')
     title = request.POST.get('title_image')
@@ -212,10 +195,8 @@ def image_update_title(request, pk):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required(perm='album.delete_image')
 def image_delete(request, pk):
-    if not request.user.has_perm('album.delete_image'):
-        raise PermissionDenied('Necessário usuário autorizado')
-
     album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
     image_pk = request.POST.get('primary-key')
     image = get_object_or_404(models.Image, pk=image_pk, album_image=album.pk)
@@ -225,10 +206,8 @@ def image_delete(request, pk):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required(perm='album.delete_image')
 def multiple_image_delete(request, pk):
-    if not request.user.has_perm('album.delete_image'):
-        raise PermissionDenied('Necessário usuário autorizado')
-
     images_pk = request.POST.getlist('delete-items') or []
     if len(images_pk):
         album = get_object_or_404(models.Album, pk=pk, user_album=request.user.pk)

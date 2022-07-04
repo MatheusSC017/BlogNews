@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.shortcuts import redirect, reverse, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q, Count, Avg
 from django.contrib import messages
 from django.utils import timezone
@@ -280,17 +281,12 @@ class Post(DetailView):
         messages.success(request, 'Obrigado pelo Feedback')
 
 
-class BlogUser(LoginRequiredMixin, BlogTemplate):
+class BlogUser(LoginRequiredMixin, PermissionRequiredMixin, BlogTemplate):
     """ List the user posts """
     template_name = 'post/blog_user.html'
+    login_url = settings.LOGIN_URL
+    permission_required = 'post.view_post'
     permission_denied_message = 'Necessário usuário autorizado'
-
-    def dispatch(self, request, *args, **kwargs):
-        """ Check the user permissions """
-        dispatch = super().dispatch(request, *args, **kwargs)
-        if not request.user.has_perm('post.view_post'):
-            return self.handle_no_permission()
-        return dispatch
 
     def get_queryset(self, *args, **kwargs):
         """ Select only the user posts """
@@ -316,19 +312,14 @@ class BlogUser(LoginRequiredMixin, BlogTemplate):
         return redirect(reverse('post:user_blog'))
 
 
-class RegisterPost(LoginRequiredMixin, CreateView):
+class RegisterPost(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """ Page to register the Post """
     template_name = 'post/post_user.html'
     model = PostModel
     form_class = PostForm
+    login_url = settings.LOGIN_URL
+    permission_required = 'post.add_post'
     permission_denied_message = 'Necessário usuário autorizado'
-
-    def dispatch(self, request, *args, **kwargs):
-        """ Check the permissions """
-        dispatch = super().dispatch(request, *args, **kwargs)
-        if not request.user.has_perm('post.add_post'):
-            return self.handle_no_permission()
-        return dispatch
 
     def post(self, request, *args, **kwargs):
         """ Includes the user and check the form """
@@ -346,19 +337,14 @@ class RegisterPost(LoginRequiredMixin, CreateView):
         return reverse('post:user_blog')
 
 
-class UpdatePost(LoginRequiredMixin, UpdateView):
+class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ Update the post """
     template_name = 'post/post_user.html'
     model = PostModel
     form_class = PostForm
+    login_url = settings.LOGIN_URL
+    permission_required = 'post.change_post'
     permission_denied_message = 'Necessário usuário autorizado'
-
-    def dispatch(self, request, *args, **kwargs):
-        """ Check the user permissions """
-        dispatch = super().dispatch(request, *args, **kwargs)
-        if not request.user.has_perm('post.change_post'):
-            return self.handle_no_permission()
-        return dispatch
 
     def get_success_url(self, *args, **kwargs):
         """ Redirect the user to posts page """

@@ -2,4 +2,153 @@
 
 {% block title %}{% endblock %}
 
-{% block content %}{% endblock %}
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light light-bg-color sticky-top d-none d-lg-block">
+    <div class="container">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#slides">Slides</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#introduction">Introdução</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#galery">Galeria</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#searches">Pesquisas</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<section class="container-fluid landing-item" id="slides">
+    <div class="row row-cols-1 row-cols-lg-2">
+        <div class="col col-lg-6">
+            <div class="carousel slide" id="carouselImages" data-bs-ride="carousel">
+                <div class="carousel-indicators" >
+                    <button type="button" data-bs-target="#carouselImages" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Imagem 1"></button>
+                    <button type="button" data-bs-target="#carouselImages" data-bs-slide-to="1" aria-label="Imagem 2"></button>
+                    <button type="button" data-bs-target="#carouselImages" data-bs-slide-to="2" aria-label="Imagem 3"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://source.unsplash.com/random/600x600?r=1" class="d-block" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://source.unsplash.com/random/600x600?r=2" class="d-block" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://source.unsplash.com/random/600x600?r=3" class="d-block" alt="...">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselImages" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+        <div class="col col-lg-6 banner-most-popular-container">
+            <div class="banner-most-popular-content">
+                <article class="banner-most-popular gray-bg-color rounded-3 d-sm-flex border border-light">
+                    <img src="https://source.unsplash.com/random/300x300?r=4" class="img-fluid rounded-start">
+                    <div class="p-3">
+                        <h1 class="h6 m-bottom-3"><strong>Titulo de um dos principais post do site |||||||||</strong></h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+                    </div>
+                </article>
+                <article class="banner-most-popular gray-bg-color rounded-3 d-sm-flex border border-light">
+                    <img src="https://source.unsplash.com/random/300x300?r=5" class="img-fluid rounded-start">
+                    <div class="p-3">
+                        <h1 class="h6 m-bottom-3"><strong>Titulo de um dos principais post do site |||||||||</strong></h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container-fluid landing-item gray-bg-color" id="introduction">
+   <article class="landing-item-content">
+       <h1 class="text-center m-bottom-5 dark-color">Introdução ao meu Blog</h1>
+       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+       <div class="d-md-flex">
+            <div class="p-5">
+                <h2 class="dark-color">
+                    Regras dos sites
+                </h2>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><strong class="h3 rotate-10">1º</strong> <span class="ms-5">Respeitar a opinião do proximo;</span></li>
+                    <li class="mb-2"><strong class="h3 rotate-10">2º</strong> <span class="ms-5">Apresentar somente informações com base solida;</span></li>
+                    <li class="mb-2"><strong class="h3 rotate-10">3º</strong> <span class="ms-5">Regra de número 3</span></li>
+                    <li class="mb-2"><strong class="h3 rotate-10">4º</strong> <span class="ms-5">Regra de número 4</span></li>
+                    <li class="mb-2"><strong class="h3 rotate-10">5º</strong> <span class="ms-5">Regra de número 5</span></li>
+                    <li class="mb-2"><strong class="h3 rotate-10">6º</strong> <span class="ms-5">Regra de número 6</span></li>
+                </ul>
+            </div>
+            <div class="ms-auto d-none d-md-block">
+                <img src="https://source.unsplash.com/random/300x300?r=6" class="img-fluid rounded-3 border border-light">
+            </div>
+       </div>
+   </article>
+</section>
+<section class="fluid-container landing-item" id="galery">
+    <h1 class="mt-5 ms-5">Galeria</h1>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 text-center m-0">
+        <div class="col p-3">
+            <div class="gallery-image rounded-3 border border-light">
+                <img src="https://source.unsplash.com/random/400x400?r=6" class="img-fluid">
+            </div>
+        </div>
+        <div class="col p-3">
+            <div class="gallery-image rounded-3 border border-light">
+                <img src="https://source.unsplash.com/random/400x400?r=7" class="img-fluid">
+            </div>
+        </div>
+        <div class="col p-3">
+            <div class="gallery-image rounded-3 border border-light">
+                <img src="https://source.unsplash.com/random/400x400?r=8" class="img-fluid">
+            </div>
+        </div>
+        <div class="col p-3">
+            <div class="gallery-image rounded-3 border border-light">
+                <img src="https://source.unsplash.com/random/400x400?r=9" class="img-fluid">
+            </div>
+        </div>
+        <div class="col p-3">
+            <div class="gallery-image rounded-3 border border-light">
+                <img src="https://source.unsplash.com/random/400x400?r=10" class="img-fluid">
+            </div>
+        </div>
+        <div class="col p-3">
+            <div class="gallery-image rounded-3 border border-light">
+                <img src="https://source.unsplash.com/random/400x400?r=11" class="img-fluid">
+            </div>
+        </div>
+
+    </div>
+</section>
+<section class="fluid-container landing-item gray-bg-color" id="searches">
+    <article class="p-5">
+        <h1 class="dark-color">Pesquisas</h1>
+        <div class="p-3">
+            <div class="mb-5">
+                <h2 class="h3">Pesquisa 1: pergunta sobre algum tema que se deseja entender a opinão geral.</h2>
+                <p class="m-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+            </div>
+            <div class="mb-5">
+                <h2 class="h3">Pesquisa 2: pergunta sobre algum tema que se deseja entender a opinão geral.</h2>
+                <p class="m-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+            </div>
+            <div class="mb-5">
+                <h2 class="h3">Pesquisa 3: pergunta sobre algum tema que se deseja entender a opinão geral.</h2>
+                <p class="m-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}

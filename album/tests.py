@@ -164,7 +164,7 @@ class AlbumUpdateMethodTestCase(TestCase):
                                                  'password': 'password_test2', })
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
                                                                     'title_album': 'test Album 2', })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
 
     def test_update_album(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -214,7 +214,7 @@ class AlbumDeleteMethodTestCase(TestCase):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
         response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
 
     def test_album_delete(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -350,7 +350,7 @@ class ImageUpdateMethodTestCase(TestCase):
         response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
                                     {'primary-key': self.image.pk,
                                      'title_image': 'Image title', })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
 
     def test_update_image(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -408,7 +408,7 @@ class ImageDeleteMethodTestCase(TestCase):
                                                  'password': 'password_test2', })
         response = self.client.post(reverse('album:image_delete', args=[self.album.pk, ]),
                                     {'primary-key': self.image.pk, })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
 
     def test_delete_image(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -456,7 +456,7 @@ class MultipleImageDeleteMethodTestCase(TestCase):
                                                  'password': 'password_test2', })
         response = self.client.post(reverse('album:images_delete', args=[self.album.pk, ]),
                                     {'delete-items': [self.image1.pk, self.image2.pk, ], })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
 
     def test_multiple_image_delete(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',

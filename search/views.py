@@ -107,6 +107,7 @@ class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     ordering = ['-published_search', '-publication_date_search', 'finish_date_search']
     login_url = settings.LOGIN_URL
     permission_required = 'search.view_search'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -122,6 +123,7 @@ class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = forms.SearchForm
     login_url = settings.LOGIN_URL
     permission_required = 'search.add_search'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -165,6 +167,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = forms.SearchForm
     login_url = settings.LOGIN_URL
     permission_required = 'search.change_search'
+    permission_denied_message = 'Necessário usuário autorizado'
 
     def get(self, request, pk, *args, **kwargs):
         get_object_or_404(models.Search, pk=pk, user_search=request.user)
