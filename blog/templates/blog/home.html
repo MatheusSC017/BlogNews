@@ -12,9 +12,11 @@
             <li class="nav-item">
                 <a class="nav-link" href="#introduction">Introdução</a>
             </li>
+            {% if galery.count > 3 %}
             <li class="nav-item">
                 <a class="nav-link" href="#galery">Galeria</a>
             </li>
+            {% endif %}
             <li class="nav-item">
                 <a class="nav-link" href="#searches">Pesquisas</a>
             </li>
@@ -52,26 +54,39 @@
                 </button>
             </div>
         </div>
+
+        {% if posts.count == 2 %}
         <div class="col col-lg-6 banner-most-popular-container">
             <div class="banner-most-popular-content">
+                {% for post in posts %}
                 <article class="banner-most-popular gray-bg-color rounded-3 d-sm-flex border border-light">
-                    <img src="https://source.unsplash.com/random/300x300?r=4" class="img-fluid rounded-start">
+                    {% if post.image_post %}
+                    <img src="{{ post.image_post.url }}" class="img-fluid rounded-start">
+                    {% endif %}
                     <div class="p-3">
-                        <h1 class="h6 m-bottom-3"><strong>Titulo de um dos principais post do site |||||||||</strong></h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+                        <h1 class="h4 m-bottom-3">
+                            <strong>
+                                {{ post.title_post }}
+                            </strong>
+                        </h1>
+                        <p>
+                            {{ post.excerpt_post }}
+                        </p>
                     </div>
                 </article>
-                <article class="banner-most-popular gray-bg-color rounded-3 d-sm-flex border border-light">
-                    <img src="https://source.unsplash.com/random/300x300?r=5" class="img-fluid rounded-start">
-                    <div class="p-3">
-                        <h1 class="h6 m-bottom-3"><strong>Titulo de um dos principais post do site |||||||||</strong></h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
-                    </div>
-                </article>
+                {% endfor %}
             </div>
         </div>
+        {% else %}
+        <div class="col col-lg-6 d-none d-lg-block p-5 text-center">
+            <h1>
+                Publique seu post aqui e receba diversos feedbacks dos nossos leitores.
+            </h1>
+        </div>
+        {% endif %}
     </div>
 </section>
+
 <section class="container-fluid landing-item gray-bg-color" id="introduction">
    <article class="landing-item-content">
        <h1 class="text-center m-bottom-5 dark-color">Introdução ao meu Blog</h1>
@@ -96,42 +111,25 @@
        </div>
    </article>
 </section>
+
+{% if galery.count > 3 %}
 <section class="fluid-container landing-item" id="galery">
     <h1 class="mt-5 ms-5">Galeria</h1>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 text-center m-0">
+        {% for image in galery %}
         <div class="col p-3">
             <div class="gallery-image rounded-3 border border-light">
-                <img src="https://source.unsplash.com/random/400x400?r=6" class="img-fluid">
+                <img src="{{ image.image.url }}"
+                     title="{{ image.title_image }}"
+                     alt="{{ image.title_image }}"
+                     class="img-fluid">
             </div>
         </div>
-        <div class="col p-3">
-            <div class="gallery-image rounded-3 border border-light">
-                <img src="https://source.unsplash.com/random/400x400?r=7" class="img-fluid">
-            </div>
-        </div>
-        <div class="col p-3">
-            <div class="gallery-image rounded-3 border border-light">
-                <img src="https://source.unsplash.com/random/400x400?r=8" class="img-fluid">
-            </div>
-        </div>
-        <div class="col p-3">
-            <div class="gallery-image rounded-3 border border-light">
-                <img src="https://source.unsplash.com/random/400x400?r=9" class="img-fluid">
-            </div>
-        </div>
-        <div class="col p-3">
-            <div class="gallery-image rounded-3 border border-light">
-                <img src="https://source.unsplash.com/random/400x400?r=10" class="img-fluid">
-            </div>
-        </div>
-        <div class="col p-3">
-            <div class="gallery-image rounded-3 border border-light">
-                <img src="https://source.unsplash.com/random/400x400?r=11" class="img-fluid">
-            </div>
-        </div>
-
+        {% endfor %}
     </div>
 </section>
+{% endif %}
+
 <section class="fluid-container landing-item gray-bg-color" id="searches">
     <article class="p-5">
         <h1 class="dark-color">Pesquisas</h1>
