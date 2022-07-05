@@ -32,7 +32,7 @@ class Home(TemplateView):
             publication_date_search__lte=timezone.now()
         ).annotate(
             max_option=Subquery(options.values('response_option'))
-        )[:3]
+        ).order_by('-publication_date_search')[:3]
 
         return context
 
