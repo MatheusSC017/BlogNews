@@ -17,9 +17,11 @@
                 <a class="nav-link" href="#galery">Galeria</a>
             </li>
             {% endif %}
+            {% if searches.count > 0 %}
             <li class="nav-item">
                 <a class="nav-link" href="#searches">Pesquisas</a>
             </li>
+            {% endif %}
         </ul>
     </div>
 </nav>
@@ -130,23 +132,19 @@
 </section>
 {% endif %}
 
+{% if searches.count > 0 %}
 <section class="fluid-container landing-item gray-bg-color" id="searches">
     <article class="p-5">
         <h1 class="dark-color">Pesquisas</h1>
         <div class="p-3">
+            {% for search in searches %}
             <div class="mb-5">
-                <h2 class="h3">Pesquisa 1: pergunta sobre algum tema que se deseja entender a opinão geral.</h2>
-                <p class="m-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
+                <h2 class="h3">{{ search.description_search }}</h2>
+                <p class="m-3">{{ search.max_option }}</p>
             </div>
-            <div class="mb-5">
-                <h2 class="h3">Pesquisa 2: pergunta sobre algum tema que se deseja entender a opinão geral.</h2>
-                <p class="m-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
-            </div>
-            <div class="mb-5">
-                <h2 class="h3">Pesquisa 3: pergunta sobre algum tema que se deseja entender a opinão geral.</h2>
-                <p class="m-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna arcu, feugiat eu feugiat quis, vulputate non dui. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum iaculis ante turpis, sed tempus dui volutpat eu. Praesent sodales suscipit ex.</p>
-            </div>
+            {% endfor %}
         </div>
     </article>
 </section>
+{% endif %}
 {% endblock %}
