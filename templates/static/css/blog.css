@@ -88,6 +88,12 @@ p {
     color: #020202;
 }
 
+/* Nav */
+.blog-sticky-top {
+    position: sticky;
+    top: 0;
+}
+
 /* Landing */
 .landing-item-content {
     padding: 5% 0%;
