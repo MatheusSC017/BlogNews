@@ -2,54 +2,60 @@ from django.shortcuts import reverse
 from django.test import Client, TestCase
 from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.messages import get_messages
+from django.utils import timezone as tz
 from .models import Category, Post, RattingUserPost
 from comment.models import Comment
 from .views import Post as PostView, Blog
 from user.views import Login
 
 
-class BlogPageTestCase(TestCase):
+class BlogTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.py_category = Category.objects.create(title_category='Python')
         self.django_category = Category.objects.create(title_category='Django')
 
         self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
+        self.other_user = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
+
+        content_type = ContentType.objects.get_for_model(Post)
+        permissions = Permission.objects.filter(content_type=content_type)
+        for permission in permissions:
+            self.user.user_permissions.add(permission)
 
         self.post1 = Post.objects.create(title_post='Python Frameworks',
                                          excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
                                                       'python',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
                                          category_post=self.py_category,
-                                         published_date_post='2022-05-21',
+                                         published_date_post=tz.now() - tz.timedelta(days=30),
                                          user_post=self.user)
         self.post2 = Post.objects.create(title_post='Django',
                                          excerpt_post='Tutorial interativo do framework django',
                                          description_post='Informações diversas sobre o framework e suas '
                                                           'funcionalidades',
                                          category_post=self.django_category,
-                                         published_date_post='2022-06-01',
+                                         published_date_post=tz.now() - tz.timedelta(days=20),
                                          user_post=self.user)
         self.post3 = Post.objects.create(title_post='Python Machine Learning',
                                          excerpt_post='Introdução a tecnicas de ML com python',
                                          description_post='O que é ML e apresentação teorica do seu '
                                                           'funcionamento',
                                          category_post=self.py_category,
-                                         published_date_post='2022-01-09',
+                                         published_date_post=tz.now() - tz.timedelta(days=90),
                                          user_post=self.user)
         self.post4 = Post.objects.create(title_post='Python Machine Learning Frameworks',
                                          excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
                                          description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
-                                         published_date_post='2022-06-04',
+                                         published_date_post=tz.now() - tz.timedelta(days=15),
                                          published_post=False,
                                          user_post=self.user)
         self.post5 = Post.objects.create(title_post='Python análise de dados',
                                          excerpt_post='Curso de python DataScience (Frameworks)',
                                          description_post='Informações sobre os processos envolvendo análise de dados',
                                          category_post=self.py_category,
-                                         published_date_post='2020-01-01',
-                                         published_post=True,
+                                         published_date_post=tz.now() - tz.timedelta(days=120),
                                          user_post=self.user)
 
         RattingUserPost.objects.create(user_ratting=self.user,
@@ -65,6 +71,12 @@ class BlogPageTestCase(TestCase):
                                        post_ratting=self.post5,
                                        ratting=4)
 
+        self.comment = Comment.objects.create(user_comment=self.user,
+                                              post_comment=self.post1,
+                                              comment='Testando')
+
+
+class BlogPageTestCase(BlogTestCase):
     def test_connection_with_the_blog_page(self):
         response = self.client.get(reverse('post:blog'))
         self.assertEqual(response.status_code, 200)
@@ -114,46 +126,13 @@ class BlogPageTestCase(TestCase):
         return [post.pk for post in response.context.get('posts')]
 
 
-class PostPageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.py_category = Category.objects.create(title_category='Python')
-
-        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
-        self.other_user = User.objects.create_user('username_test2', 'test2@test.com.br', 'password_test2')
-
-        self.post1 = Post.objects.create(title_post='Python Frameworks',
-                                         excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
-                                                      'python',
-                                         description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
-                                         category_post=self.py_category,
-                                         user_post=self.user)
-        self.post2 = Post.objects.create(title_post='Python Machine Learning Frameworks',
-                                         excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
-                                         description_post='Framworks Pythons voltados ao uso de Machine Learning',
-                                         category_post=self.py_category,
-                                         published_post=False,
-                                         user_post=self.user)
-        self.post3 = Post.objects.create(title_post='Python Frameworks 2',
-                                         excerpt_post='Continuação',
-                                         description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
-                                         category_post=self.py_category,
-                                         user_post=self.user)
-
-        self.comment = Comment.objects.create(user_comment=self.user,
-                                              post_comment=self.post1,
-                                              comment='Testando')
-
-        self.ratting = RattingUserPost.objects.create(user_ratting=self.user,
-                                                      post_ratting=self.post2,
-                                                      ratting=3)
-
+class PostPageTestCase(BlogTestCase):
     def test_connection_with_the_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertEqual(response.status_code, 200)
 
     def test_access_to_unpublished_post(self):
-        response = self.client.get(reverse('post:post', args=[self.post2.pk]))
+        response = self.client.get(reverse('post:post', args=[self.post4.pk]))
         self.assertEqual(response.resolver_match.func.__name__, Blog.as_view().__name__)
 
     def test_receiving_data_post_page(self):
@@ -263,36 +242,7 @@ class PostPageTestCase(TestCase):
         self.assertEqual(str(messages[1]), message)
 
 
-class UserBlogPageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.py_category = Category.objects.create(title_category='Python')
-        self.django_category = Category.objects.create(title_category='Django')
-
-        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
-        self.user_without_permissions = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(Post)
-        post_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in post_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.post1 = Post.objects.create(title_post='Python Frameworks',
-                                         excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
-                                                      'python',
-                                         description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
-                                         category_post=self.py_category,
-                                         published_date_post='2022-05-21',
-                                         user_post=self.user)
-        self.post2 = Post.objects.create(title_post='Django',
-                                         excerpt_post='Tutorial interativo do framework django',
-                                         description_post='Informações diversas sobre o framework e suas '
-                                                          'funcionalidades',
-                                         category_post=self.django_category,
-                                         published_date_post='2022-06-01',
-                                         user_post=self.user,
-                                         published_post=False)
-
+class UserBlogPageTestCase(BlogTestCase):
     def test_connection_and_context_of_page_with_user_logged_in(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
@@ -315,7 +265,12 @@ class UserBlogPageTestCase(TestCase):
                                                  'password': 'password_test', })
         response = self.client.get(reverse('post:user_blog'))
         order = [_.pk for _ in response.context.get('posts')]
-        self.assertEqual([self.post2.pk, self.post1.pk], order)
+        self.assertEqual([self.post4.pk,
+                          self.post2.pk,
+                          self.post1.pk,
+                          self.post3.pk,
+                          self.post5.pk], order)
+        [164, 162, 161, 163, 165]
 
     def test_unpublish_post(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -330,7 +285,7 @@ class UserBlogPageTestCase(TestCase):
     def test_publish_post(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post2.pk, })
+        response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post4.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))
@@ -338,20 +293,7 @@ class UserBlogPageTestCase(TestCase):
         self.assertEqual(str(messages[1]), 'Post publicado')
 
 
-class UserCreatePostPageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
-
-        self.category = Category.objects.create(title_category='register_test')
-
-        content_type = ContentType.objects.get_for_model(Post)
-        post_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in post_permissions:
-            self.user.user_permissions.add(permission)
-
+class UserCreatePostPageTestCase(BlogTestCase):
     def test_post_create_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
@@ -374,7 +316,7 @@ class UserCreatePostPageTestCase(TestCase):
         parameters = {'title_post': 'register_test',
                       'excerpt_post': 'register_test_excerpt_post',
                       'description_post': 'register_test_description_post',
-                      'category_post': str(self.category.pk),
+                      'category_post': str(self.py_category.pk),
                       'image_post': '', }
         response = self.client.post(reverse('post:post_create'), parameters)
         self.assertEqual(response.status_code, 302)
@@ -384,41 +326,21 @@ class UserCreatePostPageTestCase(TestCase):
         self.assertEqual(str(messages[1]), 'Post adicionado')
 
 
-class UserUpdatePostPageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
-
-        self.category1 = Category.objects.create(title_category='post_test')
-        self.category2 = Category.objects.create(title_category='update_test')
-
-        content_type = ContentType.objects.get_for_model(Post)
-        post_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in post_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.post = Post.objects.create(title_post='post_test',
-                                        excerpt_post='post_test',
-                                        description_post='post_test',
-                                        category_post=self.category1,
-                                        user_post=self.user)
-
+class UserUpdatePostPageTestCase(BlogTestCase):
     def test_post_update_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.get(reverse('post:post_update', args=[self.post.pk, ]))
+        response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 200)
 
     def test_post_update_connection_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.get(reverse('post:post_update', args=[self.post.pk, ]))
+        response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 403)
 
     def test_post_update_connection_with_user_loggout(self):
-        response = self.client.get(reverse('post:post_update', args=[self.post.pk, ]))
+        response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 302)
 
     def test_post_update(self):
@@ -427,9 +349,9 @@ class UserUpdatePostPageTestCase(TestCase):
         parameters = {'title_post': 'update_test',
                       'excerpt_post': 'update_test_excerpt_post',
                       'description_post': 'update_test_description_post',
-                      'category_post': str(self.category2.pk),
+                      'category_post': str(self.django_category.pk),
                       'image_post': '', }
-        response = self.client.post(reverse('post:post_update', args=[self.post.pk, ]), parameters)
+        response = self.client.post(reverse('post:post_update', args=[self.post1.pk, ]), parameters)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))

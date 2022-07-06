@@ -8,11 +8,18 @@ from django.contrib.auth.models import User, Permission, ContentType
 from . import models
 
 
-class AlbumPageTestCase(TestCase):
+class AlbumTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
         self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
+        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
+
+        for model in [models.Album, models.Image]:
+            content_type = ContentType.objects.get_for_model(model)
+            permissions = Permission.objects.filter(content_type=content_type)
+            for permission in permissions:
+                self.user.user_permissions.add(permission)
 
         self.album1 = models.Album.objects.create(title_album='Album test 1',
                                                   user_album=self.user)
@@ -34,6 +41,8 @@ class AlbumPageTestCase(TestCase):
                                                   image=image,
                                                   album_image=self.album2)
 
+
+class AlbumPageTestCase(AlbumTestCase):
     def test_album_page_connection_and_context(self):
         response = self.client.get(reverse('album:album'))
         self.assertEqual(response.status_code, 200)
@@ -45,42 +54,16 @@ class AlbumPageTestCase(TestCase):
         self.assertEqual([self.album1.pk, ], order)
 
 
-class ImagePageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-
-        self.album = models.Album.objects.create(title_album='Album test',
-                                                 user_album=self.user)
-
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
-            image = SimpleUploadedFile('image.jpg', img.read())
-        for _ in range(5):
-            models.Image.objects.create(title_image='Image test',
-                                        image=image,
-                                        album_image=self.album)
-
+class ImagePageTestCase(AlbumTestCase):
     def test_image_page_connection_context_and_data(self):
-        response = self.client.get(reverse('album:image', args=[self.album.pk, ]))
+        response = self.client.get(reverse('album:image', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 200)
         self.assertIn('album', response.context)
         self.assertIn('images', response.context)
-        self.assertEqual(len(response.context.get('images')), 5)
+        self.assertEqual(len(response.context.get('images')), 3)
 
 
-class UserAlbumPageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Album)
-        album_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in album_permissions:
-            self.user.user_permissions.add(permission)
-
+class UserAlbumPageTestCase(AlbumTestCase):
     def test_album_page_without_user(self):
         response = self.client.get(reverse('album:user_album'))
         self.assertEqual(response.status_code, 302)
@@ -99,18 +82,7 @@ class UserAlbumPageTestCase(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class AlbumCreatePageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Album)
-        album_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in album_permissions:
-            self.user.user_permissions.add(permission)
-
+class AlbumCreatePageTestCase(AlbumTestCase):
     def test_album_create_without_user(self):
         response = self.client.get(reverse('album:album_create'))
         self.assertEqual(response.status_code, 302)
@@ -139,37 +111,23 @@ class AlbumCreatePageTestCase(TestCase):
         self.assertEqual(str(messages[1]), 'Álbum cadastrado')
 
 
-class AlbumUpdateMethodTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Album)
-        album_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in album_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Test Album',
-                                                 user_album=self.user)
-
+class AlbumUpdateMethodTestCase(AlbumTestCase):
     def test_update_album_without_user(self):
-        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test Album 2', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_album_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test Album 2', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_album(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test Album 2',
                                                                     'published_album': False, })
         self.assertEqual(response.status_code, 302)
@@ -181,7 +139,7 @@ class AlbumUpdateMethodTestCase(TestCase):
     def test_update_album_with_invalid_data(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album.pk,
+        response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test',
                                                                     'published_album': False, })
         self.assertEqual(response.status_code, 302)
@@ -191,35 +149,21 @@ class AlbumUpdateMethodTestCase(TestCase):
         self.assertEqual(str(messages[1]), 'Dados incorretos')
 
 
-class AlbumDeleteMethodTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Album)
-        album_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in album_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Test Album',
-                                                 user_album=self.user)
-
+class AlbumDeleteMethodTestCase(AlbumTestCase):
     def test_album_delete_without_user(self):
-        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
+        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_album_delete_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
+        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_album_delete(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album.pk, })
+        response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
@@ -227,70 +171,33 @@ class AlbumDeleteMethodTestCase(TestCase):
         self.assertEqual(str(messages[1]), 'Álbum deletado')
 
 
-class UserImagePageTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Image)
-        image_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in image_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Album test',
-                                                 user_album=self.user)
-
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
-            image = SimpleUploadedFile('image.jpg', img.read())
-        self.image1 = models.Image.objects.create(title_image='Image test 1',
-                                                  image=image,
-                                                  album_image=self.album)
-        self.image2 = models.Image.objects.create(title_image='Image test 2',
-                                                  image=image,
-                                                  album_image=self.album)
-
+class UserImagePageTestCase(AlbumTestCase):
     def test_user_image_page_without_user(self):
-        response = self.client.get(reverse('album:user_images', args=[self.album.pk, ]))
+        response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 302)
 
     def test_user_image_page_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.get(reverse('album:user_images', args=[self.album.pk, ]))
+        response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 403)
 
     def test_user_image_page_connection_context_and_data(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.get(reverse('album:user_images', args=[self.album.pk, ]))
+        response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 200)
         self.assertIn('album', response.context)
         self.assertIn('images', response.context)
         self.assertIn('image_form', response.context)
-        self.assertEqual(len(response.context.get('images')), 2)
+        self.assertEqual(len(response.context.get('images')), 3)
 
 
-class ImageCreateClassTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Image)
-        image_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in image_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Album test',
-                                                 user_album=self.user)
-
+class ImageCreateClassTestCase(AlbumTestCase):
     def test_create_image_class_without_user(self):
         with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
-        response = self.client.post(reverse('album:images_create', args=[self.album.pk, ]),
+        response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
         self.assertEqual(response.status_code, 302)
 
@@ -299,7 +206,7 @@ class ImageCreateClassTestCase(TestCase):
                                                  'password': 'password_test2', })
         with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
-        response = self.client.post(reverse('album:images_create', args=[self.album.pk, ]),
+        response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
         self.assertEqual(response.status_code, 403)
 
@@ -308,58 +215,38 @@ class ImageCreateClassTestCase(TestCase):
                                                  'password': 'password_test', })
         with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
-        response = self.client.post(reverse('album:images_create', args=[self.album.pk, ]),
+        response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Imagens cadastradas')
 
 
-class ImageUpdateMethodTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Image)
-        image_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in image_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Album test',
-                                                 user_album=self.user)
-
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
-            image = SimpleUploadedFile('image.jpg', img.read())
-        self.image = models.Image.objects.create(title_image='Image test',
-                                                 image=image,
-                                                 album_image=self.album)
-
+class ImageUpdateMethodTestCase(AlbumTestCase):
     def test_update_image_without_user(self):
-        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk,
+        response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk,
                                      'title_image': 'Image title', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_image_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk,
+        response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk,
                                      'title_image': 'Image title', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_image(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk,
+        response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk,
                                      'title_image': 'Image title', })
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Título editado')
@@ -367,104 +254,61 @@ class ImageUpdateMethodTestCase(TestCase):
     def test_update_image_with_invalid_data(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:image_update', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk,
+        response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk,
                                      'title_image': 'Test', })
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Título deve possuir ao menos 5 caracteres')
 
 
-class ImageDeleteMethodTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Image)
-        image_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in image_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Album test',
-                                                 user_album=self.user)
-
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
-            image = SimpleUploadedFile('image.jpg', img.read())
-        self.image = models.Image.objects.create(title_image='Image test',
-                                                 image=image,
-                                                 album_image=self.album)
-
+class ImageDeleteMethodTestCase(AlbumTestCase):
     def test_delete_image_without_user(self):
-        response = self.client.post(reverse('album:image_delete', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk, })
+        response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_delete_image_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.post(reverse('album:image_delete', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk, })
+        response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_delete_image(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:image_delete', args=[self.album.pk, ]),
-                                    {'primary-key': self.image.pk, })
+        response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
+                                    {'primary-key': self.image1.pk, })
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Imagem deletada')
 
 
-class MultipleImageDeleteMethodTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-        self.user = User.objects.create_user('username_test', 'test@test.com', 'password_test')
-        self.user_without_permission = User.objects.create_user('username_test2', 'test@test.com', 'password_test2')
-
-        content_type = ContentType.objects.get_for_model(models.Image)
-        image_permissions = Permission.objects.filter(content_type=content_type)
-        for permission in image_permissions:
-            self.user.user_permissions.add(permission)
-
-        self.album = models.Album.objects.create(title_album='Album test',
-                                                 user_album=self.user)
-
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
-            image = SimpleUploadedFile('image.jpg', img.read())
-        self.image1 = models.Image.objects.create(title_image='Image test 1',
-                                                  image=image,
-                                                  album_image=self.album)
-        self.image2 = models.Image.objects.create(title_image='Image test 2',
-                                                  image=image,
-                                                  album_image=self.album)
-
+class MultipleImageDeleteMethodTestCase(AlbumTestCase):
     def test_multiple_image_delete_without_user(self):
-        response = self.client.post(reverse('album:images_delete', args=[self.album.pk, ]),
+        response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),
                                     {'delete-items': [self.image1.pk, self.image2.pk, ], })
         self.assertEqual(response.status_code, 302)
 
     def test_multiple_image_delete_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2', })
-        response = self.client.post(reverse('album:images_delete', args=[self.album.pk, ]),
+        response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),
                                     {'delete-items': [self.image1.pk, self.image2.pk, ], })
         self.assertEqual(response.status_code, 302)
 
     def test_multiple_image_delete(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test', })
-        response = self.client.post(reverse('album:images_delete', args=[self.album.pk, ]),
+        response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),
                                     {'delete-items': [self.image1.pk, self.image2.pk, ], })
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('album:user_images', args=[self.album.pk, ]))
+        self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 2)
         self.assertEqual(str(messages[1]), 'Imagens excluidas')
