@@ -1,0 +1,115 @@
+/*
+ALTERAR: #212529 -> Cor do topo
+ALTERAR: #2020ff -> Cor dos links e cabeçalhos
+ALTERAR: #f8f9fa -> Cor da fonte
+*/
+
+#branding h1,
+#branding h1 a,
+#branding h1 a:link,
+#branding h1 a:visited {
+    color: #f8f9fa;
+}
+
+#branding h1 {
+    font-size: 20px;
+}
+
+#header {
+    background: #212529;
+    color: #f8f9fa;
+}
+
+#user-tools a:focus, #user-tools a:hover {
+    border-bottom-color: #f8f9fa;
+    color: #f8f9fa;
+}
+
+div.breadcrumbs a,
+div.breadcrumbs a:hover,
+div.breadcrumbs a:link,
+div.breadcrumbs a:visited,
+a:link, a:visited {
+    color: #2020ff;
+}
+
+#nav-sidebar .current-model {
+    background: #dcdcdc;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: #212529;
+    color: #f8f9fa;
+}
+
+div.breadcrumbs {
+    background: #f8f9fa;
+    color: #2020ff;
+}
+
+p.paginator a:link, p.paginator a:visited {
+    background: #f8f9fa !important;
+    color: #2020ff;
+    border-radius: 50%;
+}
+
+p.paginator a:hover {
+    background: #212529 !important;
+    color: #f8f9fa;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: #2020ff;
+}
+
+.button.default:active,
+input[type=submit].default:active,
+.button.default:focus,
+input[type=submit].default:focus,
+.button.default:hover,
+input[type=submit].default:hover {
+    background: #212529;
+}
+
+.object-tools a:focus, .object-tools a:hover {
+    background-color: #2020ff;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #212529;
+    color: #f8f9fa;
+}
+.button:active,
+input[type=submit]:active,
+input[type=button]:active,
+.button:focus,
+input[type=submit]:focus,
+input[type=button]:focus,
+.button:hover,
+input[type=submit]:hover,
+input[type=button]:hover {
+    background-color: #2020ff;
+}
+
+#changelist-filter li.selected a {
+    color: #2020ff !important;
+}
+
+#changelist-filter a:focus,
+#changelist-filter a:hover,
+#changelist-filter li.selected a:focus,
+#changelist-filter li.selected a:hover {
+    color: #212529 !important;
+}
+
+.selector-chosen h2 {
+    background: #2020ff !important;
+    color: #f8f9fa;
+}
+
+a.active.selector-chooseall:focus,
+a.active.selector-clearall:focus,
+a.active.selector-chooseall:hover,
+a.active.selector-clearall:hover {
+    color: #2020ff !important;
+}
