@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load socialaccount %}
 
 {% block title %} | Login{% endblock %}
 
@@ -11,6 +12,10 @@
         </div>
         <div class="col pt-5 pb-5 dark-color">
             <h2 class="my-3">Login</h2>
+
+            <a href="{% provider_login_url 'google' %}">
+                <img src="https://cdn-teams-slug.flaticon.com/google.jpg" class="image-icon">
+            </a>
 
             <form method="POST" action="#" class="form-field">
                 <div class="form-floating pb-2">

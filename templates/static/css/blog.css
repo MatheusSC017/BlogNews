@@ -238,6 +238,13 @@ p {
     }
 }
 
+/* Login */
+.image-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+}
+
 /* BLOG */
 .card-columns .card {
     margin-bottom: 0.75rem;

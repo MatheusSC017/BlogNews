@@ -45,9 +45,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django.contrib.humanize',
     'django_summernote',
     'axes',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # TODO: Remover ao final do projeto
     'debug_toolbar',
@@ -108,7 +113,22 @@ AUTHENTICATION_BACKENDS = [
 
     # Django ModelBackend is the default authentication backend.
     'django.contrib.auth.backends.ModelBackend',
+
+    # allauth backend
+    'allauth.account.auth_backends.AuthenticationBackend'
 ]
+
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '',
+            'secret': '',
+            'key': ''
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -128,6 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# User login configuration
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 SESSION_SAVE_EVERY_REQUEST = True
 AXES_COOLOFF_TIME = 3
@@ -176,7 +197,18 @@ MESSAGE_TAGS = {
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
+LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = reverse_lazy('user:login')
+
+SOCIALACCOUNT_FORMS = {
+    'signup': 'user.forms.SignupFormBlog',
+}
+
+# Additional configuration settings
+SOCIALACCOUNT_QUERY_EMAIL = True
+ACCOUNT_LOGOUT_ON_GET= True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_REQUIRED = True
 
 try:
     from .local_settings import *

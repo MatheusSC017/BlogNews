@@ -15,5 +15,5 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
     path('cadastrar/', views.Register.as_view(), name='register'),
     path('meus-dados/', views.Update.as_view(), name='update'),
-    path('resetar-senha/', include(reset_password_patterns))
+    path('resetar-senha/', include(reset_password_patterns)),
 ]

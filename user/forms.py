@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPa
 from django.contrib.auth.models import User
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
+from allauth.socialaccount.forms import SignupForm
 
 
 class UserCreationFormBlog(UserCreationForm):
@@ -112,6 +113,14 @@ class PasswordResetFormBlog(PasswordResetForm):
 
 
 class SetPasswordFormBlog(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+            self.fields[field].widget.attrs['placeholder'] = self.fields[field].label
+
+
+class SignupFormBlog(SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
