@@ -1,57 +1,47 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'user/base.html' %}
 {% load socialaccount %}
 
 {% block title %} | Login{% endblock %}
 
-{% block content %}
-<section class="container p-5">
-    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
-        <div class="col">
-            <img src="{% get_media_prefix %}static/user_svg_image.svg" alt="" class="img-fluid">
-        </div>
-        <div class="col pt-5 pb-5 dark-color">
-            <h2 class="my-3">Login</h2>
+{% block content_user_page %}
+<h2 class="my-3">Login</h2>
 
-            <a href="{% provider_login_url 'google' %}">
-                <img src="https://cdn-teams-slug.flaticon.com/google.jpg" class="image-icon">
-            </a>
+<a href="{% provider_login_url 'google' %}">
+    <img src="https://cdn-teams-slug.flaticon.com/google.jpg" class="image-icon">
+</a>
 
-            <form method="POST" action="#" class="form-field">
-                <div class="form-floating pb-2">
-                    <input name="username" type="text" class="form-control" id="input-user" placeholder="Nome do usuário">
-                    <label for="input-user">Usuário</label>
-                </div>
-
-                <div class="form-floating pb-2">
-                    <input name="password" type="password" class="form-control" id="input-password" placeholder="Senha">
-                    <label for="input-password">Senha</label>
-                </div>
-
-                <div class="text-end">
-                    <a href="{% url 'user:register' %}">
-                        <strong>
-                            Cadastrar
-                        </strong>
-                    </a>
-                </div>
-
-                <div class="text-end">
-                    <a href="{% url 'user:password_reset' %}">
-                        <strong>
-                            Esqueci minha senha
-                        </strong>
-                    </a>
-                </div>
-
-                {% csrf_token %}
-                <div class="text-end mt-3">
-                    <button class="btn button-format">
-                        Enviar
-                    </button>
-                </div>
-            </form>
-        </div>
+<form method="POST" action="#" class="form-field">
+    <div class="form-floating pb-2">
+        <input name="username" type="text" class="form-control" id="input-user" placeholder="Nome do usuário">
+        <label for="input-user">Usuário</label>
     </div>
-</section>
+
+    <div class="form-floating pb-2">
+        <input name="password" type="password" class="form-control" id="input-password" placeholder="Senha">
+        <label for="input-password">Senha</label>
+    </div>
+
+    <div class="text-end">
+        <a href="{% url 'user:register' %}">
+            <strong>
+                Cadastrar
+            </strong>
+        </a>
+    </div>
+
+    <div class="text-end">
+        <a href="{% url 'user:password_reset' %}">
+            <strong>
+                Esqueci minha senha
+            </strong>
+        </a>
+    </div>
+
+    {% csrf_token %}
+    <div class="text-end mt-3">
+        <button class="btn button-format">
+            Enviar
+        </button>
+    </div>
+</form>
 {% endblock %}

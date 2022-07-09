@@ -1,49 +1,50 @@
-{% extends "base.html" %}
+{% extends "user/base.html" %}
 {% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Signup" %}{% endblock %}
 
-{% block content %}
-<section class="container p-5">
-    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
-        <div class="col">
-            <img src="{% get_media_prefix %}static/user_svg_image.svg" alt="" class="img-fluid">
-        </div>
-        <div class="col pt-5 pb-5 dark-color">
-            <h1>{% trans "Sign Up" %}</h1>
+{% block content_user_page %}
+    <h1>{% trans "Sign Up" %}</h1>
 
-            <p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
-            {{site_name}}. As a final step, please complete the following form:{% endblocktrans %}</p>
+    <p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
+    {{site_name}}. As a final step, please complete the following form:{% endblocktrans %}</p>
 
-            <form class="signup form-field" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
-                {% csrf_token %}
+    <form class="signup form-field" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+        {% csrf_token %}
 
-                {% for field in form %}
-                    <div class="form-floating mb-3">
-                        {{ field }}
-                        {{ field.label_tag }}
-                        <div class="secondary-color">
-                        {{ field.errors }}
-                        </div>
-                        {% if field.help_text %}
-                        <p class="help primary-color">{{ field.help_text|safe }}</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-
-                {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                {% endif %}
-                <div class="text-end mt-3">
-                    <button type="submit" class="btn button-format">
-                        {% trans "Sign Up" %}
-                    </button>
+        {% for field in form %}
+            <div class="form-floating mb-3">
+                {{ field }}
+                {{ field.label_tag }}
+                <div class="secondary-color">
+                {{ field.errors }}
                 </div>
-            </form>
+                {% if field.help_text %}
+                <p class="help primary-color">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
 
-
+        <div class="form-check">
+            <input class="form-check-input border border-dark"
+                   name="checkpermissions"
+                   type="checkbox"
+                   value="Aceitar"
+                   id="contentCreator">
+            <label class="form-check-label" for="contentCreator">
+                Aceito os termos de uso para criação de conteúdo
+            </label>
         </div>
-    </div>
-</section>
+
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <div class="text-end mt-3">
+            <button type="submit" class="btn button-format">
+                {% trans "Sign Up" %}
+            </button>
+        </div>
+    </form>
+
 {% endblock %}

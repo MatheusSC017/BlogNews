@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="container p-5">
+    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
+        <div class="col d-flex">
+            <img src="{% get_media_prefix %}static/user_svg_image.svg" alt="" class="img-fluid align-middle">
+        </div>
+        <div class="col pt-3 pb-3 dark-color">
+            {% block content_user_page %}
+            {% endblock %}
+        </div>
+    </div>
+</section>
+{% endblock %}
