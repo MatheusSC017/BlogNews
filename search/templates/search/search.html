@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
+{% load setting_tags %}
 {% load convert_tags %}
 
 {% block head %}
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+    function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+    }
+</script>
 {% endblock %}
 
 {% block title %} | {{ search.description_search }}{% endblock %}
@@ -14,7 +21,7 @@
     <div class="row">
         <div class="col-xl"></div>
         <div class="col-xl-10 border border-dark p-5">
-            <form action="#" method="POST">
+            <form action="#" method="POST" id='demo-form'>
                 <h1 class="h2 pb-3">
                     {{ search.description_search }}
                 </h1>
@@ -60,7 +67,12 @@
                 {% if status %}
                 {% csrf_token %}
                 <div class="text-end">
-                    <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Enviar">
+                    <button id="btn_send_avaliation"
+                        class="btn button-format g-recaptcha btn-primary"
+                        data-sitekey="{% recaptcha_site_key %}"
+                        data-callback='onSubmit'>
+                        Enviar
+                    </button>
                 </div>
                 {% endif %}
             </form>

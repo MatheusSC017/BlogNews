@@ -1,5 +1,5 @@
 from django.shortcuts import reverse
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.messages import get_messages
 from django.utils import timezone as tz
@@ -126,6 +126,8 @@ class BlogPageTestCase(BlogTestCase):
         return [post.pk for post in response.context.get('posts')]
 
 
+@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class PostPageTestCase(BlogTestCase):
     def test_connection_with_the_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
@@ -147,7 +149,8 @@ class PostPageTestCase(BlogTestCase):
 
     def test_view_post_with_logged_in_user(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         views = self.post1.user_views_post
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertEqual(response.context.get('post').user_views_post, views + 1)
@@ -159,7 +162,7 @@ class PostPageTestCase(BlogTestCase):
         self.assertEqual(response.context.get('post').anonymous_views_post, views)
 
     def test_post_method_with_incorrect_action(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'action': 'incorrect-action', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Ação inválida')
 
@@ -170,59 +173,63 @@ class PostPageTestCase(BlogTestCase):
         self.assertEqual(response.resolver_match.func.__name__, Login.as_view().__name__)
 
     def test_comment_registration_with_user_logged_in(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'comment': 'Comment_test', 'action': 'create-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário adicionado')
 
     def test_comment_update_with_user_logged_in(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário editado')
 
     def test_comment_update_with_other_user_logged_in(self):
-        user_parameter = {'username': 'username_test2', 'password': 'password_test2', }
+        user_parameter = {'username': 'username_test2',
+                          'password': 'password_test2',
+                          'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
 
     def test_comment_update_with_invalid_pk(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'primary-key': '', 'comment': 'Comment_test', 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
 
     def test_update_comment_other_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
                                                          'Comentário inválido', self.post3.pk)
 
     def test_comment_delete_with_user_logged_in(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário deletado')
 
     def test_comment_delete_with_other_user_logged_in(self):
-        user_parameter = {'username': 'username_test2', 'password': 'password_test2', }
+        user_parameter = {'username': 'username_test2',
+                          'password': 'password_test2',
+                          'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
 
     def test_comment_delete_with_invalid_pk(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'primary-key': '', 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
 
     def test_delete_comment_other_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
                                                          'Comentário inválido', self.post3.pk)
 
     def test_register_feedback_to_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'star': '5', 'action': 'ratting-post', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Obrigado pelo Feedback')
 
     def test_update_feedback_to_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', }
+        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
         action_parameter = {'star': '5', 'action': 'ratting-post', }
         self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
                                                          'Obrigado pelo Feedback', self.post3.pk)
@@ -242,17 +249,21 @@ class PostPageTestCase(BlogTestCase):
         self.assertEqual(str(messages[1]), message)
 
 
+@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class UserBlogPageTestCase(BlogTestCase):
     def test_connection_and_context_of_page_with_user_logged_in(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:user_blog'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('posts', response.context)
 
     def test_connection_page_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2', })
+                                                 'password': 'password_test2',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:user_blog'))
         self.assertEqual(response.status_code, 403)
 
@@ -262,7 +273,8 @@ class UserBlogPageTestCase(BlogTestCase):
 
     def test_data_received_user_post_page(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:user_blog'))
         order = [_.pk for _ in response.context.get('posts')]
         self.assertEqual([self.post4.pk,
@@ -274,7 +286,8 @@ class UserBlogPageTestCase(BlogTestCase):
 
     def test_unpublish_post(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
@@ -284,7 +297,8 @@ class UserBlogPageTestCase(BlogTestCase):
 
     def test_publish_post(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post4.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
@@ -293,16 +307,20 @@ class UserBlogPageTestCase(BlogTestCase):
         self.assertEqual(str(messages[1]), 'Post publicado')
 
 
+@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class UserCreatePostPageTestCase(BlogTestCase):
     def test_post_create_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 200)
 
     def test_post_create_connection_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2', })
+                                                 'password': 'password_test2',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 403)
 
@@ -312,7 +330,8 @@ class UserCreatePostPageTestCase(BlogTestCase):
 
     def test_post_create(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         parameters = {'title_post': 'register_test',
                       'excerpt_post': 'register_test_excerpt_post',
                       'description_post': 'register_test_description_post',
@@ -326,16 +345,20 @@ class UserCreatePostPageTestCase(BlogTestCase):
         self.assertEqual(str(messages[1]), 'Post adicionado')
 
 
+@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class UserUpdatePostPageTestCase(BlogTestCase):
     def test_post_update_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 200)
 
     def test_post_update_connection_with_user_without_permission(self):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2', })
+                                                 'password': 'password_test2',
+                                                 'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 403)
 
@@ -345,7 +368,8 @@ class UserUpdatePostPageTestCase(BlogTestCase):
 
     def test_post_update(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test', })
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
         parameters = {'title_post': 'update_test',
                       'excerpt_post': 'update_test_excerpt_post',
                       'description_post': 'update_test_description_post',

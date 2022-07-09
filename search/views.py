@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils import timezone
 from . import models, forms
+from utils.utils import verify_recaptcha
 
 
 class Searches(ListView):
@@ -57,6 +58,12 @@ class Search(DetailView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
+        recaptcha_response = self.request.POST.get('g-recaptcha-response')
+
+        if not verify_recaptcha(recaptcha_response):
+            messages.warning(request, 'ReCaptcha inválido')
+            return redirect(reverse('search:search', args=[kwargs.get('pk'), ]))
+
         if not request.user.is_authenticated:
             return redirect(reverse('user:login'))
 
@@ -94,7 +101,7 @@ class Search(DetailView):
         context['status'] = (context['search'].finish_date_search > timezone.now())
         if self.request.user.is_authenticated:
             context['vote'] = models.VottingUserOption.objects.filter(user_votting=self.request.user.pk,
-                                                                      option_votting__in=options)[0]
+                                                                      option_votting__in=options).first
 
         return context
 

@@ -1,7 +1,17 @@
 {% extends 'user/base.html' %}
+{% load setting_tags %}
 {% load socialaccount %}
 
 {% block title %} | Login{% endblock %}
+
+{% block head %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+    function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+    }
+</script>
+{% endblock %}
 
 {% block content_user_page %}
 <h2 class="my-3">Login</h2>
@@ -10,7 +20,7 @@
     <img src="https://cdn-teams-slug.flaticon.com/google.jpg" class="image-icon">
 </a>
 
-<form method="POST" action="#" class="form-field">
+<form method="POST" action="#" class="form-field" id='demo-form'>
     <div class="form-floating pb-2">
         <input name="username" type="text" class="form-control" id="input-user" placeholder="Nome do usuário">
         <label for="input-user">Usuário</label>
@@ -39,7 +49,9 @@
 
     {% csrf_token %}
     <div class="text-end mt-3">
-        <button class="btn button-format">
+        <button class="btn button-format g-recaptcha"
+                data-sitekey="{% recaptcha_site_key %}"
+                data-callback='onSubmit'>
             Enviar
         </button>
     </div>

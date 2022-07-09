@@ -1,6 +1,17 @@
 from PIL import Image
 from django.conf import settings
 from pathlib import Path
+import requests
+
+
+def verify_recaptcha(recaptcha_response):
+    response = requests.post('https://www.google.com/recaptcha/api/siteverify',
+                             data={
+                                 'secret': settings.RECAPTCHA_SECRET_KEY,
+                                 'response': recaptcha_response,
+                             })
+
+    return response.json()['success']
 
 
 def resize_image(img_db, new_width: 400):

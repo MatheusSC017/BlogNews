@@ -9,6 +9,7 @@ from .models import Post as PostModel, Category as CategoryModel, RattingUserPos
 from comment.models import Comment
 from comment.forms import CommentForm
 from .forms import PostForm
+from utils.utils import verify_recaptcha
 
 
 class BlogTemplate(ListView):
@@ -197,6 +198,11 @@ class Post(DetailView):
     def create_comment(self, request, context):
         """ Registration of the comment """
         form = context.get('comment_form')
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+
+        if not verify_recaptcha(recaptcha_response):
+            messages.warning(request, 'ReCaptcha inválido')
+            return self.render_to_response(context)
 
         if not form.is_valid():
             return self.render_to_response(context)

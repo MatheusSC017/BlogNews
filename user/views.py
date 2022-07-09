@@ -24,6 +24,7 @@ from .forms import (
 from post.models import Post
 from album.models import Album, Image
 from search.models import Search, Option
+from utils.utils import verify_recaptcha
 
 
 class Login(View, TemplateResponseMixin):
@@ -40,12 +41,18 @@ class Login(View, TemplateResponseMixin):
 
     def post(self, *args, **kwargs):
         """ Check the user data and login """
-        username = self.request.POST.get('username')
-        password = self.request.POST.get('password')
+        recaptcha_response = self.request.POST.get('g-recaptcha-response')
+
+        if not verify_recaptcha(recaptcha_response):
+            messages.warning(self.request, 'ReCaptcha inválido')
+            return redirect(reverse('user:login'))
 
         if self.request.user.is_authenticated:
             messages.warning(self.request, 'Usuário já logado')
             return redirect(reverse('blog:index'))
+
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
 
         user = authenticate(self.request, username=username, password=password)
         if user is not None:
@@ -57,9 +64,11 @@ class Login(View, TemplateResponseMixin):
             return self.render_to_response({})
 
 
-@login_required(login_url=settings.LOGIN_URL)
 def logout_user(request):
     """ Check if the user is already logged out, if not, the user is logged out """
+    if not request.user.is_authenticated:
+        return redirect(settings.LOGIN_URL)
+
     logout(request)
     messages.success(request, 'Usuário deslogado')
     return redirect(reverse('blog:index'))

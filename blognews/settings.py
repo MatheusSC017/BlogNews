@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = 'YOUR PROJECT SECRET KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -123,9 +123,9 @@ SITE_ID = 1
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': '',
-            'secret': '',
-            'key': ''
+            'client_id': 'YOUR CLIENT ID',
+            'secret': 'YOUR SECRET KEY',
+            'key': 'YOUR KEY'
         }
     }
 }
@@ -206,9 +206,20 @@ SOCIALACCOUNT_FORMS = {
 
 # Additional configuration settings
 SOCIALACCOUNT_QUERY_EMAIL = True
-ACCOUNT_LOGOUT_ON_GET= True
+ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
+
+RECAPTCHA_SITE_KEY = 'YOUR RECAPTCHA SITE KEY'
+RECAPTCHA_SECRET_KEY = 'YOUR RECAPTCHA SECRET KEY'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'YOUR E-MAIL'
+EMAIL_HOST_PASSWORD = 'YOUR PASSWORD'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'BlogNews'
 
 try:
     from .local_settings import *
