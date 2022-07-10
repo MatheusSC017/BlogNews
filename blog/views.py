@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from django.db.models import Max, Count, Subquery, OuterRef
+from django.db.models import Count, Subquery, OuterRef
 from django.utils import timezone
 from post import models as model_post
 from album import models as model_album
@@ -15,8 +15,8 @@ class Home(TemplateView):
 
         context['posts'] = model_post.Post.objects.filter(
             published_post=True,
-            published_date_post__lte=timezone.now()
-        ).defer('description_post').order_by('-published_date_post')[:2]
+            publication_date_post__lte=timezone.now()
+        ).defer('description_post').order_by('-publication_date_post')[:2]
 
         context['galery'] = model_album.Image.objects.filter(
             album_image__published_album=True

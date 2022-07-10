@@ -28,35 +28,41 @@ class BlogTestCase(TestCase):
                                                       'python',
                                          description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
                                          category_post=self.py_category,
-                                         published_date_post=tz.now() - tz.timedelta(days=30),
+                                         publication_date_post=tz.now() - tz.timedelta(days=30),
                                          user_post=self.user)
         self.post2 = Post.objects.create(title_post='Django',
                                          excerpt_post='Tutorial interativo do framework django',
                                          description_post='Informações diversas sobre o framework e suas '
                                                           'funcionalidades',
                                          category_post=self.django_category,
-                                         published_date_post=tz.now() - tz.timedelta(days=20),
+                                         publication_date_post=tz.now() - tz.timedelta(days=20),
                                          user_post=self.user)
         self.post3 = Post.objects.create(title_post='Python Machine Learning',
                                          excerpt_post='Introdução a tecnicas de ML com python',
                                          description_post='O que é ML e apresentação teorica do seu '
                                                           'funcionamento',
                                          category_post=self.py_category,
-                                         published_date_post=tz.now() - tz.timedelta(days=90),
+                                         publication_date_post=tz.now() - tz.timedelta(days=90),
                                          user_post=self.user)
         self.post4 = Post.objects.create(title_post='Python Machine Learning Frameworks',
                                          excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
                                          description_post='Framworks Pythons voltados ao uso de Machine Learning',
                                          category_post=self.py_category,
-                                         published_date_post=tz.now() - tz.timedelta(days=15),
+                                         publication_date_post=tz.now() - tz.timedelta(days=15),
                                          published_post=False,
                                          user_post=self.user)
         self.post5 = Post.objects.create(title_post='Python análise de dados',
                                          excerpt_post='Curso de python DataScience (Frameworks)',
                                          description_post='Informações sobre os processos envolvendo análise de dados',
                                          category_post=self.py_category,
-                                         published_date_post=tz.now() - tz.timedelta(days=120),
+                                         publication_date_post=tz.now() - tz.timedelta(days=120),
                                          user_post=self.user)
+        self.post6 = Post.objects.create(title_post='Posts sobre informação futura',
+                                         excerpt_post='Python e o futuro',
+                                         description_post='Python e o futuro',
+                                         category_post=self.py_category,
+                                         publication_date_post=tz.now() + tz.timedelta(days=120),
+                                         user_post=self.other_user)
 
         RattingUserPost.objects.create(user_ratting=self.user,
                                        post_ratting=self.post1,

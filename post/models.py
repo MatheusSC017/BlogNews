@@ -25,7 +25,7 @@ class Post(models.Model):
     anonymous_views_post = models.PositiveIntegerField(default=0, verbose_name='Visualizações')
     user_views_post = models.PositiveIntegerField(default=0, verbose_name='Visualizações')
     published_post = models.BooleanField(default=True, verbose_name='publicado')
-    published_date_post = models.DateTimeField(default=timezone.now, verbose_name='data de publicação')
+    publication_date_post = models.DateTimeField(default=timezone.now, verbose_name='data de publicação')
     edition_date_post = models.DateTimeField(default=timezone.now, verbose_name='data de edição')
     album_post = models.ForeignKey(Album, blank=True, null=True, on_delete=models.CASCADE, verbose_name='Album')
     category_post = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoria')

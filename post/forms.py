@@ -7,12 +7,12 @@ class PostForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        format_fields = ['title_post', 'excerpt_post', 'image_post', 'published_date_post', 'edition_date_post', ]
+        format_fields = ['title_post', 'excerpt_post', 'image_post', 'publication_date_post', 'edition_date_post', ]
         for field in format_fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
             self.fields[field].widget.attrs['placeholder'] = self.fields[field].label
         self.fields['category_post'].widget.attrs['class'] = 'form-select'
-        self.fields['published_date_post'].disabled = True
+        self.fields['publication_date_post'].disabled = True
         self.fields['edition_date_post'].disabled = True
 
     def clean(self):
@@ -41,7 +41,7 @@ class PostForm(ModelForm):
     class Meta:
         model = Post
         fields = ['title_post', 'excerpt_post', 'description_post', 'image_post',
-                  'category_post', 'published_date_post', 'edition_date_post', ]
+                  'category_post', 'publication_date_post', 'edition_date_post', ]
         widgets = {
             'description_post': SummernoteWidget(),
         }

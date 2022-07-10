@@ -21,7 +21,7 @@ class IndexPageTestCase(TestCase):
         self.post1 = model_post.Post.objects.create(title_post='title_test_1',
                                                     excerpt_post='excerpt_test_1',
                                                     description_post='description_test_1',
-                                                    published_date_post=tz.now() + tz.timedelta(days=5),
+                                                    publication_date_post=tz.now() + tz.timedelta(days=5),
                                                     category_post=self.category,
                                                     user_post=self.user)
         self.post2 = model_post.Post.objects.create(title_post='title_test_2',
@@ -33,13 +33,13 @@ class IndexPageTestCase(TestCase):
         self.post3 = model_post.Post.objects.create(title_post='title_test_3',
                                                     excerpt_post='excerpt_test_3',
                                                     description_post='description_test_3',
-                                                    published_date_post=tz.now() - tz.timedelta(days=10),
+                                                    publication_date_post=tz.now() - tz.timedelta(days=10),
                                                     category_post=self.category,
                                                     user_post=self.user)
         self.post4 = model_post.Post.objects.create(title_post='title_test_4',
                                                     excerpt_post='excerpt_test_4',
                                                     description_post='description_test_4',
-                                                    published_date_post=tz.now() - tz.timedelta(days=5),
+                                                    publication_date_post=tz.now() - tz.timedelta(days=5),
                                                     category_post=self.category,
                                                     user_post=self.user)
 

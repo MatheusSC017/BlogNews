@@ -23,7 +23,7 @@ class BlogTemplate(ListView):
     paginate_by = 10
     context_object_name = 'posts'
     category = None
-    order_by = '-published_date_post'
+    order_by = '-publication_date_post'
     search = None
 
     def get_queryset(self, *args, **kwargs):
@@ -82,7 +82,7 @@ class BlogTemplate(ListView):
             self.search = search_field
 
         order_list = {
-            'publicacao': '-published_date_post',
+            'publicacao': '-publication_date_post',
             'avaliacao': '-ratting_post',
         }
         if order_by_field in order_list.keys():
@@ -102,6 +102,7 @@ class Blog(BlogTemplate):
     def get_queryset(self, *args, **kwargs):
         """ Select only the published posts """
         qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(publication_date_post__lte=timezone.now())
         qs = qs.filter(published_post=True)
         return qs
 
