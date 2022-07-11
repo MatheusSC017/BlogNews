@@ -101,11 +101,13 @@ class Register(CreateView):
 
 
 class Update(LoginRequiredMixin, FormView):
+    """ Page to update the user data """
     template_name = 'user/update.html'
     model = User
     form_class = UserChangeFormBlog
 
     def get(self, request, *args, **kwargs):
+        """ Include the initial data of the form """
         user_data = {
             'username': request.user.username,
             'email': request.user.email,
@@ -116,11 +118,13 @@ class Update(LoginRequiredMixin, FormView):
         return super().get(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
+        """ Return the form """
         if form_class is None:
             form_class = self.get_form_class()
         return form_class(**self.get_form_kwargs(), instance=self.request.user)
 
     def form_valid(self, form):
+        """ Check if the form is valid """
         form.instance = self.request.user
         form.save()
         messages.success(self.request, "Perfil editado")
@@ -128,6 +132,7 @@ class Update(LoginRequiredMixin, FormView):
 
 
 class PasswordReset(PasswordResetView):
+    """ Page to inform the email of the user who wants to reset the password """
     email_template_name = 'user/password_reset_email.html'
     template_name = 'user/password_reset.html'
     form_class = PasswordResetFormBlog
@@ -135,14 +140,17 @@ class PasswordReset(PasswordResetView):
 
 
 class PasswordResetDone(PasswordResetDoneView):
+    """ Message with instructions """
     template_name = 'user/password_reset_done.html'
 
 
 class PasswordResetConfirm(PasswordResetConfirmView):
+    """ Page that verifies the token and resets the password """
     template_name = 'user/password_reset_confirm.html'
     form_class = SetPasswordFormBlog
     success_url = reverse_lazy('user:password_reset_complete')
 
 
 class PasswordResetComplete(PasswordResetCompleteView):
+    """ Final message to reset the password """
     template_name = 'user/password_reset_complete.html'

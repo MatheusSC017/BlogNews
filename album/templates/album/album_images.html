@@ -33,11 +33,13 @@
                         <div class="button-options">
                             <button onclick="popupForm('update-image-form', 1);
                                              pkField('update-image-form', {{ image.pk }});
-                                             imageFields({{ image.pk }})">
+                                             imageFields({{ image.pk }})"
+                                    type="button">
                                 <i class="bi bi-pencil-fill"></i>
                             </button>
                             <button onclick="popupForm('delete-image-form', 1);
-                                             pkField('delete-image-form', {{ image.pk }})">
+                                             pkField('delete-image-form', {{ image.pk }})"
+                                    type="button">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                             <input type="checkbox"

@@ -11,6 +11,7 @@ from utils.utils import verify_recaptcha
 
 
 class Searches(ListView):
+    """ Shows all the published searches """
     template_name = 'search/searches.html'
     model = models.Search
     context_object_name = 'searches'
@@ -18,6 +19,7 @@ class Searches(ListView):
     ordering = ['-publication_date_search', 'finish_date_search', ]
 
     def get_queryset(self):
+        """ Make sure the search has been published and the publication date is less than or equal to now """
         qs = super().get_queryset()
 
         qs = qs.filter(published_search=True,
@@ -26,6 +28,7 @@ class Searches(ListView):
         return qs
 
     def get_context_data(self, *args, **kwargs):
+        """ Add the options of the questions and the number of votes """
         context = super().get_context_data(*args, **kwargs)
 
         searches = list()
@@ -44,11 +47,13 @@ class Searches(ListView):
 
 
 class Search(DetailView):
+    """ Show the question with its options and if is open to new answers """
     template_name = 'search/search.html'
     model = models.Search
     context_object_name = 'search'
 
     def get(self, request, *args, **kwargs):
+        """ Show the question if it has been published and the publication data is less than or equal to now """
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
 
@@ -58,6 +63,7 @@ class Search(DetailView):
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
+        """ Create or update the user votting """
         recaptcha_response = self.request.POST.get('g-recaptcha-response')
 
         if not verify_recaptcha(recaptcha_response):
@@ -90,6 +96,10 @@ class Search(DetailView):
         return redirect(reverse('search:search', args=[search.pk, ]))
 
     def get_context_data(self, *args, **kwargs):
+        """
+        Include the options and markers such as the user-selected option, the option with the most votes,
+        and whether the question is open to new answers
+        """
         context = super().get_context_data(*args, **kwargs)
 
         options = models.Option.objects.filter(search_option=context['search'].pk)
@@ -107,6 +117,7 @@ class Search(DetailView):
 
 
 class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """ Shows all the user questions """
     template_name = 'search/user_searches.html'
     model = models.Search
     paginate_by = 20
@@ -117,6 +128,7 @@ class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_denied_message = 'Necessário usuário autorizado'
 
     def get_queryset(self):
+        """ Select only the user questions """
         qs = super().get_queryset()
 
         qs = qs.filter(user_search=self.request.user)
@@ -125,6 +137,7 @@ class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 
 class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """ Page to create a new question """
     template_name = 'search/search_form.html'
     model = models.Search
     form_class = forms.SearchForm
@@ -133,6 +146,7 @@ class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_denied_message = 'Necessário usuário autorizado'
 
     def get_context_data(self, *args, **kwargs):
+        """ Add the option form to the context """
         context = super().get_context_data(*args, **kwargs)
 
         if kwargs.get('option_form'):
@@ -143,6 +157,7 @@ class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
+        """ Make sure the form is valid and add the required fields """
         option_form = forms.OptionInlineForm(data=self.request.POST)
 
         if option_form.is_valid() and form.is_valid():
@@ -156,6 +171,7 @@ class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
             return self.form_invalid(form, option_form)
 
     def form_invalid(self, form, option_form):
+        """ Show again the page if the form is invalid """
         return self.render_to_response(
             self.get_context_data(
                 form=form,
@@ -164,11 +180,13 @@ class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         )
 
     def get_success_url(self):
+        """ Success message """
         messages.success(self.request, 'Pesquisa cadastrada')
         return reverse('search:user_search')
 
 
 class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """ Page to update the selected question """
     template_name = 'search/search_form.html'
     model = models.Search
     form_class = forms.SearchForm
@@ -177,10 +195,12 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_denied_message = 'Necessário usuário autorizado'
 
     def get(self, request, pk, *args, **kwargs):
+        """ Show the page is the question belongs to the user """
         get_object_or_404(models.Search, pk=pk, user_search=request.user)
         return super().get(pk, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
+        """ Add the option form to the context """
         context = super().get_context_data(*args, **kwargs)
 
         if kwargs.get('option_form'):
@@ -191,6 +211,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
+        """ Make sure the form is valid and add the required fields """
         option_form = forms.OptionInlineForm(data=self.request.POST, instance=self.object)
 
         if option_form.is_valid() and form.is_valid():
@@ -202,6 +223,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
             return self.form_invalid(form, option_form)
 
     def form_invalid(self, form, option_form):
+        """ Show the page again if the form is invalid """
         return self.render_to_response(
             self.get_context_data(
                 form=form,
@@ -210,6 +232,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         )
 
     def get_success_url(self):
+        """ Success message """
         messages.success(self.request, 'Pesquisa atualizada')
         return reverse('search:user_search')
 
@@ -217,6 +240,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required(perm='search.delete_search')
 def delete_search(request):
+    """ Delete the user question """
     if request.POST:
         search = get_object_or_404(models.Search, pk=request.POST.get('primary-key'), user_search=request.user)
         search.delete()

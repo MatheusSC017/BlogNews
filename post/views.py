@@ -13,12 +13,7 @@ from utils.utils import verify_recaptcha
 
 
 class BlogTemplate(ListView):
-    """
-    Blog template
-
-    List of posts with search tool by category, text and sorting
-
-    """
+    """ List of posts with search tool by category, text and sorting """
     model = PostModel
     paginate_by = 10
     context_object_name = 'posts'
@@ -92,11 +87,7 @@ class BlogTemplate(ListView):
 
 
 class Blog(BlogTemplate):
-    """
-    Blog Page
-
-    List only the published posts
-    """
+    """ List only the published posts """
     template_name = 'post/blog.html'
 
     def get_queryset(self, *args, **kwargs):
@@ -108,11 +99,7 @@ class Blog(BlogTemplate):
 
 
 class Post(DetailView):
-    """
-    PostPage
-
-    Show Details about the post and registered comments
-    """
+    """  Show Details about the post and registered comments """
     template_name = 'post/post.html'
     model = PostModel
     context_object_name = 'post'
