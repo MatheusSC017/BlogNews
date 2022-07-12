@@ -6,6 +6,7 @@ from django.db.models import Q, Count, Avg
 from django.contrib import messages
 from django.utils import timezone
 from .models import Post as PostModel, Category as CategoryModel, RattingUserPost
+from album import models as album_models
 from comment.models import Comment
 from comment.forms import CommentForm
 from .forms import PostForm
@@ -315,6 +316,16 @@ class RegisterPost(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'post.add_post'
     permission_denied_message = 'Necessário usuário autorizado'
 
+    def get_form(self, form_class=None):
+        """ Select only the user albuns """
+        form = super().get_form(form_class)
+
+        form.fields['album_post'].queryset = album_models.Album.objects.filter(
+            user_album=self.request.user.pk
+        )
+
+        return form
+
     def post(self, request, *args, **kwargs):
         """ Includes the user and check the form """
         form = self.get_form()
@@ -339,6 +350,16 @@ class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     login_url = settings.LOGIN_URL
     permission_required = 'post.change_post'
     permission_denied_message = 'Necessário usuário autorizado'
+
+    def get_form(self, form_class=None):
+        """ Select only the user albuns """
+        form = super().get_form(form_class)
+
+        form.fields['album_post'].queryset = album_models.Album.objects.filter(
+            user_album=self.request.user.pk
+        )
+
+        return form
 
     def get_success_url(self, *args, **kwargs):
         """ Redirect the user to posts page """

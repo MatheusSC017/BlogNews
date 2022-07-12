@@ -26,8 +26,8 @@
                 </div>
             </form>
 
-            <div class="container-fluid card-columns pt-3 pb-3 text-center">
-                <form method="POST" action="{% url 'album:images_delete' album.pk %}">
+            <form method="POST" action="{% url 'album:images_delete' album.pk %}">
+                <div class="container-fluid card-columns pt-3 pb-3 text-center">
                     {% for image in images %}
                     <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
                         <div class="button-options">
@@ -60,14 +60,17 @@
                              class="card-img-top">
                     </div>
                     {% endfor %}
-                    {% csrf_token %}
-                    <div class="text-end">
-                        <button class="btn button-format" onclick="return confirmAction()">
-                            Deletar
-                        </button>
-                    </div>
-                </form>
-            </div>
+
+                </div>
+                {% csrf_token %}
+                {% if images.count > 0 %}
+                <div class="text-end w-100">
+                    <button class="btn button-format" onclick="return confirmAction()">
+                        Deletar
+                    </button>
+                </div>
+                {% endif %}
+            </form>
         </div>
         <div class="col-xl"></div>
     </div>

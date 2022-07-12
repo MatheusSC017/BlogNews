@@ -61,7 +61,7 @@
             <!-- Album option -->
             {% if post.album_post %}
             <div class="text-end mt-3">
-                <a href="{% url 'post:post' post.pk %}">
+                <a href="{% url 'album:image' post.album_post.pk %}">
                     <button class="button-format"><strong>Album</strong></button>
                 </a>
             </div>

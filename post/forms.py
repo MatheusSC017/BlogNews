@@ -12,6 +12,7 @@ class PostForm(ModelForm):
             self.fields[field].widget.attrs['class'] = 'form-control'
             self.fields[field].widget.attrs['placeholder'] = self.fields[field].label
         self.fields['category_post'].widget.attrs['class'] = 'form-select'
+        self.fields['album_post'].widget.attrs['class'] = 'form-select'
         self.fields['publication_date_post'].disabled = True
         self.fields['edition_date_post'].disabled = True
 
@@ -41,7 +42,7 @@ class PostForm(ModelForm):
     class Meta:
         model = Post
         fields = ['title_post', 'excerpt_post', 'description_post', 'image_post',
-                  'category_post', 'publication_date_post', 'edition_date_post', ]
+                  'category_post', 'album_post', 'publication_date_post', 'edition_date_post', ]
         widgets = {
             'description_post': SummernoteWidget(),
         }
