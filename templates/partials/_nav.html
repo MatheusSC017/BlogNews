@@ -45,6 +45,7 @@
                         {% if perms.search.view_search %}
                         <li><a class="dropdown-item" href="{% url 'search:user_search' %}">Minhas Pesquisas</a></li>
                         {% endif %}
+                        <li><a class="dropdown-item" href="{% url 'socialaccount_connections' %}">Conexões</a></li>
                         <li><a class="dropdown-item" href="{% url 'user:update' %}">Meus dados</a></li>
                         <li><a class="dropdown-item" href="{% url 'user:logout' %}">Sair</a></li>
                     </ul>

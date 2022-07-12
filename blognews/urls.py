@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from user.views import SocialAccountSignupViewBlog
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +27,7 @@ urlpatterns = [
     path('album/', include('album.urls')),
     path('pesquisa/', include('search.urls')),
     path('summernote/', include('django_summernote.urls')),
+    path('accounts/social/signup/', SocialAccountSignupViewBlog.as_view(), name='socialaccount_signup'),
     path('accounts/', include('allauth.urls')),
 
     # TODO: Remover no final do projeto

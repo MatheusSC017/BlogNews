@@ -9,7 +9,7 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
     PasswordResetCompleteView
 )
-from django.contrib.auth.decorators import login_required
+from allauth.socialaccount.views import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
@@ -25,6 +25,7 @@ from post.models import Post
 from album.models import Album, Image
 from search.models import Search, Option
 from utils.utils import verify_recaptcha
+from allauth.socialaccount import helpers
 
 
 class Login(View, TemplateResponseMixin):
@@ -154,3 +155,18 @@ class PasswordResetConfirm(PasswordResetConfirmView):
 class PasswordResetComplete(PasswordResetCompleteView):
     """ Final message to reset the password """
     template_name = 'user/password_reset_complete.html'
+
+
+class SocialAccountSignupViewBlog(SignupView):
+    def form_valid(self, form):
+        """ Add the permissions python manage"""
+        self.request.session.pop("socialaccount_sociallogin", None)
+        user = form.save(self.request)
+        if self.request.POST.get('checkpermissions'):
+            models_permissions = [Post, Album, Image, Search, Option, ]
+            for model in models_permissions:
+                content_type = ContentType.objects.get_for_model(model)
+                post_permissions = Permission.objects.filter(content_type=content_type)
+                for permission in post_permissions:
+                    user.user_permissions.add(permission)
+        return helpers.complete_social_signup(self.request, self.sociallogin)
