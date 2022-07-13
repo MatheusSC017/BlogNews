@@ -26,7 +26,7 @@ class AlbumTestCase(TestCase):
         self.album2 = models.Album.objects.create(title_album='Album test 2',
                                                   user_album=self.user)
 
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         self.image1 = models.Image.objects.create(title_image='Image test 1',
                                                   image=image,
@@ -219,7 +219,7 @@ class UserImagePageTestCase(AlbumTestCase):
                    RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class ImageCreateClassTestCase(AlbumTestCase):
     def test_create_image_class_without_user(self):
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
@@ -229,7 +229,7 @@ class ImageCreateClassTestCase(AlbumTestCase):
         self.client.post(reverse('user:login'), {'username': 'username_test2',
                                                  'password': 'password_test2',
                                                  'g-recaptcha-response': 'recaptcha', })
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
@@ -239,7 +239,7 @@ class ImageCreateClassTestCase(AlbumTestCase):
         self.client.post(reverse('user:login'), {'username': 'username_test',
                                                  'password': 'password_test',
                                                  'g-recaptcha-response': 'recaptcha', })
-        with open(settings.MEDIA_ROOT / 'static/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
