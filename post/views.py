@@ -4,13 +4,12 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q, Count, Avg
 from django.contrib import messages
-from django.utils import timezone
+from django.utils import timezone as tz
 from .models import Post as PostModel, Category as CategoryModel, RattingUserPost
 from album import models as album_models
 from comment.models import Comment
 from comment.forms import CommentForm
 from .forms import PostForm
-from utils.utils import verify_recaptcha
 
 
 class BlogTemplate(ListView):
@@ -94,7 +93,7 @@ class Blog(BlogTemplate):
     def get_queryset(self, *args, **kwargs):
         """ Select only the published posts """
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.filter(publication_date_post__lte=timezone.now())
+        qs = qs.filter(publication_date_post__lte=tz.now())
         qs = qs.filter(published_post=True)
         return qs
 
@@ -131,6 +130,38 @@ class Post(DetailView):
 
         return response
 
+    def post(self, request, *args, **kwargs):
+        """ Registration/ update the ratting of user """
+        if not request.user.is_authenticated:
+            return redirect(reverse('user:login'))
+
+        post = get_object_or_404(PostModel, pk=kwargs.get('pk'), published_post=True, publication_date_post__lte=tz.now())
+
+        try:
+            ratting = int(request.POST.get('star'))
+        except TypeError:
+            messages.error(request, 'Falha na avaliação')
+            return redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
+
+        if 1 > ratting or ratting > 5:
+            messages.error(request, 'Avaliação inválida')
+            return redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
+
+        ratting_post = RattingUserPost.objects.filter(user_ratting=request.user,
+                                                      post_ratting=post)
+
+        if ratting_post.count() == 0:
+            RattingUserPost.objects.create(user_ratting=request.user,
+                                           post_ratting=post,
+                                           ratting=ratting)
+        else:
+            ratting_post = ratting_post[0]
+            ratting_post.ratting = ratting
+            ratting_post.save()
+
+        messages.success(request, 'Obrigado pelo Feedback')
+        return redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
+
     def get_queryset(self, *args, **kwargs):
         """ Returns the data of the Post """
         qs = super().get_queryset(*args, **kwargs)
@@ -157,123 +188,6 @@ class Post(DetailView):
                 context['ratting_user'] = ratting_user[0].ratting
 
         return context
-
-    def post(self, request, *args, **kwargs):
-        """ Check the action to be take """
-        if not request.user.is_authenticated:
-            return redirect(reverse('user:login'))
-
-        self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
-        if not context['post'].published_post:
-            return redirect(reverse('post:blog'))
-
-        action = {'create-comment': self.create_comment,
-                  'update-comment': self.update_comment,
-                  'delete-comment': self.delete_comment,
-                  'ratting-post': self.ratting_post, }
-
-        response = None
-        try:
-            response = action[request.POST.get('action')](request, context)
-        except KeyError:
-            messages.error(request, 'Ação inválida')
-
-        if response is None:
-            response = redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
-
-        return response
-
-    def create_comment(self, request, context):
-        """ Registration of the comment """
-        form = context.get('comment_form')
-        recaptcha_response = request.POST.get('g-recaptcha-response')
-
-        if not verify_recaptcha(recaptcha_response):
-            messages.warning(request, 'ReCaptcha inválido')
-            return self.render_to_response(context)
-
-        if not form.is_valid():
-            return self.render_to_response(context)
-
-        comment = form.save(commit=False)
-
-        comment.user_comment = request.user
-        comment.post_comment = context.get('post')
-        comment.save()
-        messages.success(request, 'Comentário adicionado')
-
-    def update_comment(self, request, context):
-        """ Update the comment """
-        form = context.get('comment_form')
-
-        if not form.is_valid():
-            return self.render_to_response(context)
-
-        try:
-            comment = get_object_or_404(Comment, pk=request.POST['primary-key'])
-
-            if comment.post_comment != context.get('post'):
-                messages.error(request, 'Comentário inválido')
-                return self.render_to_response(context)
-        except (KeyError, ValueError):
-            messages.error(request, 'Comentário não encontrado')
-            return self.render_to_response(context)
-
-        if comment.user_comment != request.user:
-            messages.error(request, 'Usuário inválido')
-            return self.render_to_response(context)
-
-        comment.comment = request.POST.get('comment')
-        comment.edition_date_comment = timezone.now()
-
-        comment.save()
-        messages.success(request, 'Comentário editado')
-
-    def delete_comment(self, request, context):
-        """ Delete the comment """
-        try:
-            comment = get_object_or_404(Comment, pk=request.POST['primary-key'])
-
-            if comment.post_comment != context.get('post'):
-                messages.error(request, 'Comentário inválido')
-                return self.render_to_response(context)
-        except (KeyError, ValueError):
-            messages.error(request, 'Comentário não encontrado')
-            return self.render_to_response(context)
-
-        if comment.user_comment != request.user:
-            messages.error(request, 'Usuário inválido')
-            return self.render_to_response(context)
-
-        comment.delete()
-        messages.success(request, 'Comentário deletado')
-
-    def ratting_post(self, request, context):
-        """ Registration/ update the ratting of user """
-        try:
-            ratting = int(self.request.POST.get('star'))
-
-            if 1 > ratting or ratting > 5:
-                messages.error(request, 'Avaliação inválida')
-                return self.render_to_response(context)
-        except TypeError:
-            messages.error(request, 'Falha na avaliação')
-            return self.render_to_response(context)
-
-        ratting_post = RattingUserPost.objects.filter(user_ratting=request.user,
-                                                      post_ratting=context.get('post'))
-
-        if ratting_post.count() == 0:
-            RattingUserPost.objects.create(user_ratting=request.user,
-                                           post_ratting=context.get('post'),
-                                           ratting=ratting)
-        else:
-            ratting_post = ratting_post[0]
-            ratting_post.ratting = ratting
-            ratting_post.save()
-
-        messages.success(request, 'Obrigado pelo Feedback')
 
 
 class BlogUser(LoginRequiredMixin, PermissionRequiredMixin, BlogTemplate):

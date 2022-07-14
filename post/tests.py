@@ -77,10 +77,6 @@ class BlogTestCase(TestCase):
                                        post_ratting=self.post5,
                                        ratting=4)
 
-        self.comment = Comment.objects.create(user_comment=self.user,
-                                              post_comment=self.post1,
-                                              comment='Testando')
-
 
 class BlogPageTestCase(BlogTestCase):
     def test_connection_with_the_blog_page(self):
@@ -167,93 +163,35 @@ class PostPageTestCase(BlogTestCase):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertEqual(response.context.get('post').anonymous_views_post, views)
 
-    def test_post_method_with_incorrect_action(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'action': 'incorrect-action', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Ação inválida')
-
     def test_post_method_with_user_logged_out(self):
         response = self.client.post(reverse('post:post', args=[self.post1.pk]),
                                     {'comment': 'Comment_test',
                                      'action': 'create-comment', })
         self.assertEqual(response.resolver_match.func.__name__, Login.as_view().__name__)
 
-    def test_comment_registration_with_user_logged_in(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'comment': 'Comment_test', 'action': 'create-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário adicionado')
-
-    def test_comment_update_with_user_logged_in(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário editado')
-
-    def test_comment_update_with_other_user_logged_in(self):
-        user_parameter = {'username': 'username_test2',
-                          'password': 'password_test2',
-                          'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
-
-    def test_comment_update_with_invalid_pk(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'primary-key': '', 'comment': 'Comment_test', 'action': 'update-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
-
-    def test_update_comment_other_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'comment': 'Comment_test', 'primary-key': self.comment.pk, 'action': 'update-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
-                                                         'Comentário inválido', self.post3.pk)
-
-    def test_comment_delete_with_user_logged_in(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário deletado')
-
-    def test_comment_delete_with_other_user_logged_in(self):
-        user_parameter = {'username': 'username_test2',
-                          'password': 'password_test2',
-                          'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Usuário inválido')
-
-    def test_comment_delete_with_invalid_pk(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'primary-key': '', 'action': 'delete-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Comentário não encontrado')
-
-    def test_delete_comment_other_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'primary-key': self.comment.pk, 'action': 'delete-comment', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
-                                                         'Comentário inválido', self.post3.pk)
-
     def test_register_feedback_to_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'star': '5', 'action': 'ratting-post', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter, 'Obrigado pelo Feedback')
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
+        response = self.client.post(reverse('post:post', args=[self.post1.pk, ]),
+                                    {'star': '5', })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
+        comments = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(comments), 2)
+        self.assertEqual(str(comments[1]), 'Obrigado pelo Feedback')
 
     def test_update_feedback_to_post(self):
-        user_parameter = {'username': 'username_test', 'password': 'password_test', 'g-recaptcha-response': 'recaptcha'}
-        action_parameter = {'star': '5', 'action': 'ratting-post', }
-        self.template_comment_action_with_user_logged_in(user_parameter, action_parameter,
-                                                         'Obrigado pelo Feedback', self.post3.pk)
-
-    def template_comment_action_with_user_logged_in(self, user_parameters, action_parameters, message, pk=0):
-        if pk == 0:
-            pk = self.post1.pk
-        self.client.post(reverse('user:login'), user_parameters)
-        response = self.client.post(reverse('post:post', args=[pk]), action_parameters)
-
-        if response.status_code == 200:
-            self.assertEqual(response.resolver_match.func.__name__, PostView.as_view().__name__)
-        else:
-            self.assertRedirects(response, reverse('post:post', args=[pk]))
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), message)
-
+        self.client.post(reverse('user:login'), {'username': 'username_test',
+                                                 'password': 'password_test',
+                                                 'g-recaptcha-response': 'recaptcha', })
+        response = self.client.post(reverse('post:post', args=[self.post3.pk, ]),
+                                    {'star': '5', })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('post:post', args=[self.post3.pk, ]))
+        comments = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(comments), 2)
+        self.assertEqual(str(comments[1]), 'Obrigado pelo Feedback')
 
 @override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
                    RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
