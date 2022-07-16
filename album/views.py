@@ -121,14 +121,11 @@ def album_update(request):
     """ Method to update the selected album """
     if request.POST:
         pk = request.POST.get('primary-key')
-        form = forms.AlbumForm(request.POST)
         if pk is not None:
             album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+            form = forms.AlbumForm(request.POST, instance=album)
             if form.is_valid():
-                album_form = form.save(commit=False)
-                album_form.pk = album.pk
-                album_form.user_album = album.user_album
-                album_form.save()
+                form.save()
                 messages.success(request, 'Álbum editado')
                 return redirect(reverse('album:user_album'))
             else:
@@ -167,6 +164,13 @@ class AlbumImagesUser(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     login_url = settings.LOGIN_URL
     permission_required = 'album.view_image'
     permission_denied_message = 'Necessário usuário autorizado'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        if context['album'].user_album != request.user:
+            return redirect(reverse('album:user_album'))
+        return self.render_to_response(context)
 
     def get_context_data(self, *args, **kwargs):
         """ Add all the images to the context and the form to add new images """

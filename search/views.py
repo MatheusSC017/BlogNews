@@ -194,10 +194,23 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'search.change_search'
     permission_denied_message = 'Necessário usuário autorizado'
 
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """ Show the page is the question belongs to the user """
-        get_object_or_404(models.Search, pk=pk, user_search=request.user)
-        return super().get(pk, *args, **kwargs)
+        self.object = self.get_object()
+
+        if self.object.user_search != request.user:
+            return redirect(reverse('search:user_search'))
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """ Make sure the question belongs to the user """
+        self.object = self.get_object()
+
+        if self.object.user_search != request.user:
+            return redirect(reverse('search:user_search'))
+
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """ Add the option form to the context """

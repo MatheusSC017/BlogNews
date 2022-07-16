@@ -105,9 +105,7 @@ class Post(DetailView):
     context_object_name = 'post'
 
     def get(self, request, *args, **kwargs):
-        """
-            Check if the post is published and the post view system
-        """
+        """ Check if the post is published and the post view system """
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         post = context['post']
@@ -264,6 +262,22 @@ class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     login_url = settings.LOGIN_URL
     permission_required = 'post.change_post'
     permission_denied_message = 'Necessário usuário autorizado'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if self.object.user_post != request.user:
+            return redirect(reverse('post:user_blog'))
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if self.object.user_post != request.user:
+            return redirect(reverse('post:user_blog'))
+
+        return super().post(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         """ Select only the user albuns """
