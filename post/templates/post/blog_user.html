@@ -67,11 +67,6 @@
 <section id="popup" style="display: none">
     <div class="dark-background"></div>
     <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-post-form">
-
-            <button class="btn button-format secondary-bg-color"
-                onclick="popupForm('delete-post-form', 0)">
-                Cancelar
-            </button>
             <form action="#" method="POST" class="d-inline">
                 <input type="hidden" name="primary-key">
                 {% csrf_token %}
@@ -79,6 +74,10 @@
                     Confirmar
                 </button>
             </form>
+            <button class="btn button-format secondary-bg-color"
+                onclick="popupForm('delete-post-form', 0)">
+                Cancelar
+            </button>
     </div>
 </section>
 

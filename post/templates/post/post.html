@@ -194,13 +194,13 @@
 
             {% csrf_token %}
             <div class="text-end mt-3">
+                <button class="btn button-format">
+                    Enviar
+                </button>
                 <div class="btn button-format secondary-bg-color"
                     onclick="popupForm('update-comment-form', 0)">
                     Cancelar
                 </div>
-                <button class="btn button-format">
-                    Enviar
-                </button>
             </div>
         </form>
     </div>
@@ -212,13 +212,13 @@
 
             {% csrf_token %}
             <div class="text-end mt-3">
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
                 <div class="btn button-format secondary-bg-color"
                     onclick="popupForm('delete-comment-form', 0)">
                     Cancelar
                 </div>
-                <button class="btn button-format primary-bg-color">
-                    Confirmar
-                </button>
             </div>
         </form>
     </div>
