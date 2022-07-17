@@ -27,6 +27,7 @@ urlpatterns = [
     path('comentario/', include('comment.urls')),
     path('album/', include('album.urls')),
     path('pesquisa/', include('search.urls')),
+    path('newsletter/', include('newsletter.urls')),
     path('summernote/', include('django_summernote.urls')),
     path('accounts/social/signup/', SocialAccountSignupViewBlog.as_view(), name='socialaccount_signup'),
     path('accounts/', include('allauth.urls')),

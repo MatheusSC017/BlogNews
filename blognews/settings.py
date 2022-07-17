@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'album',
     'comment',
     'search',
+    'newsletter',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
