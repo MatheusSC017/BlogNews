@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class RattingField(models.PositiveIntegerField):
     def formfield(self, **kwargs):
         return super().formfield(
