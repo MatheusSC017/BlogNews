@@ -1,0 +1,15 @@
+{% load i18n %}
+
+Saudações, {{ email }}
+
+Você está recebendo este e-mail porque você (ou alguém fingindo ser você)
+solicitou que sua newsletter fosse cancelada no site {{ domain }}. Se você não
+deseja cancelar sua inscrição, por favor ignore este e-mail.
+
+Para cancelar sua incrição, por favor clique no link abaixo, ou copie e cole
+no seu navegador:
+
+{{ protocol }}://{{ domain }}{% url 'newsletter:unsubscribe_confirm' token %}
+
+Atenciosamente,
+Gestão {{ site_name }}

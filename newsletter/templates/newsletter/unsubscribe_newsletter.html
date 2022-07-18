@@ -1,0 +1,25 @@
+{% extends 'newsletter/base.html' %}
+{% load static %}
+
+{% block title %}Deseja cancelar sua inscrição na nossa NewsLetter? | {% endblock %}
+
+{% block img_url %}
+    {% static 'img/close_svg_image.svg' %}
+{% endblock %}
+
+{% block content_newsletter_page %}
+    <h1 class="mt-5">Deseja cancelar sua inscrição na nossa NewsLetter?</h1>
+    <form action="#" method="POST" class="d-flex">
+        <div class="input-group me-3">
+            <span class="input-group-text" id="email-newsletter">E-mail</span>
+            <input type="email"
+                   name="email-newsletter"
+                   class="form-control"
+                   aria-describedby="email-newsletter"
+                   placeholder="seu_email@email.com"
+                   arial-label="Seu E-mail para cancelar sua inscrição">
+        </div>
+        {% csrf_token %}
+        <input type="submit" value="Enviar" class="button-format">
+    </form>
+{% endblock %}

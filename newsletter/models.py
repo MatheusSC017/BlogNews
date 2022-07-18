@@ -8,6 +8,11 @@ class NewsLetterUser(models.Model):
     activated_date_newsletteruser = models.DateTimeField(default=tz.now(), verbose_name='data de ativação')
     activated_newsletteruser = models.BooleanField(default=True, verbose_name='ativado')
 
+    def save(self, *args, **kwargs):
+        if self.activated_newsletteruser:
+            self.activated_date_newsletteruser = tz.now()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.email_newsletteruser
 

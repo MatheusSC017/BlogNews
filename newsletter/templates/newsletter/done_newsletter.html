@@ -1,19 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'newsletter/base.html' %}
 {% load static %}
 
 {% block title %}Obrigado por assinar nossa NewsLetter | {% endblock %}
 
-{% block content %}
+{% block img_url %}
+    {% static 'img/congratulation_svg_image.svg' %}
+{% endblock %}
 
-<section class="container p-5">
-    <div class="row row-cols-1 row-cols-lg-2 gray-bg-color rounded">
-        <div class="col d-flex">
-            <img src="{% static 'img/congratulation_svg_image.svg' %}" alt="" class="img-fluid align-middle">
-        </div>
-        <div class="col pt-3 pb-3 dark-color">
-            <h1 class="mt-5">Obrigado por assinar nossa Newsletter</h1>
-        </div>
-    </div>
-</section>
-
+{% block content_newsletter_page %}
+    <h1 class="mt-5">Obrigado por assinar nossa Newsletter</h1>
 {% endblock %}
