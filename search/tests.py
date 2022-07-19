@@ -232,7 +232,8 @@ class UpdateSearchPageTestCase(SearchTestCase):
                                                  'password': 'password_test2',
                                                  'g-recaptcha-response': 'recaptcha', })
         response = self.client.get(reverse('search:search_update', kwargs={'pk': self.search1.pk, }))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('search:user_search'))
 
     def test_update_search_page_connection_and_context(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
