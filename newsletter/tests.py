@@ -41,3 +41,63 @@ class AddUserTestCase(NewsLetterUserTestCase):
                                     {'email-newsletter': 'test@test.com.br'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('newsletter:done_add_user'))
+
+
+class UnsubscribeTestCase(NewsLetterUserTestCase):
+    def test_unsubscribe_connection(self):
+        response = self.client.get(reverse('newsletter:unsubscribe'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, views.UnsubscribeNewsletter.as_view().__name__)
+
+    def test_unsubscribe_solicitation(self):
+        response = self.client.post(reverse('newsletter:unsubscribe'),
+                                    {'email-newsletter': 'test@test.com.br'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('newsletter:unsubscribe_done'))
+
+
+class ConfirmUnsubscribeTestCase(NewsLetterUserTestCase):
+    def generate_session_token(self, email='test@test.com.br'):
+        token = get_random_string(length=32)
+        session = self.client.session
+        session[token] = email
+        session.save()
+        return token
+
+    def test_confirm_unsubscribe_connection_valid_token(self):
+        token = self.generate_session_token()
+        response = self.client.get(reverse('newsletter:unsubscribe_confirm', kwargs={'token': token}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, views.ConfirmUnsubscribeNewsletter.as_view().__name__)
+        self.assertTrue(response.context['valid_token'])
+
+    def test_confirm_unsubscribe_connection_invalid_token(self):
+        token = get_random_string(length=32)
+        response = self.client.get(reverse('newsletter:unsubscribe_confirm', kwargs={'token': token}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, views.ConfirmUnsubscribeNewsletter.as_view().__name__)
+        self.assertFalse(response.context['valid_token'])
+
+    def test_confirm_unsubscribe_with_email_not_activated(self):
+        token = self.generate_session_token(email='test2@test.com.br')
+        response = self.client.post(reverse('newsletter:unsubscribe_confirm', kwargs={'token': token}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('blog:index'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'E-mail não cadastrado')
+
+    def test_confirm_unsubscribe_with_invalid_email(self):
+        token = self.generate_session_token(email='test@test.com.br')
+        response = self.client.post(reverse('newsletter:unsubscribe_confirm', kwargs={'token': token}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('blog:index'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'E-mail não cadastrado')
+
+    def test_confirm_unsubscribe(self):
+        token = self.generate_session_token(email='test1@test.com.br')
+        response = self.client.post(reverse('newsletter:unsubscribe_confirm', kwargs={'token': token}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('newsletter:unsubscribe_finish'))
