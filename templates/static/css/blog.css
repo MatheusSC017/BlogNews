@@ -217,7 +217,7 @@ p {
 .gallery-image img:hover {
     transform: translate(-3%, -3%) scale(1.2) rotate(5deg);
 }
-  
+
 /* Footer */
 .footer-center-section {
     border-width: 1px 0px;
@@ -286,17 +286,24 @@ p {
 }
 
 /* Album */
-.album-item {
-    max-width: 650px;
+.album-secondary-images {
+    max-width: 400px;
+    max-height: 400px;
 }
 
 .album-primary-images img {
+    height: 400px;
     max-width: 100%;
     max-height: 400px;
 }
 
+.album-secondary-images {
+    max-width: 200px;
+    max-height: 400px;
+}
+
 .album-secondary-images img {
-    min-height: 50%;
+    height: 200px;
     max-width: 200px;
     max-height: 200px;
 }
@@ -367,7 +374,7 @@ label.star:before {
     font-family: FontAwesome;
 }
 
-/* Post */
+/* Popup */
 #popup {
     position: fixed;
     z-index: 10;
@@ -396,6 +403,7 @@ label.star:before {
     transform: translate(-50%, -50%);
 }
 
+/* Buttons */
 .button-options {
     position: absolute;
     z-index: 1;

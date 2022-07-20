@@ -20,4 +20,7 @@ class Report(models.Model):
     creation_date_report = models.DateTimeField(default=tz.now, verbose_name='data de criação')
 
     def __str__(self):
-        return self.user_report + ': ' + self.status_report
+        return str(self.user_report)
+
+    class Meta:
+        verbose_name = 'denúncia'

@@ -7,6 +7,7 @@ class ReportAdmin(admin.ModelAdmin):
     list_display_links = ('pk', 'user_report', )
     list_filter = ('status_report', )
     search_fields = ('user_report', 'description_report', )
+    exclude = ('status_report', )
 
 
 admin.site.register(Report, ReportAdmin)

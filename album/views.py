@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.conf import settings
 from . import forms
 from . import models
+from report.models import Report
 
 
 class Album(ListView):
@@ -255,3 +256,27 @@ def multiple_image_delete(request, pk):
         return redirect(reverse('album:user_images', args=[pk, ]))
     else:
         return redirect(reverse('album:user_images', args=[pk, ]))
+
+
+def register_report(request):
+    if not request.POST:
+        return redirect(reverse('album:album'))
+
+    pk = request.POST.get('primary-key')
+
+    if not pk:
+        messages.error(request, 'Album não encontrado')
+        return redirect(reverse('album:album'))
+
+    album = get_object_or_404(models.Album, pk=pk, published_album=True)
+    report_description = request.POST.get('report-description')
+
+    if not report_description.strip():
+        messages.error(request, 'A denúncia não pode estar vázia')
+        return redirect(reverse('album:image', kwargs={'pk': pk, }))
+
+    description = 'Album: {}, Autor: {} - {}'.format(pk, album.user_album, report_description)
+
+    Report.objects.create(user_report=album.user_album, description_report=description)
+    messages.success(request, 'Sua denúncia foi registrada')
+    return redirect(reverse('album:image', kwargs={'pk': pk, }))
