@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.utils import timezone
 from . import models, forms
+from report.models import Report
 from utils.utils import verify_recaptcha
 
 
@@ -259,3 +260,27 @@ def delete_search(request):
         search.delete()
         messages.success(request, 'Pesquisa deletada')
     return redirect(reverse('search:user_search'))
+
+
+def register_report(request):
+    if not request.POST:
+        return redirect(reverse('search:searches'))
+
+    pk = request.POST.get('primary-key')
+
+    if not pk:
+        messages.error(request, 'Pesquisa não encontrado')
+        return redirect(reverse('search:searches'))
+
+    search = get_object_or_404(models.Search, pk=pk, published_search=True)
+    report_description = request.POST.get('report-description')
+
+    if not report_description.strip():
+        messages.error(request, 'A denúncia não pode estar vázia')
+        return redirect(reverse('search:search', kwargs={'pk': pk, }))
+
+    description = 'Pesquisa: {}, Autor: {} - {}'.format(pk, search.user_search, report_description)
+
+    Report.objects.create(user_report=search.user_search, description_report=description)
+    messages.success(request, 'Sua denúncia foi registrada')
+    return redirect(reverse('search:search', kwargs={'pk': pk, }))

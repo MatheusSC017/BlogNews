@@ -13,4 +13,5 @@ urlpatterns = [
     path('', views.Blog.as_view(), name='blog'),
     path('<int:pk>/', views.Post.as_view(), name='post'),
     path('meus_posts/', include(post_patterns)),
+    path('denunciar/', views.register_report, name='report')
 ]

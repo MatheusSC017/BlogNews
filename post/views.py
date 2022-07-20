@@ -10,6 +10,7 @@ from album import models as album_models
 from comment.models import Comment
 from comment.forms import CommentForm
 from .forms import PostForm
+from report.models import Report
 
 
 class BlogTemplate(ListView):
@@ -293,3 +294,28 @@ class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         """ Redirect the user to posts page """
         messages.success(self.request, 'Post atualizado')
         return reverse('post:user_blog')
+
+
+def register_report(request):
+    if not request.POST:
+        return redirect(reverse('post:blog'))
+
+    pk = request.POST.get('primary-key')
+
+    if not pk:
+        messages.error(request, 'Post não encontrado')
+        return redirect(reverse('post:blog'))
+
+    post = get_object_or_404(PostModel, pk=pk, published_post=True)
+    report_description = request.POST.get('report-description')
+
+    if not report_description.strip():
+        messages.error(request, 'A denúncia não pode estar vázia')
+        return redirect(reverse('post:post', kwargs={'pk': pk, }))
+
+    description = 'Post: {}, Autor: {} - {}'.format(pk, post.user_post, report_description)
+
+    Report.objects.create(user_report=post.user_post, description_report=description)
+    messages.success(request, 'Sua denúncia foi registrada')
+    return redirect(reverse('post:post', kwargs={'pk': pk, }))
+

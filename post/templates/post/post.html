@@ -41,6 +41,12 @@
                     </small>
                 </div>
             </div>
+            <div class="text-end">
+                <button class="btn button-format"
+                        onclick="popupForm('report-form', 1)">
+                    Reportar
+                </button>
+            </div>
             {% if post.image_post %}
             <div class="text-center p-3">
                 <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="img-fluid w-50">
@@ -218,6 +224,31 @@
                 </div>
                 <button class="btn button-format primary-bg-color">
                     Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none; width: 400px" id="report-form">
+        <form action="{% url 'post:report' %}" method="POST" class="form-field">
+
+            <div class="form-floating">
+                <textarea class="form-control"
+                          placeholder="Deixe sua denúncia aqui"
+                          id="reportTextarea"
+                          name="report-description"></textarea>
+                <label for="reportTextarea">Denúncia</label>
+            </div>
+
+            <input type="hidden" name="primary-key" value="{{ post.pk }}">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format"
+                    onclick="popupForm('report-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
                 </button>
             </div>
         </form>
