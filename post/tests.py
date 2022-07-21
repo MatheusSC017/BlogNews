@@ -3,6 +3,7 @@ from django.test import Client, TestCase, override_settings
 from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.messages import get_messages
 from django.utils import timezone as tz
+from django.conf import settings
 from .models import Category, Post, RattingUserPost
 from comment.models import Comment
 from .views import Post as PostView, Blog
@@ -128,8 +129,8 @@ class BlogPageTestCase(BlogTestCase):
         return [post.pk for post in response.context.get('posts')]
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class PostPageTestCase(BlogTestCase):
     def test_connection_with_the_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
@@ -193,8 +194,9 @@ class PostPageTestCase(BlogTestCase):
         self.assertEqual(len(comments), 2)
         self.assertEqual(str(comments[1]), 'Obrigado pelo Feedback')
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserBlogPageTestCase(BlogTestCase):
     def test_connection_and_context_of_page_with_user_logged_in(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -251,8 +253,8 @@ class UserBlogPageTestCase(BlogTestCase):
         self.assertEqual(str(messages[1]), 'Post publicado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserCreatePostPageTestCase(BlogTestCase):
     def test_post_create_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
@@ -289,8 +291,8 @@ class UserCreatePostPageTestCase(BlogTestCase):
         self.assertEqual(str(messages[1]), 'Post adicionado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserUpdatePostPageTestCase(BlogTestCase):
     def test_post_update_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',

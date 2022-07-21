@@ -63,8 +63,8 @@ class ImagePageTestCase(AlbumTestCase):
         self.assertEqual(len(response.context.get('images')), 3)
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserAlbumPageTestCase(AlbumTestCase):
     def test_album_page_without_user(self):
         response = self.client.get(reverse('album:user_album'))
@@ -86,8 +86,8 @@ class UserAlbumPageTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class AlbumCreatePageTestCase(AlbumTestCase):
     def test_album_create_without_user(self):
         response = self.client.get(reverse('album:album_create'))
@@ -120,8 +120,8 @@ class AlbumCreatePageTestCase(AlbumTestCase):
         self.assertEqual(str(messages[1]), 'Álbum cadastrado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class AlbumUpdateMethodTestCase(AlbumTestCase):
     def test_update_album_without_user(self):
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
@@ -163,8 +163,8 @@ class AlbumUpdateMethodTestCase(AlbumTestCase):
         self.assertEqual(str(messages[1]), 'Dados incorretos')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class AlbumDeleteMethodTestCase(AlbumTestCase):
     def test_album_delete_without_user(self):
         response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
@@ -189,8 +189,8 @@ class AlbumDeleteMethodTestCase(AlbumTestCase):
         self.assertEqual(str(messages[1]), 'Álbum deletado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserImagePageTestCase(AlbumTestCase):
     def test_user_image_page_without_user(self):
         response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
@@ -215,8 +215,8 @@ class UserImagePageTestCase(AlbumTestCase):
         self.assertEqual(len(response.context.get('images')), 3)
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class ImageCreateClassTestCase(AlbumTestCase):
     def test_create_image_class_without_user(self):
         with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
@@ -250,8 +250,8 @@ class ImageCreateClassTestCase(AlbumTestCase):
         self.assertEqual(str(messages[1]), 'Imagens cadastradas')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class ImageUpdateMethodTestCase(AlbumTestCase):
     def test_update_image_without_user(self):
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
@@ -295,8 +295,8 @@ class ImageUpdateMethodTestCase(AlbumTestCase):
         self.assertEqual(str(messages[1]), 'Título deve possuir ao menos 5 caracteres')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class ImageDeleteMethodTestCase(AlbumTestCase):
     def test_delete_image_without_user(self):
         response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
@@ -324,8 +324,8 @@ class ImageDeleteMethodTestCase(AlbumTestCase):
         self.assertEqual(str(messages[1]), 'Imagem deletada')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class MultipleImageDeleteMethodTestCase(AlbumTestCase):
     def test_multiple_image_delete_without_user(self):
         response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),

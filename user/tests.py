@@ -2,12 +2,13 @@ from django.test import TestCase, Client, override_settings
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from django.contrib.messages import get_messages
+from django.conf import settings
 from blog.views import Home
 from .views import Login, Register
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class RegisterPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -62,8 +63,8 @@ class RegisterPageTestCase(TestCase):
         return response
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UpdatePageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -124,8 +125,8 @@ class UpdatePageTestCase(TestCase):
         return response
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class LoginPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -164,8 +165,8 @@ class LoginPageTestCase(TestCase):
         self.assertEqual(str(messages[0]), 'Usuário ou senha incorretos')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class LogoutPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()

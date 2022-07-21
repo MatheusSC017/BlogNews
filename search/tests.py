@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.messages import get_messages
 from django.utils import timezone
 from django.shortcuts import reverse
+from django.conf import settings
 from . import views
 from . import models
 
@@ -70,8 +71,8 @@ class SearchesPageTestCase(SearchTestCase):
         self.assertEqual(response.context.get('searches')[1].get('search').pk, self.search2.pk)
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class SearchPageTestCase(SearchTestCase):
     def test_search_page_with_inactive_search(self):
         response = self.client.get(reverse('search:search', args=[self.search3.pk, ]))
@@ -142,8 +143,8 @@ class SearchPageTestCase(SearchTestCase):
         self.assertEqual(str(messages[1]), 'Obrigado pelo voto')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserSearchPageTestCase(SearchTestCase):
     def test_user_search_page_without_user(self):
         response = self.client.get(reverse('search:user_search'))
@@ -167,8 +168,8 @@ class UserSearchPageTestCase(SearchTestCase):
         self.assertEqual(len(response.context.get('searches')), 2)
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class CreateSearchPageTestCase(SearchTestCase):
     def test_create_search_page_connection_without_user(self):
         response = self.client.get(reverse('search:search_create'))
@@ -213,8 +214,8 @@ class CreateSearchPageTestCase(SearchTestCase):
         self.assertEqual(str(messages[1]), 'Pesquisa cadastrada')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UpdateSearchPageTestCase(SearchTestCase):
     def test_update_search_page_connection_without_user(self):
         response = self.client.get(reverse('search:search_update', kwargs={'pk': self.search1.pk, }))
@@ -267,8 +268,8 @@ class UpdateSearchPageTestCase(SearchTestCase):
         self.assertEqual(str(messages[1]), 'Pesquisa atualizada')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class DeleteSearchMethodTestCase(SearchTestCase):
     def test_delete_search_method_get_connection(self):
         self.client.post(reverse('user:login'), {'username': 'username_test',
