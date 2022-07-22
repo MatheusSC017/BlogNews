@@ -3,7 +3,9 @@ from django.test import TestCase, Client, override_settings
 from django.contrib.auth.models import User
 from django.utils import timezone as tz
 from django.contrib.messages import get_messages
+from django.conf import settings
 from post.models import Post, Category
+from django.http import HttpRequest
 from .models import Comment
 
 
@@ -52,13 +54,11 @@ class CommentTestCase(TestCase):
                                                comment='Testando')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
+@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
+                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class CommentCreateMethodTestCase(CommentTestCase):
     def test_create_comment_get_method(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('comment:comment_create', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
@@ -69,41 +69,31 @@ class CommentCreateMethodTestCase(CommentTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_create_comment_with_unpublished_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_create', args=[self.post3.pk, ]),
                                     {'comment': 'Comment_test', 'g-recaptcha-response': 'recaptcha', })
         self.assertEqual(response.status_code, 404)
 
     def test_create_comment_post_with_future_publication_date(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_create', args=[self.post2.pk, ]),
                                     {'comment': 'Comment_test', 'g-recaptcha-response': 'recaptcha', })
         self.assertEqual(response.status_code, 404)
 
     def test_create_comment(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_create', args=[self.post1.pk, ]),
                                     {'comment': 'Comment_test', 'g-recaptcha-response': 'recaptcha', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
         comments = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(comments), 2)
-        self.assertEqual(str(comments[1]), 'Comentário adicionado')
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(str(comments[0]), 'Comentário adicionado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class CommentUpdateMethodTestCase(CommentTestCase):
     def test_update_comment_get_method(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('comment:comment_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
@@ -114,57 +104,43 @@ class CommentUpdateMethodTestCase(CommentTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_update_comment_with_unpublished_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_update', args=[self.post3.pk, ]),
                                     {'comment': 'Comment_test', 'primary-key': self.comment3.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_update_comment_post_with_future_publication_date(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_update', args=[self.post2.pk, ]),
                                     {'comment': 'Comment_test', 'primary-key': self.comment2.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_update_comment_with_other_user(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_update', args=[self.post1.pk, ]),
                                     {'comment': 'Comment_test', 'primary-key': self.comment1.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_update_comment_with_other_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_update', args=[self.post4.pk, ]),
                                     {'comment': 'Comment_test', 'primary-key': self.comment1.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_update_comment(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_update', args=[self.post1.pk, ]),
                                     {'comment': 'Comment_test', 'primary-key': self.comment1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
         comments = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(comments), 2)
-        self.assertEqual(str(comments[1]), 'Comentário editado')
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(str(comments[0]), 'Comentário editado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-                   RECAPTCHA_SECRET_KEY='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
 class CommentDeleteMethodTestCase(CommentTestCase):
     def test_delete_comment_get_method(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('comment:comment_delete', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
@@ -175,45 +151,35 @@ class CommentDeleteMethodTestCase(CommentTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_delete_comment_with_unpublished_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_delete', args=[self.post3.pk, ]),
                                     {'primary-key': self.comment3.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_delete_comment_post_with_future_publication_date(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_delete', args=[self.post2.pk, ]),
                                     {'primary-key': self.comment2.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_delete_comment_with_other_user(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_delete', args=[self.post1.pk, ]),
                                     {'primary-key': self.comment1.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_delete_comment_with_other_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_delete', args=[self.post4.pk, ]),
                                     {'primary-key': self.comment1.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_delete_comment(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('comment:comment_delete', args=[self.post1.pk, ]),
                                     {'comment': 'Comment_test', 'primary-key': self.comment1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
         comments = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(comments), 2)
-        self.assertEqual(str(comments[1]), 'Comentário deletado')
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(str(comments[0]), 'Comentário deletado')

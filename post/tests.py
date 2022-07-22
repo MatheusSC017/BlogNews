@@ -1,12 +1,11 @@
 from django.shortcuts import reverse
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.messages import get_messages
 from django.utils import timezone as tz
-from django.conf import settings
 from .models import Category, Post, RattingUserPost
-from comment.models import Comment
-from .views import Post as PostView, Blog
+from django.http import HttpRequest
+from .views import Blog
 from user.views import Login
 
 
@@ -129,8 +128,6 @@ class BlogPageTestCase(BlogTestCase):
         return [post.pk for post in response.context.get('posts')]
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class PostPageTestCase(BlogTestCase):
     def test_connection_with_the_post_page(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
@@ -151,9 +148,7 @@ class PostPageTestCase(BlogTestCase):
         self.assertEqual(response.context.get('post').anonymous_views_post, views + 1)
 
     def test_view_post_with_logged_in_user(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         views = self.post1.user_views_post
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
         self.assertEqual(response.context.get('post').user_views_post, views + 1)
@@ -171,45 +166,35 @@ class PostPageTestCase(BlogTestCase):
         self.assertEqual(response.resolver_match.func.__name__, Login.as_view().__name__)
 
     def test_register_feedback_to_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('post:post', args=[self.post1.pk, ]),
                                     {'star': '5', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post1.pk, ]))
         comments = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(comments), 2)
-        self.assertEqual(str(comments[1]), 'Obrigado pelo Feedback')
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(str(comments[0]), 'Obrigado pelo Feedback')
 
     def test_update_feedback_to_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('post:post', args=[self.post3.pk, ]),
                                     {'star': '5', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post3.pk, ]))
         comments = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(comments), 2)
-        self.assertEqual(str(comments[1]), 'Obrigado pelo Feedback')
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(str(comments[0]), 'Obrigado pelo Feedback')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserBlogPageTestCase(BlogTestCase):
     def test_connection_and_context_of_page_with_user_logged_in(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('post:user_blog'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('posts', response.context)
 
     def test_connection_page_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('post:user_blog'))
         self.assertEqual(response.status_code, 403)
 
@@ -218,9 +203,7 @@ class UserBlogPageTestCase(BlogTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_data_received_user_post_page(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('post:user_blog'))
         order = [_.pk for _ in response.context.get('posts')]
         self.assertEqual([self.post4.pk,
@@ -231,42 +214,32 @@ class UserBlogPageTestCase(BlogTestCase):
         [164, 162, 161, 163, 165]
 
     def test_unpublish_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Post despublicado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Post despublicado')
 
     def test_publish_post(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('post:user_blog'), {'primary-key': self.post4.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Post publicado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Post publicado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserCreatePostPageTestCase(BlogTestCase):
     def test_post_create_connection(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 200)
 
     def test_post_create_connection_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('post:post_create'))
         self.assertEqual(response.status_code, 403)
 
@@ -275,9 +248,7 @@ class UserCreatePostPageTestCase(BlogTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_post_create(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         parameters = {'title_post': 'register_test',
                       'excerpt_post': 'register_test_excerpt_post',
                       'description_post': 'register_test_description_post',
@@ -287,24 +258,18 @@ class UserCreatePostPageTestCase(BlogTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Post adicionado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Post adicionado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserUpdatePostPageTestCase(BlogTestCase):
     def test_post_update_connection(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 200)
 
     def test_post_update_connection_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('post:post_update', args=[self.post1.pk, ]))
         self.assertEqual(response.status_code, 403)
 
@@ -313,9 +278,7 @@ class UserUpdatePostPageTestCase(BlogTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_post_update(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         parameters = {'title_post': 'update_test',
                       'excerpt_post': 'update_test_excerpt_post',
                       'description_post': 'update_test_description_post',
@@ -325,5 +288,5 @@ class UserUpdatePostPageTestCase(BlogTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Post atualizado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Post atualizado')

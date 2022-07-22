@@ -1,8 +1,9 @@
-from django.test import TestCase, Client, override_settings
+from django.test import TestCase, Client
 from django.shortcuts import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from pathlib import Path
+from django.http import HttpRequest
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User, Permission, ContentType
 from . import models
@@ -63,65 +64,49 @@ class ImagePageTestCase(AlbumTestCase):
         self.assertEqual(len(response.context.get('images')), 3)
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserAlbumPageTestCase(AlbumTestCase):
     def test_album_page_without_user(self):
         response = self.client.get(reverse('album:user_album'))
         self.assertEqual(response.status_code, 302)
 
     def test_album_page_connection_and_context(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('album:user_album'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('albuns', response.context)
 
     def test_album_page_connection_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('album:user_album'))
         self.assertEqual(response.status_code, 403)
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class AlbumCreatePageTestCase(AlbumTestCase):
     def test_album_create_without_user(self):
         response = self.client.get(reverse('album:album_create'))
         self.assertEqual(response.status_code, 302)
 
     def test_album_create_page_connection(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('album:album_create'))
         self.assertEqual(response.status_code, 200)
 
     def test_album_create_page_connection_with_uset_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('album:album_create'))
         self.assertEqual(response.status_code, 403)
 
     def test_album_create(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:album_create'), {'title_album': 'Album Test',
                                                                     'published_album': 'True', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Álbum cadastrado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Álbum cadastrado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class AlbumUpdateMethodTestCase(AlbumTestCase):
     def test_update_album_without_user(self):
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
@@ -129,84 +114,66 @@ class AlbumUpdateMethodTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_update_album_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test Album 2', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_album(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test Album 2',
                                                                     'published_album': False, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Álbum editado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Álbum editado')
 
     def test_update_album_with_invalid_data(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
                                                                     'title_album': 'test',
                                                                     'published_album': False, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Dados incorretos')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Dados incorretos')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class AlbumDeleteMethodTestCase(AlbumTestCase):
     def test_album_delete_without_user(self):
         response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_album_delete_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_album_delete(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:album_delete'), {'primary-key': self.album1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Álbum deletado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Álbum deletado')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserImagePageTestCase(AlbumTestCase):
     def test_user_image_page_without_user(self):
         response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 302)
 
     def test_user_image_page_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 403)
 
     def test_user_image_page_connection_context_and_data(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('album:user_images', args=[self.album1.pk, ]))
         self.assertEqual(response.status_code, 200)
         self.assertIn('album', response.context)
@@ -215,8 +182,6 @@ class UserImagePageTestCase(AlbumTestCase):
         self.assertEqual(len(response.context.get('images')), 3)
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class ImageCreateClassTestCase(AlbumTestCase):
     def test_create_image_class_without_user(self):
         with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
@@ -226,9 +191,7 @@ class ImageCreateClassTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_create_image_class_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
@@ -236,9 +199,7 @@ class ImageCreateClassTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_create_image_class(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
@@ -246,12 +207,10 @@ class ImageCreateClassTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Imagens cadastradas')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Imagens cadastradas')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class ImageUpdateMethodTestCase(AlbumTestCase):
     def test_update_image_without_user(self):
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
@@ -260,43 +219,35 @@ class ImageUpdateMethodTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_update_image_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
                                      'title_image': 'Image title', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_image(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
                                      'title_image': 'Image title', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Título editado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Título editado')
 
     def test_update_image_with_invalid_data(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
                                      'title_image': 'Test', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Título deve possuir ao menos 5 caracteres')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Título deve possuir ao menos 5 caracteres')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class ImageDeleteMethodTestCase(AlbumTestCase):
     def test_delete_image_without_user(self):
         response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
@@ -304,28 +255,22 @@ class ImageDeleteMethodTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_delete_image_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_delete_image(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:image_delete', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Imagem deletada')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Imagem deletada')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class MultipleImageDeleteMethodTestCase(AlbumTestCase):
     def test_multiple_image_delete_without_user(self):
         response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),
@@ -333,21 +278,17 @@ class MultipleImageDeleteMethodTestCase(AlbumTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_multiple_image_delete_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),
                                     {'delete-items': [self.image1.pk, self.image2.pk, ], })
         self.assertEqual(response.status_code, 302)
 
     def test_multiple_image_delete(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:images_delete', args=[self.album1.pk, ]),
                                     {'delete-items': [self.image1.pk, self.image2.pk, ], })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Imagens excluidas')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Imagens excluidas')

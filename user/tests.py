@@ -3,12 +3,11 @@ from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from django.contrib.messages import get_messages
 from django.conf import settings
+from django.http import HttpRequest
 from blog.views import Home
 from .views import Login, Register
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class RegisterPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -19,9 +18,7 @@ class RegisterPageTestCase(TestCase):
 
     def test_access_registration_page_with_user_already_logged_in(self):
         User.objects.create_user(username='username_test', email='email@test.com', password='password_test')
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('user:register'))
         self.assertEqual(response.resolver_match.func.__name__, Home.as_view().__name__)
 
@@ -63,8 +60,6 @@ class RegisterPageTestCase(TestCase):
         return response
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UpdatePageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -78,42 +73,34 @@ class UpdatePageTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_connection_with_update_page(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('user:update'))
         self.assertEqual(response.status_code, 200)
 
     def test_update_user_with_username_already_created(self):
         User.objects.create_user(username='username_test2', email='email@test.com', password='password_test2')
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.update_test(username='username_test2')
         self.assertEqual(response.resolver_match.func.__name__, Register.as_view().__name__)
 
     def test_update_user(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.update_test()
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('user:update'))
         self.assertTrue(User.objects.get(username='username_test'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Perfil editado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Perfil editado')
 
     def test_update_user_password(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.update_test(password='password_test2',
                                     password_confirm='password_test2')
         self.assertEqual(response.status_code, 302)
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Perfil editado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Perfil editado')
 
     def update_test(self, username='username_test', password='', password_confirm=''):
         response = self.client.post(reverse('user:update'), {'username': username,
@@ -137,14 +124,12 @@ class LoginPageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_login_user_already_logged_in(self):
-        self.client.post(reverse('user:login'), data={'username': 'username_test',
-                                                      'password': 'password_test',
-                                                      'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('user:login'))
         self.assertEqual(response.resolver_match.func.__name__, Home.as_view().__name__)
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Usuário já logado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Usuário já logado')
 
     def test_login_user_correct_data(self):
         response = self.client.post(reverse('user:login'), data={'username': 'username_test',
@@ -165,8 +150,6 @@ class LoginPageTestCase(TestCase):
         self.assertEqual(str(messages[0]), 'Usuário ou senha incorretos')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class LogoutPageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -182,11 +165,9 @@ class LogoutPageTestCase(TestCase):
         self.assertRedirects(response, reverse('user:login'))
 
     def test_logout_user(self):
-        self.client.post(reverse('user:login'), data={'username': 'username_test',
-                                                      'password': 'password_test',
-                                                      'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('user:logout'))
         self.assertRedirects(response, reverse('blog:index'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Usuário deslogado')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Usuário deslogado')

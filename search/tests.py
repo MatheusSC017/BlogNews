@@ -4,6 +4,7 @@ from django.contrib.messages import get_messages
 from django.utils import timezone
 from django.shortcuts import reverse
 from django.conf import settings
+from django.http import HttpRequest
 from . import views
 from . import models
 
@@ -95,72 +96,58 @@ class SearchPageTestCase(SearchTestCase):
         self.assertIn('status', response.context)
 
     def test_search_page_vote_with_inactive_search(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search', args=[self.search3.pk, ]),
                                     {'optionChoice': self.option6.pk})
         self.assertEqual(response.status_code, 404)
 
     def test_search_page_vote_with_future_search(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search', args=[self.search4.pk, ]),
                                     {'optionChoice': self.option7.pk})
         self.assertEqual(response.status_code, 404)
 
     def test_search_page_vote_finished_search(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search', args=[self.search2.pk, ]),
                                     {'optionChoice': self.option3.pk})
         self.assertEqual(response.status_code, 404)
 
     def test_search_page_new_vote(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search', args=[self.search1.pk, ]),
-                                    {'optionChoice': self.option1.pk})
+                                    {'optionChoice': self.option1.pk,
+                                     'g-recaptcha-response': 'RECAPTCHA', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:search', args=[self.search1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Obrigado pelo voto')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Obrigado pelo voto')
 
     def test_search_page_update_vote(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('search:search', args=[self.search1.pk, ]),
-                                    {'optionChoice': self.option1.pk})
+                                    {'optionChoice': self.option1.pk,
+                                     'g-recaptcha-response': 'RECAPTCHA', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:search', args=[self.search1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Obrigado pelo voto')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Obrigado pelo voto')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UserSearchPageTestCase(SearchTestCase):
     def test_user_search_page_without_user(self):
         response = self.client.get(reverse('search:user_search'))
         self.assertEqual(response.status_code, 302)
 
     def test_user_search_page_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test3',
-                                                 'password': 'password_test3',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test3', password='password_test3', request=HttpRequest())
         response = self.client.get(reverse('search:user_search'))
         self.assertEqual(response.status_code, 403)
 
     def test_user_search_page_connection_and_context(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('search:user_search'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, views.UserSearches.as_view().__name__)
@@ -168,33 +155,25 @@ class UserSearchPageTestCase(SearchTestCase):
         self.assertEqual(len(response.context.get('searches')), 2)
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class CreateSearchPageTestCase(SearchTestCase):
     def test_create_search_page_connection_without_user(self):
         response = self.client.get(reverse('search:search_create'))
         self.assertEqual(response.status_code, 302)
 
     def test_create_search_page_connection_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test3',
-                                                 'password': 'password_test3',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test3', password='password_test3', request=HttpRequest())
         response = self.client.get(reverse('search:search_create'))
         self.assertEqual(response.status_code, 403)
 
     def test_create_search_page_connection_and_context(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('search:search_create'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.context)
         self.assertIn('option_form', response.context)
 
     def test_create_search(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search_create'),
                                     {
                                         'description_search': 'Test Search Description',
@@ -210,45 +189,35 @@ class CreateSearchPageTestCase(SearchTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Pesquisa cadastrada')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Pesquisa cadastrada')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class UpdateSearchPageTestCase(SearchTestCase):
     def test_update_search_page_connection_without_user(self):
         response = self.client.get(reverse('search:search_update', kwargs={'pk': self.search1.pk, }))
         self.assertEqual(response.status_code, 302)
 
     def test_update_search_page_connection_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test3',
-                                                 'password': 'password_test3',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test3', password='password_test3', request=HttpRequest())
         response = self.client.get(reverse('search:search_update', kwargs={'pk': self.search1.pk, }))
         self.assertEqual(response.status_code, 403)
 
     def test_update_search_page_with_other_user(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.get(reverse('search:search_update', kwargs={'pk': self.search1.pk, }))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
 
     def test_update_search_page_connection_and_context(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('search:search_update', kwargs={'pk': self.search1.pk, }))
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.context)
         self.assertIn('option_form', response.context)
 
     def test_update_search(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search_update', kwargs={'pk': self.search1.pk, }),
                                     {
                                         'description_search': 'Test Search Description',
@@ -264,17 +233,13 @@ class UpdateSearchPageTestCase(SearchTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Pesquisa atualizada')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Pesquisa atualizada')
 
 
-@override_settings(RECAPTCHA_SITE_KEY=settings.RECAPTCHA_SITE_KEY_TEST,
-                   RECAPTCHA_SECRET_KEY=settings.RECAPTCHA_SECRET_KEY_TEST)
 class DeleteSearchMethodTestCase(SearchTestCase):
     def test_delete_search_method_get_connection(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('search:search_delete'))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
@@ -284,26 +249,20 @@ class DeleteSearchMethodTestCase(SearchTestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_delete_search_method_connection_with_user_without_permission(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test3',
-                                                 'password': 'password_test3',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test3', password='password_test3', request=HttpRequest())
         response = self.client.post(reverse('search:search_delete'), {'primary-key': self.search1.pk, })
         self.assertEqual(response.status_code, 302)
 
     def test_delete_search_method_with_other_user(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test2',
-                                                 'password': 'password_test2',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('search:search_delete'), {'primary-key': self.search1.pk, })
         self.assertEqual(response.status_code, 404)
 
     def test_delete_search(self):
-        self.client.post(reverse('user:login'), {'username': 'username_test',
-                                                 'password': 'password_test',
-                                                 'g-recaptcha-response': 'recaptcha', })
+        self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search_delete'), {'primary-key': self.search1.pk, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Pesquisa deletada')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Pesquisa deletada')
