@@ -18,6 +18,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from user.views import SocialAccountSignupViewBlog
+from allauth.socialaccount.views import ConnectionsView, LoginCancelledView, LoginErrorView
+
+allauth_patterns = [
+    path('social/cadastrar/', SocialAccountSignupViewBlog.as_view(), name='socialaccount_signup'),
+    path('social/conexoes/', ConnectionsView.as_view(), name='socialaccount_connections'),
+    path('social/login/cancelar/', LoginCancelledView.as_view(), name='socialaccount_login_cancelled'),
+    path('social/login/erro/', LoginErrorView.as_view(), name='socialaccount_login_error'),
+    path('', include('allauth.socialaccount.providers.google.urls')),
+]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,8 +38,7 @@ urlpatterns = [
     path('pesquisa/', include('search.urls')),
     path('newsletter/', include('newsletter.urls')),
     path('summernote/', include('django_summernote.urls')),
-    path('accounts/social/signup/', SocialAccountSignupViewBlog.as_view(), name='socialaccount_signup'),
-    path('accounts/', include('allauth.urls')),
+    path('contas/', include(allauth_patterns)),
 
     # TODO: Remover no final do projeto
     path('__debug__/', include('debug_toolbar.urls')),
