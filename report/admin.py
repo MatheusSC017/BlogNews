@@ -8,7 +8,7 @@ class ReportAdmin(admin.ModelAdmin):
     list_display_links = ('pk', 'user_report', )
     list_filter = ('status_report', )
     search_fields = ('user_report', 'description_report', )
-    # exclude = ('status_report', )
+    exclude = ('status_report', )
     actions = ('approve_report', 'reject_report', )
 
     @admin.action(description='Aprovar denúncia de usúario')
@@ -30,7 +30,7 @@ class ReportAdmin(admin.ModelAdmin):
 
             user_report_register.reports_userreportregister += 1
 
-            if user_report_register.reports_userreportregister == 3:
+            if user_report_register.reports_userreportregister >= 3:
                 user_report_register.status_userreportregister = 'b'
                 report.user_report.user_permissions.clear()
 

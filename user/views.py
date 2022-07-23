@@ -94,8 +94,8 @@ class Register(CreateView):
             models_permissions = [Post, Album, Image, Search, Option, ]
             for model in models_permissions:
                 content_type = ContentType.objects.get_for_model(model)
-                post_permissions = Permission.objects.filter(content_type=content_type)
-                for permission in post_permissions:
+                permissions = Permission.objects.filter(content_type=content_type)
+                for permission in permissions:
                     self.object.user_permissions.add(permission)
         messages.success(self.request, 'Usuário cadastrado')
         return reverse('user:login')
