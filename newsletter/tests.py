@@ -1,7 +1,10 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
+from django.http import HttpRequest
 from django.shortcuts import reverse
 from django.contrib.messages import get_messages
 from django.utils.crypto import get_random_string
+from django.utils import lorem_ipsum
 from . import models
 from . import views
 
@@ -101,3 +104,27 @@ class ConfirmUnsubscribeTestCase(NewsLetterUserTestCase):
         response = self.client.post(reverse('newsletter:unsubscribe_confirm', kwargs={'token': token}))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('newsletter:unsubscribe_finish'))
+
+
+class SendNewsLetterMessageTestCase(NewsLetterUserTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.user = User.objects.create_superuser(username='admin', email='admin@admin.com', password='admin123456')
+        self.message = models.NewsLetterMessage.objects.create(title_newslettermessage=lorem_ipsum.words(7),
+                                                               message_newslettermessage=lorem_ipsum.paragraph())
+
+    def test_send_message_for_newsletter_users(self):
+        self.client.login(username='admin', password='admin123456', request=HttpRequest())
+        response = self.client.post(reverse('admin:newsletter_newslettermessage_changelist'),
+                                    {
+                                        'action': 'send_newsletter',
+                                        '_selected_action': [self.message.pk, ],
+                                    })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('admin:newsletter_newslettermessage_changelist'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), '1 mensagem(ns) enviadas com sucesso.')
+        message = models.NewsLetterMessage.objects.get(pk=self.message.pk)
+        self.assertTrue(message.published_newslettermessage)

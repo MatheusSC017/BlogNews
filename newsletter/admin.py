@@ -36,7 +36,7 @@ class NewsLetterMessageAdmin(sn_admin.SummernoteModelAdmin):
             email_message.content_subtype = 'html'
             email_message.send(fail_silently=True)
 
-        messages.success(request, str(queryset.count()) + ' mensagens enviadas com sucesso.')
+        messages.success(request, str(queryset.count()) + ' mensagem(ns) enviadas com sucesso.')
         queryset.update(published_newslettermessage=True)
 
 
