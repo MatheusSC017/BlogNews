@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import HttpRequest
 from blog.views import Home
 from .views import Login, Register
+from .models import UserReportRegister
 
 
 class RegisterPageTestCase(TestCase):
@@ -171,3 +172,46 @@ class LogoutPageTestCase(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Usuário deslogado')
+
+
+class UserReportRegisterActionsTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+        self.admin = User.objects.create_superuser(username='admin', email='admin@test.com', password='admin123456')
+        self.user1 = User.objects.create_user(username='username_test1',
+                                              email='test@test.com',
+                                              password='password_test1')
+        self.user2 = User.objects.create_user(username='username_test2',
+                                              email='test@test.com',
+                                              password='password_test2')
+
+        self.userreportregister1 = UserReportRegister.objects.create(user_userreportregister=self.user1)
+        self.userreportregister2 = UserReportRegister.objects.create(user_userreportregister=self.user2,
+                                                                     reports_userreportregister=3,
+                                                                     status_userreportregister='b')
+
+    def test_block_user_content_creation(self):
+        self.client.login(username='admin', password='admin123456', request=HttpRequest())
+        response = self.client.post(reverse('admin:user_userreportregister_changelist'),
+                                    {
+                                        'action': 'block_user_permissions',
+                                        '_selected_action': [self.userreportregister1.pk, ],
+                                    })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('admin:user_userreportregister_changelist'))
+        userreportregister = UserReportRegister.objects.get(pk=self.userreportregister1.pk)
+        self.assertEqual(userreportregister.status_userreportregister, 'b')
+
+    def test_unlock_user_content_creation(self):
+        self.client.login(username='admin', password='admin123456', request=HttpRequest())
+        response = self.client.post(reverse('admin:user_userreportregister_changelist'),
+                                    {
+                                        'action': 'unlock_user_permissions',
+                                        '_selected_action': [self.userreportregister2.pk, ],
+                                    })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('admin:user_userreportregister_changelist'))
+        userreportregister = UserReportRegister.objects.get(pk=self.userreportregister2.pk)
+        self.assertEqual(userreportregister.reports_userreportregister, 0)
+        self.assertEqual(userreportregister.status_userreportregister, 'n')
