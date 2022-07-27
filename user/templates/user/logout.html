@@ -1,0 +1,13 @@
+{% extends 'user/base.html' %}
+
+{% block title %} | Encerrando sessão{% endblock %}
+
+{% block content_user_page %}
+<h3>Sessão encerrada</h3>
+
+<p>
+    Obrigado por aproveitar um tempo com o nosso site hoje.
+</p>
+
+<a href="{% url 'user:login' %}">Acessar novamente</a>
+{% endblock %}

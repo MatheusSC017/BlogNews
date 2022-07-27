@@ -1,4 +1,3 @@
-from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.edit import CreateView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Permission, ContentType
@@ -7,7 +6,9 @@ from django.contrib.auth.views import (
     PasswordResetView,
     PasswordResetDoneView,
     PasswordResetConfirmView,
-    PasswordResetCompleteView
+    PasswordResetCompleteView,
+    LoginView,
+    LogoutView,
 )
 from allauth.socialaccount.views import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,8 +19,9 @@ from django.conf import settings
 from .forms import (
     UserCreationFormBlog,
     UserChangeFormBlog,
+    AuthenticationFormBlog,
     PasswordResetFormBlog,
-    SetPasswordFormBlog
+    SetPasswordFormBlog,
 )
 from post.models import Post
 from album.models import Album, Image
@@ -28,51 +30,42 @@ from utils.utils import verify_recaptcha
 from allauth.socialaccount import helpers
 
 
-class Login(View, TemplateResponseMixin):
+class Login(LoginView):
     """ Page to user login in the system """
     template_name = 'user/login.html'
+    form_class = AuthenticationFormBlog
+    redirect_authenticated_user = reverse_lazy('blog:index')
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """ Check if the user is already logged in """
-        if self.request.user.is_authenticated:
-            messages.warning(self.request, 'Usuário já logado')
+        if request.user.is_authenticated:
             return redirect(reverse('blog:index'))
 
-        return self.render_to_response({})
+        return self.render_to_response(self.get_context_data())
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """ Check the user data and login """
-        recaptcha_response = self.request.POST.get('g-recaptcha-response')
+        recaptcha_response = request.POST.get('g-recaptcha-response')
 
         if not verify_recaptcha(recaptcha_response):
-            messages.warning(self.request, 'ReCaptcha inválido')
+            messages.warning(request, 'ReCaptcha inválido')
             return redirect(reverse('user:login'))
 
-        if self.request.user.is_authenticated:
-            messages.warning(self.request, 'Usuário já logado')
+        if request.user.is_authenticated:
+            messages.warning(request, 'Usuário já logado')
             return redirect(reverse('blog:index'))
 
-        username = self.request.POST.get('username')
-        password = self.request.POST.get('password')
+        return super().post(request, *args, **kwargs)
 
-        user = authenticate(self.request, username=username, password=password)
-        if user is not None:
-            login(self.request, user=user)
-            messages.success(self.request, 'Usuário logado')
-            return redirect(reverse('blog:index'))
-        else:
-            messages.error(self.request, 'Usuário ou senha incorretos')
-            return self.render_to_response({})
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuário logado')
+        login(self.request, user=form.get_user())
+        return redirect(self.redirect_authenticated_user)
 
 
-def logout_user(request):
-    """ Check if the user is already logged out, if not, the user is logged out """
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
-    logout(request)
-    messages.success(request, 'Usuário deslogado')
-    return redirect(reverse('blog:index'))
+class Logout(LogoutView):
+    """ The user is logged out """
+    template_name = 'user/logout.html'
 
 
 class Register(CreateView):

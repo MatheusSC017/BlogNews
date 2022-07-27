@@ -127,10 +127,8 @@ class LoginPageTestCase(TestCase):
     def test_login_user_already_logged_in(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('user:login'))
-        self.assertEqual(response.resolver_match.func.__name__, Home.as_view().__name__)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Usuário já logado')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('blog:index'))
 
     def test_login_user_correct_data(self):
         response = self.client.post(reverse('user:login'), data={'username': 'username_test',
@@ -146,9 +144,7 @@ class LoginPageTestCase(TestCase):
                                                                  'password': 'password',
                                                                  'g-recaptcha-response': 'recaptcha', })
         self.assertEqual(response.resolver_match.func.__name__, Login.as_view().__name__)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Usuário ou senha incorretos')
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
 
 
 class LogoutPageTestCase(TestCase):
@@ -158,20 +154,13 @@ class LogoutPageTestCase(TestCase):
 
     def test_logout_connection_page(self):
         response = self.client.get(reverse('user:logout'))
-        self.assertEqual(response.status_code, 302)
-
-    def test_logout_user_already_logged_out(self):
-        response = self.client.get(reverse('user:logout'))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('user:login'))
+        self.assertEqual(response.status_code, 200)
 
     def test_logout_user(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.get(reverse('user:logout'))
-        self.assertRedirects(response, reverse('blog:index'))
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'Usuário deslogado')
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
 
 
 class UserReportRegisterActionsTestCase(TestCase):
