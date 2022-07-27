@@ -27,7 +27,7 @@ class AlbumTestCase(TestCase):
         self.album2 = models.Album.objects.create(title_album='Album test 2',
                                                   user_album=self.user)
 
-        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[1] / 'album/img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         self.image1 = models.Image.objects.create(title_image='Image test 1',
                                                   image=image,
@@ -184,7 +184,7 @@ class UserImagePageTestCase(AlbumTestCase):
 
 class ImageCreateClassTestCase(AlbumTestCase):
     def test_create_image_class_without_user(self):
-        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[1] / 'album/img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
@@ -192,7 +192,7 @@ class ImageCreateClassTestCase(AlbumTestCase):
 
     def test_create_image_class_with_user_without_permission(self):
         self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
-        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[1] / 'album/img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })
@@ -200,7 +200,7 @@ class ImageCreateClassTestCase(AlbumTestCase):
 
     def test_create_image_class(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[1] / 'album/img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
         response = self.client.post(reverse('album:images_create', args=[self.album1.pk, ]),
                                     {'image_field': [image, ], })

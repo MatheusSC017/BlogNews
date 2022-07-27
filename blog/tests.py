@@ -49,7 +49,7 @@ class IndexPageTestCase(TestCase):
                                                        user_album=self.user,
                                                        published_album=False)
 
-        with open(settings.STATICFILES_DIRS[0] / 'img/test.jpg', 'rb') as img:
+        with open(settings.STATICFILES_DIRS[2] / 'blog/img/test.jpg', 'rb') as img:
             self.image = SimpleUploadedFile('image.jpg', img.read())
 
         self.image1 = model_album.Image.objects.create(image=self.image, album_image=self.album1)

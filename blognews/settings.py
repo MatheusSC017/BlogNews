@@ -173,6 +173,10 @@ USE_TZ = False
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     BASE_DIR / 'templates/static',
+    BASE_DIR / 'album/templates/static',
+    BASE_DIR / 'blog/templates/static',
+    BASE_DIR / 'user/templates/static',
+    BASE_DIR / 'newsletter/templates/static',
 )
 STATIC_ROOT = BASE_DIR / 'static'
 
