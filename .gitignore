@@ -135,6 +135,4 @@ local_settings
 .idea/
 
 # Media
-media/albuns/
-media/post/
-media/django.summernote/
+media/*
