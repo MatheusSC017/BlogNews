@@ -2,6 +2,56 @@
 
 Este projeto foi pensado com o intuito de aprendizado através da aplicação da maioria das técnicas e funções disponibilizadas pelo Django, como modelos, views, templates, forms e etc. Além de testar em prática o conhecimento necessário para adaptar as classes disponibilizadas pelo Django ou criar classes próprias.
 
+## Requisitos
+* **Python 3.9**
+* **MySQL**
+
+## Instalação
+1. Clone este repositorio em seu dispositivo através do comando
+> gh repo clone MatheusSC017/BlogNews
+2. Crie uma ambiente virtual em seu dispositivo
+> python -m venv venv
+3. Instale as bibliotecas salvas no arquivo requirements.txt, caso esteja utilizando o gerenciador de pacotes PIP você poderá utilizar o comando a seguir
+> pip install -r requirements.txt
+
+## Configuração
+para realizar a configuração do site altere o arquivo Blog/blognews/settings.py ou crie um arquivo local_settings.py no mesmo diretórios, definindo os seguintes parametros
+
+Defina a chave secreta para o site
+> SECRET_KEY = 'SITE_SECRET_KEY'
+
+Definas as configurações do e-mail para o envio da newsletter
+> EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+> 
+> EMAIL_HOST = 'HOST'
+> 
+> EMAIL_HOST_USER = EMAIL_USER'
+> 
+> EMAIL_HOST_PASSWORD = 'PASSOWORD'
+> 
+> EMAIL_PORT = 587
+> 
+> EMAIL_USE_TLS = True
+> 
+> DEFAULT_FROM_EMAIL = 'EMAIL'
+
+Informe a suas chaves para recaptcha ou utilize as de testes fornecidas pelo Google (SITE_KEY_GOOGLE: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI, SECRET_KEY_GOOGLE: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe, para mais informações acesse [Google Recaptcha](https://developers.google.com/recaptcha/docs/faq)
+> RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY'
+> 
+> RECAPTCHA_SECRET_KEY = 'RECAPTCHA_SECRET_KEY'
+>
+
+Configure os provedores que serão utilizados para login, segue-se o exemplo abaixo para o provedor Google, onde deve-se informar o client_id, secret e key
+> SOCIALACCOUNT_PROVIDERS = {
+>     'google': {
+>         'APP': {
+>             'client_id': 'CLIENT_ID',
+>             'secret': 'SECRET',
+>             'key': 'KEY'
+>         }
+>     }
+> }
+
 ## Divisão do site
 
 O site BlogNews é dividido em três partes:
