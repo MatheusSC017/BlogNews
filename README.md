@@ -18,39 +18,53 @@ Este projeto foi pensado com o intuito de aprendizado através da aplicação da
 para realizar a configuração do site altere o arquivo Blog/blognews/settings.py ou crie um arquivo local_settings.py no mesmo diretórios, definindo os seguintes parametros
 
 Defina a chave secreta para o site
-> SECRET_KEY = 'SITE_SECRET_KEY'
+~~~python
+SECRET_KEY = 'SITE_SECRET_KEY'
+~~~
 
 Definas as configurações do e-mail para o envio da newsletter
-> EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-> 
-> EMAIL_HOST = 'HOST'
-> 
-> EMAIL_HOST_USER = EMAIL_USER'
-> 
-> EMAIL_HOST_PASSWORD = 'PASSOWORD'
-> 
-> EMAIL_PORT = 587
-> 
-> EMAIL_USE_TLS = True
-> 
-> DEFAULT_FROM_EMAIL = 'EMAIL'
+~~~python
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+EMAIL_HOST = 'HOST'
+EMAIL_HOST_USER = 'USER'
+EMAIL_HOST_PASSWORD = 'PASSOWORD'
+EMAIL_PORT = 9999
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'BLOGNEWS'
+~~~
 
 Informe a suas chaves para recaptcha ou utilize as de testes fornecidas pelo Google (SITE_KEY_GOOGLE: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI, SECRET_KEY_GOOGLE: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe, para mais informações acesse [Google Recaptcha](https://developers.google.com/recaptcha/docs/faq)
-> RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY'
-> 
-> RECAPTCHA_SECRET_KEY = 'RECAPTCHA_SECRET_KEY'
->
+~~~python
+RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY'
+RECAPTCHA_SECRET_KEY = 'RECAPTCHA_SECRET_KEY'
+~~~
 
 Configure os provedores que serão utilizados para login, segue-se o exemplo abaixo para o provedor Google, onde deve-se informar o client_id, secret e key
-> SOCIALACCOUNT_PROVIDERS = {
->     'google': {
->         'APP': {
->             'client_id': 'CLIENT_ID',
->             'secret': 'SECRET',
->             'key': 'KEY'
->         }
->     }
-> }
+~~~python
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': 'CLIENT_ID',
+            'secret': 'SECRET',
+            'key': 'KEY'
+        }
+    }
+}
+~~~
+ 
+Por ultimo configure a conexão com o banco de dados
+~~~python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '',
+        'HOST': '',
+        'USER': '',
+        'PASSWORD': '',
+        'PORT': '',
+    }
+}
+~~~
 
 ## Divisão do site
 
