@@ -57,7 +57,7 @@ Por ultimo configure a conexão com o banco de dados
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
+        'NAME': 'blog_database',
         'HOST': '',
         'USER': '',
         'PASSWORD': '',
