@@ -101,11 +101,11 @@ WSGI_APPLICATION = 'blognews.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blog_database',
-        'HOST': '127.0.0.1',
-        'USER': 'root',
-        'PASSWORD': '',
-        'PORT': '3306',
+        'NAME': 'DATABASE',
+        'HOST': 'HOST',
+        'USER': 'USER',
+        'PASSWORD': 'PASSWORD',
+        'PORT': 'PORT',
     }
 }
 
