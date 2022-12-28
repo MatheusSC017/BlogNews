@@ -1,5 +1,5 @@
 from django.views.generic.edit import CreateView
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login
 from django.contrib.auth.models import User, Permission, ContentType
 from django.contrib.auth.views import (
     FormView,
@@ -15,7 +15,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.conf import settings
 from .forms import (
     UserCreationFormBlog,
     UserChangeFormBlog,

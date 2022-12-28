@@ -14,7 +14,7 @@ def verify_recaptcha(recaptcha_response):
     return response.json()['success']
 
 
-def resize_image(img_db, new_width: 400):
+def resize_image(img_db, new_width=400):
     img_path = settings.MEDIA_ROOT / img_db.name
     with Image.open(img_path) as img:
         width, height = img.size
