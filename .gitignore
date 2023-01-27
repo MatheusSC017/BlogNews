@@ -135,4 +135,9 @@ local_settings
 .idea/
 
 # Media
-media/*
+/BlogNews/media/*
+
+# Enviroment parameters
+.env.prod
+.env.prod.db
+

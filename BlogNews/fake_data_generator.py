@@ -23,7 +23,8 @@ fake = faker.Faker('pt_BR')
 
 def fill_out_image_field(image_field, required=False):
     try:
-        image = PillowImage.open(urllib.request.urlretrieve(fake.image_url())[0])
+        image = PillowImage.open(urllib.request.urlretrieve(fake.image_url(width=randrange(400, 800),
+                                                                           height=randrange(400, 800)))[0])
         img_name = fake.words(nb=1)[0] + str(randrange(11111, 99999)) + '.jpg'
 
         buffer = BytesIO()
@@ -41,7 +42,7 @@ def fill_out_image_field(image_field, required=False):
         )
     except urllib.error.HTTPError:
         if required:
-            fill_out_image_field(image_field)
+            fill_out_image_field(image_field, required=True)
 
 
 def admin_generator():
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 
     albums = [album_generator(user) for _ in range(randrange(1, 5)) for user in content_creators]
 
-    [image_generator(choices(albums)[0]) for _ in range(1000)]
+    [image_generator(choices(albums)[0]) for _ in range(100)]
 
     researches = (research_generator(user) for _ in range(randrange(2, 5)) for user in content_creators)
 
