@@ -182,11 +182,10 @@ class UserReportRegisterActionsTestCase(TestCase):
 
     def test_block_user_content_creation(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
-        response = self.client.post(reverse('admin:user_userreportregister_changelist'),
-                                    {
-                                        'action': 'block_user_permissions',
-                                        '_selected_action': [self.userreportregister1.pk, ],
-                                    })
+        response = self.client.post(reverse('admin:user_userreportregister_changelist'), {
+            'action': 'block_user_permissions',
+            '_selected_action': [self.userreportregister1.pk, ],
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:user_userreportregister_changelist'))
         userreportregister = UserReportRegister.objects.get(pk=self.userreportregister1.pk)
@@ -194,11 +193,10 @@ class UserReportRegisterActionsTestCase(TestCase):
 
     def test_unlock_user_content_creation(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
-        response = self.client.post(reverse('admin:user_userreportregister_changelist'),
-                                    {
-                                        'action': 'unlock_user_permissions',
-                                        '_selected_action': [self.userreportregister2.pk, ],
-                                    })
+        response = self.client.post(reverse('admin:user_userreportregister_changelist'), {
+            'action': 'unlock_user_permissions',
+            '_selected_action': [self.userreportregister2.pk, ],
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:user_userreportregister_changelist'))
         userreportregister = UserReportRegister.objects.get(pk=self.userreportregister2.pk)

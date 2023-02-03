@@ -17,11 +17,10 @@ class ReportActionsTestCase(TestCase):
 
     def test_approve_report(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
-        response = self.client.post(reverse('admin:report_report_changelist'),
-                                    {
-                                        'action': 'approve_report',
-                                        '_selected_action': [self.report.pk, ]
-                                    })
+        response = self.client.post(reverse('admin:report_report_changelist'), {
+            'action': 'approve_report',
+            '_selected_action': [self.report.pk, ]
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:report_report_changelist'))
         report = Report.objects.get(pk=self.report.pk)
@@ -33,11 +32,10 @@ class ReportActionsTestCase(TestCase):
         UserReportRegister.objects.create(user_userreportregister=self.user,
                                           reports_userreportregister=2)
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
-        response = self.client.post(reverse('admin:report_report_changelist'),
-                                    {
-                                        'action': 'approve_report',
-                                        '_selected_action': [self.report.pk, ]
-                                    })
+        response = self.client.post(reverse('admin:report_report_changelist'), {
+            'action': 'approve_report',
+            '_selected_action': [self.report.pk, ]
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:report_report_changelist'))
         report = Report.objects.get(pk=self.report.pk)
@@ -48,11 +46,10 @@ class ReportActionsTestCase(TestCase):
 
     def test_reject_report(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
-        response = self.client.post(reverse('admin:report_report_changelist'),
-                                    {
-                                        'action': 'reject_report',
-                                        '_selected_action': [self.report.pk, ]
-                                    })
+        response = self.client.post(reverse('admin:report_report_changelist'), {
+            'action': 'reject_report',
+            '_selected_action': [self.report.pk, ]
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:report_report_changelist'))
         report = Report.objects.get(pk=self.report.pk)

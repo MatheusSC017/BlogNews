@@ -13,9 +13,13 @@ fi
 
 python manage.py flush --no-input
 python manage.py migrate
-if ["$INITIAL_DATA" = "True"]
+if [ "$INITIAL_DATA" = "True" ]
 then
+  echo "Waiting for the initial data generator..."
+
   python fake_data_generator.py
+
+  echo "Generated data"
 fi
 
 exec "$@"

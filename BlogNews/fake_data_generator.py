@@ -1,9 +1,4 @@
-import os
-import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blognews.settings')
-django.setup()
-
+import django_setup
 from django.contrib.auth.models import User, Permission, ContentType
 from post.models import Category, Post
 from album.models import Album, Image

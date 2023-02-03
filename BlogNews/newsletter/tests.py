@@ -116,11 +116,10 @@ class SendNewsLetterMessageTestCase(NewsLetterUserTestCase):
 
     def test_send_message_for_newsletter_users(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
-        response = self.client.post(reverse('admin:newsletter_newslettermessage_changelist'),
-                                    {
-                                        'action': 'send_newsletter',
-                                        '_selected_action': [self.message.pk, ],
-                                    })
+        response = self.client.post(reverse('admin:newsletter_newslettermessage_changelist'), {
+            'action': 'send_newsletter',
+            '_selected_action': [self.message.pk, ],
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:newsletter_newslettermessage_changelist'))
         messages = list(get_messages(response.wsgi_request))

@@ -43,5 +43,5 @@ class VottingUserOption(models.Model):
         ]
 
     def __str__(self):
-        return self.user_votting.first_name + ' ' + self.user_votting.last_name +\
-               ' - ' + str(self.option_votting.search_option.description_search)
+        return self.user_votting.first_name + ' ' + self.user_votting.last_name + \
+            ' - ' + str(self.option_votting.search_option.description_search)

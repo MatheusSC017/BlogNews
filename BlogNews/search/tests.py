@@ -174,18 +174,17 @@ class CreateSearchPageTestCase(SearchTestCase):
 
     def test_create_search(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        response = self.client.post(reverse('search:search_create'),
-                                    {
-                                        'description_search': 'Test Search Description',
-                                        'publication_date_search': '01/01/2021 12:00:00',
-                                        'finish_date_search': '01/01/2022 23:59:59',
-                                        'option_set-MIN_NUM_FORMS': '2',
-                                        'option_set-MAX_NUM_FORMS': '8',
-                                        'option_set-TOTAL_FORMS': '2',
-                                        'option_set-INITIAL_FORMS': '0',
-                                        'option_set-0-response_option': 'Option 1',
-                                        'option_set-1-response_option': 'Option 2',
-                                    })
+        response = self.client.post(reverse('search:search_create'), {
+            'description_search': 'Test Search Description',
+            'publication_date_search': '01/01/2021 12:00:00',
+            'finish_date_search': '01/01/2022 23:59:59',
+            'option_set-MIN_NUM_FORMS': '2',
+            'option_set-MAX_NUM_FORMS': '8',
+            'option_set-TOTAL_FORMS': '2',
+            'option_set-INITIAL_FORMS': '0',
+            'option_set-0-response_option': 'Option 1',
+            'option_set-1-response_option': 'Option 2',
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
         messages = list(get_messages(response.wsgi_request))
@@ -218,18 +217,17 @@ class UpdateSearchPageTestCase(SearchTestCase):
 
     def test_update_search(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        response = self.client.post(reverse('search:search_update', kwargs={'pk': self.search1.pk, }),
-                                    {
-                                        'description_search': 'Test Search Description',
-                                        'publication_date_search': '01/01/2021 12:00:00',
-                                        'finish_date_search': '01/01/2022 23:59:59',
-                                        'option_set-MIN_NUM_FORMS': '2',
-                                        'option_set-MAX_NUM_FORMS': '8',
-                                        'option_set-TOTAL_FORMS': '2',
-                                        'option_set-INITIAL_FORMS': '0',
-                                        'option_set-0-response_option': 'Option 1',
-                                        'option_set-1-response_option': 'Option 2',
-                                    })
+        response = self.client.post(reverse('search:search_update', kwargs={'pk': self.search1.pk, }), {
+            'description_search': 'Test Search Description',
+            'publication_date_search': '01/01/2021 12:00:00',
+            'finish_date_search': '01/01/2022 23:59:59',
+            'option_set-MIN_NUM_FORMS': '2',
+            'option_set-MAX_NUM_FORMS': '8',
+            'option_set-TOTAL_FORMS': '2',
+            'option_set-INITIAL_FORMS': '0',
+            'option_set-0-response_option': 'Option 1',
+            'option_set-1-response_option': 'Option 2',
+        })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
         messages = list(get_messages(response.wsgi_request))

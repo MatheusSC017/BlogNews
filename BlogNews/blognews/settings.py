@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from django.contrib.messages import constants
 from django.urls import reverse_lazy
+import json
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -123,15 +124,7 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': 'YOUR CLIENT ID',
-            'secret': 'YOUR SECRET KEY',
-            'key': 'YOUR KEY'
-        }
-    }
-}
+SOCIALACCOUNT_PROVIDERS = json.loads(os.environ.get('SOCIALACCOUNT', '{}'))
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -232,5 +225,5 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 
 try:
     from .local_settings import *
-except:
+except ModuleNotFoundError:
     pass

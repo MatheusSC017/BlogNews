@@ -318,4 +318,3 @@ def register_report(request):
     Report.objects.create(user_report=post.user_post, description_report=description)
     messages.success(request, 'Sua denúncia foi registrada')
     return redirect(reverse('post:post', kwargs={'pk': pk, }))
-
