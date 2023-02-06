@@ -13,7 +13,7 @@ RUN apk update && apk add mysql-dev gcc python3-dev musl-dev
 
 # Install dependencies
 RUN pip3 install --upgrade pip
-COPY ./BlogNews/requirements.txt .
+COPY ./requirements.txt .
 RUN pip3 install -r requirements.txt
 RUN pip3 install gunicorn==20.1.0
 
@@ -23,7 +23,7 @@ RUN sed -i 's/\r$//g' ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
 # Copy project
-COPY ./BlogNews .
+COPY . .
 
 # Run entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

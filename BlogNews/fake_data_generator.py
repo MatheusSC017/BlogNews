@@ -1,4 +1,4 @@
-import django_setup
+import fake_data_generator_setup
 from django.contrib.auth.models import User, Permission, ContentType
 from post.models import Category, Post
 from album.models import Album, Image
