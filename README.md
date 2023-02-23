@@ -1,28 +1,36 @@
 # BlogNews
 
-Este projeto foi pensado com o intuito de aprendizado através da aplicação da maioria das técnicas e funções disponibilizadas pelo Django, como modelos, views, templates, forms e etc. Além de testar em prática o conhecimento necessário para adaptar as classes disponibilizadas pelo Django ou criar classes próprias.
+This project was designed with the aim of learning through the application of most of the techniques and functions provided by Django, such as models, views, templates, forms, etc. In addition to testing in practice the knowledge needed to adapt the classes provided by Django or create my own classes.
 
-## Requisitos
+
+
+## Requirements
 * **Python 3.9**
 * **MySQL**
 
-## Instalação
-1. Clone este repositorio em seu dispositivo através do comando
-> gh repo clone MatheusSC017/BlogNews
-2. Crie uma ambiente virtual em seu dispositivo
+## Quick install with Docker
+1. Clone the repository on your device
+
+2. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
+> docker-compose up -d --build
+
+## On-premises installation
+1. Clone the repository on your device
+
+2. Create a virtual environment on your device
 > python -m venv venv
-3. Instale as bibliotecas salvas no arquivo requirements.txt, caso esteja utilizando o gerenciador de pacotes PIP você poderá utilizar o comando a seguir
+
+3. Install the libraries saved in the requirements.txt file, if you are using the PIP package manager you can use the following command
 > pip install -r requirements.txt
 
-## Configuração
-para realizar a configuração do site altere o arquivo Blog/blognews/settings.py ou crie um arquivo local_settings.py no mesmo diretórios, definindo os seguintes parametros
+4. The last step is to configure the settings, for this change the Blog/blognews/settings.py file or create a local_settings.py file in the same directories, defining the following parameters
 
-Defina a chave secreta para o site
+Set the secret key
 ~~~python
 SECRET_KEY = 'SITE_SECRET_KEY'
 ~~~
 
-Definas as configurações do e-mail para o envio da newsletter
+Configure email settings for sending the newsletter
 ~~~python
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 EMAIL_HOST = 'HOST'
@@ -33,13 +41,13 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'BLOGNEWS'
 ~~~
 
-Informe a suas chaves para recaptcha ou utilize as de testes fornecidas pelo Google (SITE_KEY_GOOGLE: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI, SECRET_KEY_GOOGLE: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe, para mais informações acesse [Google Recaptcha](https://developers.google.com/recaptcha/docs/faq)
+Enter your recaptcha keys or use the test keys provided by Google (SITE_KEY_GOOGLE: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI, SECRET_KEY_GOOGLE: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe, for more information visit [Google Recaptcha](https://developers.google.com/recaptcha/docs/faq)
 ~~~python
 RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY'
 RECAPTCHA_SECRET_KEY = 'RECAPTCHA_SECRET_KEY'
 ~~~
 
-Configure os provedores que serão utilizados para login, segue-se o exemplo abaixo para o provedor Google, onde deve-se informar o client_id, secret e key
+Configure the providers that will be used for login, follow the example below for the Google provider, where you must inform the client_id, secret and key
 ~~~python
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -52,7 +60,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 ~~~
  
-Por ultimo configure a conexão com o banco de dados
+Finally configure the connection to the database
 ~~~python
 DATABASES = {
     'default': {
