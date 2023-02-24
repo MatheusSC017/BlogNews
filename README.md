@@ -74,19 +74,19 @@ DATABASES = {
 }
 ~~~
 
-## Divisão do site
+## Site division
 
-O site BlogNews é dividido em três partes:
+The BlogNews website is divided into three parts:
 
-1. **Área geral**: Disponível para o público geral, não sendo obrigatório o usuário estar logado, porém ainda com algumas limitações a serviços especificos, como comentários e pesquisas.
-2. **Área para criadores de conteúdo**: Trata-se de uma área destinada a usuários com a marcação de criadores de conteúdo, onde é disponibizado a eles, páginas para criação, edição, exclusão e visualização de seus próprios Posts, albuns ou pesquisas.
-3. **Área administrativa**: Trata-se de uma área para usuários com amplos poderes, onde usuários podem possuir um acesso mais profundo ao sistema de acordo com as permissões conferidas as eles por um **SuperUsuário**.
+1. **General area**: Available to the general public, it is not mandatory for the user to be logged in, but still with some limitations to specific services, such as comments and searches.
+2. **Area for content creators**: This is an area intended for users marked as content creators, where pages are available for creating, editing, deleting and viewing their own Posts, albums or searches.
+3. **Administrative area**: This is an area for users with broad powers, where users can have deeper access to the system according to the permissions granted to them by a **SuperUser**.
 
-## Tipos de usuários
+## Types of users
 
-Os usuários do BlogNews podem ser divididos no geral em 4 grupos:
+BlogNews users can be broadly divided into 4 groups:
 
-1. **Usuários finais**: São aqueles que não possuem a permissão para criar conteúdo, sendo assim, eles são limitados a apenas visualizar as informações existentes, fazer comentários ou denúncias e alterar informações próprias da conta.
-2. **Criadores de conteúdos**: Possuem todos os privilegios dos usuários finais, além de poderem criar e publicar seus próprios Posts, albuns e pesquisas.
-3. **Membros da Staff**: São aqueles que possuem acesso a área administrativa, porém eles estão limitados as permissões concedidas a eles pelos SuperUsuários. Sendo assim, se ele possuir permissão pode visualizar todo o contéudo do sistema, esteja ele publicado ou não, e fazer alterações ou exclusões a medida que achar necessário.
-4. **SuperUsuários**: Trata-se do nível mais alto do sistema, podendo conceder permissões a si próprio e a outros usuários para assim administrar o sistema.
+1. **End users**: They are those who do not have permission to create content, therefore, they are limited to only viewing existing information, making comments or complaints and changing their own account information.
+2. **Content creators**: They have all the privileges of end users, in addition to being able to create and publish their own Posts, albums and surveys.
+3. **Staff members**: They are those who have access to the administrative area, but they are limited to the permissions granted to them by Super Users. Therefore, if he has permission, he can view all the system's content, whether published or not, and make changes or deletions as he deems necessary.
+4. **Superusers**: It is the highest level of the system, being able to grant permissions to itself and other users to administer the system.
