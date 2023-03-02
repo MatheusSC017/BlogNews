@@ -8,13 +8,15 @@ This project was designed with the aim of learning through the application of mo
 * **Python 3.9**
 * **MySQL**
 
-## Quick install with Docker
+## Installation
+
+### Quick install with Docker
 1. Clone the repository on your device
 
 2. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
 > docker-compose up -d --build
 
-## On-premises installation
+### On-premises installation
 1. Clone the repository on your device
 
 2. Create a virtual environment on your device
@@ -74,7 +76,9 @@ DATABASES = {
 }
 ~~~
 
-## Site division
+## Structure
+
+### Site division
 
 The BlogNews website is divided into three parts:
 
@@ -82,7 +86,7 @@ The BlogNews website is divided into three parts:
 2. **Area for content creators**: This is an area intended for users marked as content creators, where pages are available for creating, editing, deleting and viewing their own Posts, albums or searches.
 3. **Administrative area**: This is an area for users with broad powers, where users can have deeper access to the system according to the permissions granted to them by a **SuperUser**.
 
-## Types of users
+### Types of users
 
 BlogNews users can be broadly divided into 4 groups:
 
