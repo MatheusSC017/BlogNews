@@ -138,6 +138,6 @@ local_settings
 /BlogNews/media/*
 
 # Enviroment parameters
+.env.dev
 .env.prod
 .env.prod.db
-

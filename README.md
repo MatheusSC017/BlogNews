@@ -11,9 +11,41 @@ This project was designed with the aim of learning through the application of mo
 ## Installation
 
 ### Quick install with Docker
+#### Installation for Development mode
 1. Clone the repository on your device
 
-2. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
+2. Create a .env.dev file with the website configuration, for development purposes you can use the example below:
+~~~
+SECRET_KEY=secret_key_for_use_in_docker_change_me
+DEBUG=1
+DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:1337 http://127.0.0.1:1337
+
+EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
+EMAIL_HOST=''
+EMAIL_HOST_USER=''
+EMAIL_HOST_PASSWORD=''
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL='BlogNews'
+
+RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+RECAPTCHA_SECRET_KEY=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+RECAPTCHA_SITE_KEY_TEST=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+RECAPTCHA_SECRET_KEY_TEST=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+
+SQL_ENGINE=django.db.backends.mysql
+SQL_DATABASE=blog_database
+SQL_USER=blog_database_user
+SQL_PASSWORD=blog_database_password
+SQL_HOST=db
+SQL_PORT=3306
+
+DATABASE=mysql
+INITIAL_DATA=True
+~~~
+
+3. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
 > docker-compose up -d --build
 
 ### On-premises installation
