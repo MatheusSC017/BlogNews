@@ -46,7 +46,9 @@ INITIAL_DATA=True
 ~~~
 
 3. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
-> docker-compose up -d --build
+> docker-compose up -d --build 
+
+*observation: If the error occurs that the docker image does not find the "entrypoint.sh" file, use programs such as Notepad++ to make sure that the "entrypoint.sh" file has the bytecode for carriage return (end-of-line markers) set to LF.*
 
 ### On-premises installation
 1. Clone the repository on your device
