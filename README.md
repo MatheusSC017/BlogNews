@@ -14,7 +14,9 @@ This project was designed with the aim of learning through the application of mo
 #### Installation for Development mode
 1. Clone the repository on your device
 
-2. Create a .env.dev file with the website configuration, for development purposes you can use the example below:
+2. Move to the project repository
+
+3. Create a .env.dev file with the website configuration, for development purposes you can use the example below:
 ~~~
 SECRET_KEY=secret_key_for_use_in_docker_change_me
 DEBUG=1
@@ -45,8 +47,77 @@ DATABASE=mysql
 INITIAL_DATA=True
 ~~~
 
-3. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
+4. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
 > docker-compose up -d --build 
+
+#### Installation for Production mode
+1. Clone the repository on your device
+
+2. Move to the project repository
+
+3. Create a .env.prod and a .env.prod.db file with the website configuration, These are the fields you need to fill in, some fields are already set in the example:
+
+.env.prod
+``` 
+# Django config
+SECRET_KEY=
+DEBUG=0
+DJANGO_ALLOWED_HOSTS=
+DJANGO_CSRF_TRUSTED_ORIGINS=
+
+# E-mail config
+EMAIL_BACKEND=
+EMAIL_HOST=
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_PORT=
+EMAIL_USE_TLS=
+DEFAULT_FROM_EMAIL=
+
+# Google Recaptcha config
+RECAPTCHA_SITE_KEY=
+RECAPTCHA_SECRET_KEY=
+RECAPTCHA_SITE_KEY_TEST=
+RECAPTCHA_SECRET_KEY_TEST=
+
+# Oauth
+SOCIALACCOUNT='{
+	"google": {
+		"APP": {
+			"client_id": "",
+			"secret": "",
+			"key": ""
+		}
+	}
+}'
+
+# Database config
+SQL_ENGINE=django.db.backends.mysql
+SQL_DATABASE=
+SQL_USER=
+SQL_PASSWORD=
+SQL_HOST=
+SQL_PORT=
+
+# Entrypoint config
+DATABASE=mysql
+INITIAL_DATA=False
+```
+
+.env.prod.db
+```
+MYSQL_USER: 
+MYSQL_PASSWORD: 
+MYSQL_ROOT_PASSWORD: 
+MYSQL_DATABASE: 
+MYSQL_DATABASE_HOST: 
+MYSQL_DATABASE_PORT: 
+```
+
+4. Run the docker compose file to install the application in production mode.
+> docker-compose -f docker-compose.prod.yml up -d --build
+
+> docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
 
 *observation: If the error occurs that the docker image does not find the "entrypoint.sh" file, use programs such as Notepad++ to make sure that the "entrypoint.sh" file has the bytecode for carriage return (end-of-line markers) set to LF.*
 
