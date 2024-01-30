@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %} | Album - {{ album.title_album }}{% endblock %}
+{% block title %} | Album - {{ album.title }}{% endblock %}
 
 {% block content %}
 <section class="container-fluid landing-item gray-bg-color">
     <div class="row">
         <div class="col-xl"></div>
         <div class="col-xl-10 pt-5 pb-5">
-            <h1 class="text-center">{{ album.title_album }}</h1>
+            <h1 class="text-center">{{ album.title }}</h1>
             <div class="text-end">
                 <button class="btn button-format"
                         onclick="popupForm('report-form', 1)">
@@ -19,8 +19,8 @@
                 {% for image in images %}
                 <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
                     <img src="{{ image.image.url }}"
-                         alt="{{ image.title_image }}"
-                         title="{{ image.title_image }}"
+                         alt="{{ image.title }}"
+                         title="{{ image.title }}"
                          class="card-img-top">
                 </div>
                 {% endfor %}

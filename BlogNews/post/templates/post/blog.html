@@ -6,30 +6,30 @@
 
 {% for post in posts %}
 <article class="card dark-bg-color light-color">
-    {% if post.image_post %}
+    {% if post.image %}
     <a href="{% url 'post:post' post.pk %}">
-        <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="card-img-top">
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="card-img-top">
     </a>
     {% endif %}
     <div class="card-body">
-        <h1 class="h3">{{ post.title_post }}</h1>
+        <h1 class="h3">{{ post.title }}</h1>
         <p class="d-flex justify-content-around">
             <small>
-                {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
+                {{ post.ratting|to_int }} <i class="bi bi-star-fill text-warning"></i>
             </small>
 
             <small>
-                {{ post.views_post }} <i class="bi bi-eye-fill"></i>
+                {{ post.views }} <i class="bi bi-eye-fill"></i>
             </small>
 
             <small>
-                {{ post.comments_post }} <i class="bi bi-chat-left-text-fill"></i>
+                {{ post.comments }} <i class="bi bi-chat-left-text-fill"></i>
             </small>
         </p>
-        <p>{{ post.excerpt_post }}</p>
+        <p>{{ post.excerpt }}</p>
         <p class="text-end">
             <small>
-                {{ post.published_date_post|naturalday|title }}
+                {{ post.published_date|naturalday|title }}
             </small>
         </p>
     </div>

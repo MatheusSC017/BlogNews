@@ -15,7 +15,7 @@ def create_comment(request, post_pk):
     if not request.POST:
         return redirect(reverse('post:post', args=[post_pk, ]))
 
-    post = get_object_or_404(Post, pk=post_pk, published_post=True, publication_date_post__lte=tz.now())
+    post = get_object_or_404(Post, pk=post_pk, published=True, publication_date__lte=tz.now())
     form = CommentForm(request.POST)
     recaptcha_response = request.POST.get('g-recaptcha-response')
 
@@ -28,8 +28,8 @@ def create_comment(request, post_pk):
 
     comment = form.save(commit=False)
 
-    comment.user_comment = request.user
-    comment.post_comment = post
+    comment.user = request.user
+    comment.post = post
     comment.save()
     messages.success(request, 'Comentário adicionado')
     return redirect(reverse('post:post', args=[post_pk, ]))
@@ -41,11 +41,11 @@ def update_comment(request, post_pk):
     if not request.POST:
         return redirect(reverse('post:post', args=[post_pk, ]))
 
-    post = get_object_or_404(Post, pk=post_pk, published_post=True, publication_date_post__lte=tz.now())
+    post = get_object_or_404(Post, pk=post_pk, published=True, publication_date__lte=tz.now())
     comment = get_object_or_404(Comment,
                                 pk=request.POST['primary-key'],
-                                post_comment=post,
-                                user_comment=request.user)
+                                post=post,
+                                user=request.user)
     form = CommentForm(request.POST, instance=comment)
 
     if not form.is_valid():
@@ -65,11 +65,11 @@ def delete_comment(request, post_pk):
     if not request.POST:
         return redirect(reverse('post:post', args=[post_pk, ]))
 
-    post = get_object_or_404(Post, pk=post_pk, published_post=True, publication_date_post__lte=tz.now())
+    post = get_object_or_404(Post, pk=post_pk, published=True, publication_date__lte=tz.now())
     comment = get_object_or_404(Comment,
                                 pk=request.POST['primary-key'],
-                                post_comment=post.pk,
-                                user_comment=request.user.pk)
+                                post=post.pk,
+                                user=request.user.pk)
 
     comment.delete()
     messages.success(request, 'Comentário deletado')

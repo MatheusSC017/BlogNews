@@ -14,7 +14,7 @@
 </script>
 {% endblock %}
 
-{% block title %} | {{ post.title_post }}{% endblock %}
+{% block title %} | {{ post.title }}{% endblock %}
 
 {% block content %}
 <section class="container-fluid landing-item gray-bg-color pt-5 pb-5">
@@ -25,19 +25,19 @@
         <div class="col-xl-8">
 
             <!-- Details about the post -->
-            <h1 class="text-center dark-color">{{ post.title_post }}</h1>
+            <h1 class="text-center dark-color">{{ post.title }}</h1>
             <div class="d-flex justify-content-center">
                 <div class="w-25 d-flex justify-content-around">
                     <small>
-                        {{ post.ratting_post|to_int }} <i class="bi bi-star-fill text-warning"></i>
+                        {{ post.ratting|to_int }} <i class="bi bi-star-fill text-warning"></i>
                     </small>
 
                     <small>
-                        {{ post.views_post }} <i class="bi bi-eye-fill"></i>
+                        {{ post.views }} <i class="bi bi-eye-fill"></i>
                     </small>
 
                     <small>
-                        {{ post.comments_post }} <i class="bi bi-chat-left-text-fill"></i>
+                        {{ post.comments }} <i class="bi bi-chat-left-text-fill"></i>
                     </small>
                 </div>
             </div>
@@ -47,27 +47,27 @@
                     Reportar
                 </button>
             </div>
-            {% if post.image_post %}
+            {% if post.image %}
             <div class="text-center p-3">
-                <img src="{{ post.image_post.url }}" alt="{{ post.title_post }}" class="img-fluid w-50">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid w-50">
             </div>
             {% endif %}
             <p>
-                {{ post.description_post|safe }}
+                {{ post.description|safe }}
             </p>
             <p class="text-end">
                 Escrito por:
-                <cite>{{ post.user_post.first_name }} {{ post.user_post.last_name }}</cite><br>
+                <cite>{{ post.user.first_name }} {{ post.user.last_name }}</cite><br>
                 Publicado:
                 <small>
-                    {{ post.published_date_post|naturalday|title }}
+                    {{ post.published_date|naturalday|title }}
                 </small>
             </p>
 
             <!-- Album option -->
-            {% if post.album_post %}
+            {% if post.album %}
             <div class="text-end mt-3">
-                <a href="{% url 'album:image' post.album_post.pk %}">
+                <a href="{% url 'album:image' post.album.pk %}">
                     <button class="button-format"><strong>Album</strong></button>
                 </a>
             </div>
@@ -120,11 +120,11 @@
     <div class="row pt-5">
         <div class="col-xl"></div>
         <div class="col-xl-8" id="comments-post">
-            <h2 class="my-3">Comentários {{ post.comments_post }}</h2>
+            <h2 class="my-3">Comentários {{ post.comments }}</h2>
 
             {% for comment in comments %}
             <section class="border-bottom comment position-relative" id="comment-{{ comment.pk }}">
-                {% if comment.user_comment == user %}
+                {% if comment.user == user %}
                 <div class="button-options">
                     <button onclick="popupForm('update-comment-form', 1);
                                                 commentField({{ comment.pk }});
@@ -138,7 +138,7 @@
                 </div>
                 {% endif %}
                 <h3 class="h5 mb-2 mt-5 dark-color">
-                    {{ comment.user_comment.first_name }} {{ comment.user_comment.last_name}}
+                    {{ comment.user.first_name }} {{ comment.user.last_name}}
                 </h3>
                 <small class="dark-color">{{ comment.edition_date_comment|naturalday|title }}</small>
                 <p class="mb-1">{{ comment.comment }}</p>

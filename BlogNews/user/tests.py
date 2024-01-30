@@ -175,10 +175,10 @@ class UserReportRegisterActionsTestCase(TestCase):
                                               email='test@test.com',
                                               password='password_test2')
 
-        self.userreportregister1 = UserReportRegister.objects.create(user_userreportregister=self.user1)
-        self.userreportregister2 = UserReportRegister.objects.create(user_userreportregister=self.user2,
-                                                                     reports_userreportregister=3,
-                                                                     status_userreportregister='b')
+        self.userreportregister1 = UserReportRegister.objects.create(user=self.user1)
+        self.userreportregister2 = UserReportRegister.objects.create(user=self.user2,
+                                                                     reports=3,
+                                                                     status='b')
 
     def test_block_user_content_creation(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
@@ -189,7 +189,7 @@ class UserReportRegisterActionsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:user_userreportregister_changelist'))
         userreportregister = UserReportRegister.objects.get(pk=self.userreportregister1.pk)
-        self.assertEqual(userreportregister.status_userreportregister, 'b')
+        self.assertEqual(userreportregister.status, 'b')
 
     def test_unlock_user_content_creation(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
@@ -200,5 +200,5 @@ class UserReportRegisterActionsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:user_userreportregister_changelist'))
         userreportregister = UserReportRegister.objects.get(pk=self.userreportregister2.pk)
-        self.assertEqual(userreportregister.reports_userreportregister, 0)
-        self.assertEqual(userreportregister.status_userreportregister, 'n')
+        self.assertEqual(userreportregister.reports, 0)
+        self.assertEqual(userreportregister.status, 'n')

@@ -15,16 +15,16 @@
             <form action="#" method="POST" class="form-field">
 
                 <div class="form-floating mb-3">
-                    {{ form.title_album }}
-                    {{ form.title_album.label_tag }}
+                    {{ form.title }}
+                    {{ form.title.label_tag }}
                     <div class="secondary-color">
-                        {{ form.title_album.errors }}
+                        {{ form.title.errors }}
                     </div>
                 </div>
 
                 <div class="form-check">
-                    {{ form.published_album }}
-                    {{ form.published_album.label_tag }}
+                    {{ form.published }}
+                    {{ form.published.label_tag }}
                 </div>
 
                 {% csrf_token %}

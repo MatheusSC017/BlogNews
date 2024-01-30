@@ -81,7 +81,7 @@ def category_generator():
     title = ' '.join(fake.words(nb=randrange(1, 5)))
 
     category = Category.objects.create(
-        title_category=title
+        title=title
     )
 
     return category
@@ -94,14 +94,14 @@ def post_generator(user, category):
     published = choices([True, False], weights=(90, 10))[0]
 
     post = Post.objects.create(
-        title_post=title,
-        excerpt_post=excerpt,
-        description_post=description,
-        published_post=published,
-        category_post=category,
-        user_post=user
+        title=title,
+        excerpt=excerpt,
+        description=description,
+        published=published,
+        category=category,
+        user=user
     )
-    image_field = post.image_post
+    image_field = post.image
     fill_out_image_field(image_field)
 
     return post
@@ -112,9 +112,9 @@ def album_generator(user):
     published = choices([True, False], weights=(90, 10))[0]
 
     return Album.objects.create(
-        title_album=title,
-        published_album=published,
-        user_album=user
+        title=title,
+        published=published,
+        user=user
     )
 
 
@@ -122,8 +122,8 @@ def image_generator(album):
     title = fake.text(max_nb_chars=50)
 
     image = Image.objects.create(
-        title_image=title,
-        album_image=album
+        title=title,
+        album=album
     )
 
     image_field = image.image
@@ -137,18 +137,18 @@ def research_generator(user):
     finish_date = timezone.now() + timezone.timedelta(days=(days + randrange(10, 100)))
 
     return Search.objects.create(
-        description_search=description,
-        publication_date_search=publication_date,
-        finish_date_search=finish_date,
-        user_search=user)
+        description=description,
+        publication_date=publication_date,
+        finish_date=finish_date,
+        user=user)
 
 
 def option_generator(research):
     response = fake.text(max_nb_chars=300)
 
     Option.objects.create(
-        response_option=response,
-        search_option=research
+        response=response,
+        search=research
     )
 
 

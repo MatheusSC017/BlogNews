@@ -23,42 +23,42 @@ class SearchTestCase(TestCase):
             self.user.user_permissions.add(permission)
             self.other_user.user_permissions.add(permission)
 
-        self.search1 = models.Search.objects.create(description_search='Pegunta 1',
-                                                    publication_date_search=timezone.now(),
-                                                    finish_date_search=timezone.now() + timezone.timedelta(days=30),
-                                                    user_search=self.user)
-        self.search2 = models.Search.objects.create(description_search='Pegunta 2',
-                                                    publication_date_search=timezone.now() - timezone.timedelta(
+        self.search1 = models.Search.objects.create(description='Pegunta 1',
+                                                    publication_date=timezone.now(),
+                                                    finish_date=timezone.now() + timezone.timedelta(days=30),
+                                                    user=self.user)
+        self.search2 = models.Search.objects.create(description='Pegunta 2',
+                                                    publication_date=timezone.now() - timezone.timedelta(
                                                         days=20),
-                                                    finish_date_search=timezone.now() - timezone.timedelta(days=5),
-                                                    user_search=self.other_user)
-        self.search3 = models.Search.objects.create(description_search='Pegunta 3',
-                                                    finish_date_search=timezone.now() + timezone.timedelta(days=5),
-                                                    user_search=self.user,
-                                                    published_search=False)
-        self.search4 = models.Search.objects.create(description_search='Pegunta 4',
-                                                    publication_date_search=timezone.now() + timezone.timedelta(
+                                                    finish_date=timezone.now() - timezone.timedelta(days=5),
+                                                    user=self.other_user)
+        self.search3 = models.Search.objects.create(description='Pegunta 3',
+                                                    finish_date=timezone.now() + timezone.timedelta(days=5),
+                                                    user=self.user,
+                                                    published=False)
+        self.search4 = models.Search.objects.create(description='Pegunta 4',
+                                                    publication_date=timezone.now() + timezone.timedelta(
                                                         days=20),
-                                                    finish_date_search=timezone.now() + timezone.timedelta(days=50),
-                                                    user_search=self.other_user)
-        self.option1 = models.Option.objects.create(response_option='Resposta 1',
-                                                    search_option=self.search1)
-        self.option2 = models.Option.objects.create(response_option='Resposta 2',
-                                                    search_option=self.search1)
-        self.option3 = models.Option.objects.create(response_option='Resposta 1',
-                                                    search_option=self.search2)
-        self.option4 = models.Option.objects.create(response_option='Resposta 2',
-                                                    search_option=self.search2)
-        self.option5 = models.Option.objects.create(response_option='Resposta 1',
-                                                    search_option=self.search3)
-        self.option6 = models.Option.objects.create(response_option='Resposta 2',
-                                                    search_option=self.search3)
-        self.option7 = models.Option.objects.create(response_option='Resposta 1',
-                                                    search_option=self.search4)
-        self.option8 = models.Option.objects.create(response_option='Resposta 2',
-                                                    search_option=self.search4)
-        models.VottingUserOption.objects.create(user_votting=self.other_user,
-                                                option_votting=self.option2)
+                                                    finish_date=timezone.now() + timezone.timedelta(days=50),
+                                                    user=self.other_user)
+        self.option1 = models.Option.objects.create(response='Resposta 1',
+                                                    search=self.search1)
+        self.option2 = models.Option.objects.create(response='Resposta 2',
+                                                    search=self.search1)
+        self.option3 = models.Option.objects.create(response='Resposta 1',
+                                                    search=self.search2)
+        self.option4 = models.Option.objects.create(response='Resposta 2',
+                                                    search=self.search2)
+        self.option5 = models.Option.objects.create(response='Resposta 1',
+                                                    search=self.search3)
+        self.option6 = models.Option.objects.create(response='Resposta 2',
+                                                    search=self.search3)
+        self.option7 = models.Option.objects.create(response='Resposta 1',
+                                                    search=self.search4)
+        self.option8 = models.Option.objects.create(response='Resposta 2',
+                                                    search=self.search4)
+        models.VottingUserOption.objects.create(user=self.other_user,
+                                                option=self.option2)
 
 
 class SearchesPageTestCase(SearchTestCase):
@@ -175,15 +175,15 @@ class CreateSearchPageTestCase(SearchTestCase):
     def test_create_search(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search_create'), {
-            'description_search': 'Test Search Description',
-            'publication_date_search': '01/01/2021 12:00:00',
-            'finish_date_search': '01/01/2022 23:59:59',
+            'description': 'Test Search Description',
+            'publication_date': '01/01/2021 12:00:00',
+            'finish_date': '01/01/2022 23:59:59',
             'option_set-MIN_NUM_FORMS': '2',
             'option_set-MAX_NUM_FORMS': '8',
             'option_set-TOTAL_FORMS': '2',
             'option_set-INITIAL_FORMS': '0',
-            'option_set-0-response_option': 'Option 1',
-            'option_set-1-response_option': 'Option 2',
+            'option_set-0-response': 'Option 1',
+            'option_set-1-response': 'Option 2',
         })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))
@@ -218,15 +218,15 @@ class UpdateSearchPageTestCase(SearchTestCase):
     def test_update_search(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('search:search_update', kwargs={'pk': self.search1.pk, }), {
-            'description_search': 'Test Search Description',
-            'publication_date_search': '01/01/2021 12:00:00',
-            'finish_date_search': '01/01/2022 23:59:59',
+            'description': 'Test Search Description',
+            'publication_date': '01/01/2021 12:00:00',
+            'finish_date': '01/01/2022 23:59:59',
             'option_set-MIN_NUM_FORMS': '2',
             'option_set-MAX_NUM_FORMS': '8',
             'option_set-TOTAL_FORMS': '2',
             'option_set-INITIAL_FORMS': '0',
-            'option_set-0-response_option': 'Option 1',
-            'option_set-1-response_option': 'Option 2',
+            'option_set-0-response': 'Option 1',
+            'option_set-1-response': 'Option 2',
         })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('search:user_search'))

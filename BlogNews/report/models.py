@@ -14,13 +14,13 @@ class Report(models.Model):
         ('r', 'Rejeitado'),
     ]
 
-    user_report = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='usuário')
-    status_report = models.CharField(max_length=1, choices=status, default=waiting, verbose_name='situação')
-    description_report = models.TextField(verbose_name='descrição')
-    creation_date_report = models.DateTimeField(default=tz.now, verbose_name='data de criação')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='usuário')
+    status = models.CharField(max_length=1, choices=status, default=waiting, verbose_name='situação')
+    description = models.TextField(verbose_name='descrição')
+    creation_date = models.DateTimeField(default=tz.now, verbose_name='data de criação')
 
     def __str__(self):
-        return str(self.user_report)
+        return str(self.user)
 
     class Meta:
         verbose_name = 'denúncia'

@@ -10,9 +10,9 @@
         <div class="col-xl-8 p-3 dark-color dark-bg-color rounded">
             <form method="POST" action="#" class="form-field" enctype="multipart/form-data">
                 {% for field in form %}
-                    <div class="{% if field != form.image_post and field != form.description_post %}form-floating{% endif %}
+                    <div class="{% if field != form.image and field != form.description %}form-floating{% endif %}
                                 mb-3 text-center">
-                        {% if field != form.image_post and field != form.description_post %}
+                        {% if field != form.image and field != form.description %}
                             {{ field }}
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {% else %}

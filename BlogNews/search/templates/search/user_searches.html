@@ -36,11 +36,11 @@
                     {% for search in searches %}
                     <tr>
                         <th>{{ search.pk }}</th>
-                        <td>{{ search.description_search }}</td>
-                        <td class="d-none d-md-table-cell">{{ search.publication_date_search }}</td>
-                        <td class="d-none d-md-table-cell">{{ search.finish_date_search }}</td>
+                        <td>{{ search.description }}</td>
+                        <td class="d-none d-md-table-cell">{{ search.publication_date }}</td>
+                        <td class="d-none d-md-table-cell">{{ search.finish_date }}</td>
                         <td>
-                            {% if search.published_search %}
+                            {% if search.published %}
                                 Sim
                             {% else %}
                                 Não

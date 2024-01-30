@@ -22,9 +22,9 @@ class Album(ListView):
         """ Select the published albuns and check if the album has 3 images or more"""
         qs = super().get_queryset(*args, **kwargs)
 
-        qs = qs.filter(published_album=True)
+        qs = qs.filter(published=True)
         qs = qs.annotate(
-            count_images=Count('image__album_image')
+            count_images=Count('image__album')
         ).filter(count_images__gte=3)
 
         return qs
@@ -36,7 +36,7 @@ class Album(ListView):
         albuns_images = list()
         for album in context['albuns']:
             albuns_images.append({'album': album,
-                                  'images': models.Image.objects.filter(album_image=album.pk)[:3], })
+                                  'images': models.Image.objects.filter(album=album.pk)[:3], })
         context['albuns'] = albuns_images
 
         return context
@@ -51,7 +51,7 @@ class AlbumImages(DetailView):
     def get_context_data(self, *args, **kwargs):
         """ Select the images of the album """
         context = super().get_context_data(*args, **kwargs)
-        context['images'] = models.Image.objects.filter(album_image=context.get('album').pk)
+        context['images'] = models.Image.objects.filter(album=context.get('album').pk)
         return context
 
     def get(self, request, *args, **kwargs):
@@ -59,7 +59,7 @@ class AlbumImages(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
 
-        if not context['album'].published_album:
+        if not context['album'].published:
             return redirect(reverse('album:album'))
 
         if context['images'].count() < 3:
@@ -81,7 +81,7 @@ class AlbumUser(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         """ Select only the user albuns """
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.filter(user_album=self.request.user.pk)
+        qs = qs.filter(user=self.request.user.pk)
         return qs
 
     def get_context_data(self, *args, **kwargs):
@@ -105,7 +105,7 @@ class AlbumCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         form = self.get_form()
         if form.is_valid():
             form = form.save(commit=False)
-            form.user_album = request.user
+            form.user = request.user
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -123,7 +123,7 @@ def album_update(request):
     if request.POST:
         pk = request.POST.get('primary-key')
         if pk is not None:
-            album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+            album = get_object_or_404(models.Album, pk=pk, user=request.user)
             form = forms.AlbumForm(request.POST, instance=album)
             if form.is_valid():
                 form.save()
@@ -146,7 +146,7 @@ def album_delete(request):
     if request.POST:
         pk = request.POST.get('primary-key')
         if pk is not None:
-            album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+            album = get_object_or_404(models.Album, pk=pk, user=request.user)
             album.delete()
             messages.error(request, 'Álbum deletado')
             return redirect(reverse('album:user_album'))
@@ -169,7 +169,7 @@ class AlbumImagesUser(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
-        if context['album'].user_album != request.user:
+        if context['album'].user != request.user:
             return redirect(reverse('album:user_album'))
         return self.render_to_response(context)
 
@@ -177,7 +177,7 @@ class AlbumImagesUser(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         """ Add all the images to the context and the form to add new images """
         context = super().get_context_data(*args, **kwargs)
 
-        context['images'] = models.Image.objects.filter(album_image=context.get('album').pk)
+        context['images'] = models.Image.objects.filter(album=context.get('album').pk)
         context['image_form'] = forms.ImageForm()
 
         return context
@@ -193,11 +193,11 @@ class UploadImages(LoginRequiredMixin, PermissionRequiredMixin, View, FormMixin)
     def post(self, request, *args, **kwargs):
         """ Upload the selected images """
         form = self.get_form()
-        album = get_object_or_404(models.Album, pk=kwargs.get('pk'), user_album=request.user.pk)
+        album = get_object_or_404(models.Album, pk=kwargs.get('pk'), user=request.user.pk)
         if form.is_valid():
             files = request.FILES.getlist('image_field')
             for f in files:
-                models.Image.objects.create(album_image=album,
+                models.Image.objects.create(album=album,
                                             image=f)
             messages.success(self.request, 'Imagens cadastradas')
             return redirect(reverse('album:user_images', args=[album.pk, ]))
@@ -210,16 +210,16 @@ class UploadImages(LoginRequiredMixin, PermissionRequiredMixin, View, FormMixin)
 @permission_required(perm='album.change_image')
 def image_update_title(request, pk):
     """ Update the image title """
-    album = get_object_or_404(models.Album, pk=pk, user_album=request.user.pk)
+    album = get_object_or_404(models.Album, pk=pk, user=request.user.pk)
     if request.POST:
         image_pk = request.POST.get('primary-key')
-        title = request.POST.get('title_image')
+        title = request.POST.get('title')
         if len(title) < 5:
             messages.error(request, 'Título deve possuir ao menos 5 caracteres')
             return redirect(reverse('album:user_images', args=[album.pk, ]))
 
-        image = get_object_or_404(models.Image, pk=image_pk, album_image=album.pk)
-        image.title_image = title
+        image = get_object_or_404(models.Image, pk=image_pk, album=album.pk)
+        image.title = title
         image.save()
         messages.success(request, 'Título editado')
         return redirect(reverse('album:user_images', args=[album.pk, ]))
@@ -231,10 +231,10 @@ def image_update_title(request, pk):
 @permission_required(perm='album.delete_image')
 def image_delete(request, pk):
     """ Delete the selected image """
-    album = get_object_or_404(models.Album, pk=pk, user_album=request.user)
+    album = get_object_or_404(models.Album, pk=pk, user=request.user)
     if request.POST:
         image_pk = request.POST.get('primary-key')
-        image = get_object_or_404(models.Image, pk=image_pk, album_image=album.pk)
+        image = get_object_or_404(models.Image, pk=image_pk, album=album.pk)
         image.delete()
         messages.success(request, 'Imagem deletada')
         return redirect(reverse('album:user_images', args=[album.pk, ]))
@@ -249,8 +249,8 @@ def multiple_image_delete(request, pk):
     if request.POST:
         images_pk = request.POST.getlist('delete-items') or []
         if len(images_pk):
-            album = get_object_or_404(models.Album, pk=pk, user_album=request.user.pk)
-            images = models.Image.objects.filter(pk__in=images_pk, album_image=album.pk)
+            album = get_object_or_404(models.Album, pk=pk, user=request.user.pk)
+            images = models.Image.objects.filter(pk__in=images_pk, album=album.pk)
             images.delete()
             messages.success(request, "Imagens excluidas")
         return redirect(reverse('album:user_images', args=[pk, ]))
@@ -275,8 +275,8 @@ def register_report(request):
         messages.error(request, 'A denúncia não pode estar vázia')
         return redirect(reverse('album:image', kwargs={'pk': pk, }))
 
-    description = 'Album: {}, Autor: {} - {}'.format(pk, album.user_album, report_description)
+    description = 'Album: {}, Autor: {} - {}'.format(pk, album.user, report_description)
 
-    Report.objects.create(user_report=album.user_album, description_report=description)
+    Report.objects.create(user=album.user, description=description)
     messages.success(request, 'Sua denúncia foi registrada')
     return redirect(reverse('album:image', kwargs={'pk': pk, }))

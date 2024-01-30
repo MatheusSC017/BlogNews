@@ -18,20 +18,20 @@ def newsletter_add_user(request):
 
     email = request.POST.get('email-newsletter')
 
-    user = NewsLetterUser.objects.filter(email_newsletteruser=email)
+    user = NewsLetterUser.objects.filter(email=email)
 
     if user.count():
-        if user[0].activated_newsletteruser:
+        if user[0].activated:
             messages.success(request, 'E-mail já cadastrado')
             return redirect(reverse('blog:index'))
         else:
             user = user[0]
-            user.activated_newsletteruser = True
-            user.activated_date_newsletteruser = tz.now()
+            user.activated = True
+            user.activated_date = tz.now()
             user.save()
             return redirect(reverse('newsletter:done_add_user'))
 
-    NewsLetterUser.objects.create(email_newsletteruser=email)
+    NewsLetterUser.objects.create(email=email)
     return redirect(reverse('newsletter:done_add_user'))
 
 
@@ -99,14 +99,14 @@ class ConfirmUnsubscribeNewsletter(View):
 
         if context['valid_token']:
             del request.session[kwargs.get('token')]
-            user = NewsLetterUser.objects.filter(email_newsletteruser=context['email'])
+            user = NewsLetterUser.objects.filter(email=context['email'])
 
             # Check if the e-mail is registered in the database
             if user.count():
                 user = user[0]
                 # Check if the user is activated
-                if user.activated_newsletteruser:
-                    user.activated_newsletteruser = False
+                if user.activated:
+                    user.activated = False
                     user.save()
                     return redirect(self.get_success_url())
 

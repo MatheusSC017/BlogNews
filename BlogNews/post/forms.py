@@ -7,33 +7,33 @@ class PostForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        format_fields = ['title_post', 'excerpt_post', 'image_post', 'publication_date_post', 'edition_date_post', ]
+        format_fields = ['title', 'excerpt', 'image', 'publication_date', 'edition_date', ]
         for field in format_fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
             self.fields[field].widget.attrs['placeholder'] = self.fields[field].label
-        self.fields['category_post'].widget.attrs['class'] = 'form-select'
-        self.fields['album_post'].widget.attrs['class'] = 'form-select'
-        self.fields['publication_date_post'].disabled = True
-        self.fields['edition_date_post'].disabled = True
+        self.fields['category'].widget.attrs['class'] = 'form-select'
+        self.fields['album'].widget.attrs['class'] = 'form-select'
+        self.fields['publication_date'].disabled = True
+        self.fields['edition_date'].disabled = True
 
     def clean(self):
         cleaned_data = self.cleaned_data
 
-        if len(cleaned_data['title_post']) < 5:
+        if len(cleaned_data['title']) < 5:
             self.add_error(
-                'title_post',
+                'title',
                 'O título deve possuir ao menos 5 caracteres.'
             )
 
-        if len(cleaned_data['excerpt_post']) < 20:
+        if len(cleaned_data['excerpt']) < 20:
             self.add_error(
-                'excerpt_post',
+                'excerpt',
                 'O excerto deve possuir ao menos 20 caracteres.'
             )
 
-        if len(cleaned_data['description_post']) < 20:
+        if len(cleaned_data['description']) < 20:
             self.add_error(
-                'description_post',
+                'description',
                 'A descrição deve possuir ao menos 20 caracteres.'
             )
 
@@ -41,8 +41,8 @@ class PostForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ['title_post', 'excerpt_post', 'description_post', 'image_post',
-                  'category_post', 'album_post', 'publication_date_post', 'edition_date_post', ]
+        fields = ['title', 'excerpt', 'description', 'image',
+                  'category', 'album', 'publication_date', 'edition_date', ]
         widgets = {
-            'description_post': SummernoteWidget(),
+            'description': SummernoteWidget(),
         }

@@ -16,41 +16,41 @@ class CommentTestCase(TestCase):
         self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
         self.other_user = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
 
-        self.category = Category.objects.create(title_category='Category Test')
+        self.category = Category.objects.create(title='Category Test')
 
-        self.post1 = Post.objects.create(title_post='Test Title Post 1',
-                                         excerpt_post='Excerpt of the Post',
-                                         description_post='Description of the Post',
-                                         category_post=self.category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=30),
-                                         user_post=self.user)
-        self.post2 = Post.objects.create(title_post='Test Title Post 2',
-                                         excerpt_post='Excerpt of the Post',
-                                         description_post='Description of the Post',
-                                         category_post=self.category,
-                                         publication_date_post=tz.now() + tz.timedelta(days=30),
-                                         user_post=self.user)
-        self.post3 = Post.objects.create(title_post='Test Title Post 3',
-                                         excerpt_post='Excerpt of the Post',
-                                         description_post='Description of the Post',
-                                         category_post=self.category,
-                                         published_post=False,
-                                         user_post=self.user)
-        self.post4 = Post.objects.create(title_post='Test Title Post 4',
-                                         excerpt_post='Excerpt of the Post',
-                                         description_post='Description of the Post',
-                                         category_post=self.category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=30),
-                                         user_post=self.user)
+        self.post1 = Post.objects.create(title='Test Title Post 1',
+                                         excerpt='Excerpt of the Post',
+                                         description='Description of the Post',
+                                         category=self.category,
+                                         publication_date=tz.now() - tz.timedelta(days=30),
+                                         user=self.user)
+        self.post2 = Post.objects.create(title='Test Title Post 2',
+                                         excerpt='Excerpt of the Post',
+                                         description='Description of the Post',
+                                         category=self.category,
+                                         publication_date=tz.now() + tz.timedelta(days=30),
+                                         user=self.user)
+        self.post3 = Post.objects.create(title='Test Title Post 3',
+                                         excerpt='Excerpt of the Post',
+                                         description='Description of the Post',
+                                         category=self.category,
+                                         published=False,
+                                         user=self.user)
+        self.post4 = Post.objects.create(title='Test Title Post 4',
+                                         excerpt='Excerpt of the Post',
+                                         description='Description of the Post',
+                                         category=self.category,
+                                         publication_date=tz.now() - tz.timedelta(days=30),
+                                         user=self.user)
 
-        self.comment1 = Comment.objects.create(user_comment=self.user,
-                                               post_comment=self.post1,
+        self.comment1 = Comment.objects.create(user=self.user,
+                                               post=self.post1,
                                                comment='Testando')
-        self.comment2 = Comment.objects.create(user_comment=self.user,
-                                               post_comment=self.post2,
+        self.comment2 = Comment.objects.create(user=self.user,
+                                               post=self.post2,
                                                comment='Testando')
-        self.comment3 = Comment.objects.create(user_comment=self.user,
-                                               post_comment=self.post3,
+        self.comment3 = Comment.objects.create(user=self.user,
+                                               post=self.post3,
                                                comment='Testando')
 
 

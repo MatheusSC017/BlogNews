@@ -17,14 +17,14 @@ class Searches(ListView):
     model = models.Search
     context_object_name = 'searches'
     paginate_by = 5
-    ordering = ['-publication_date_search', 'finish_date_search', ]
+    ordering = ['-publication_date', 'finish_date', ]
 
     def get_queryset(self):
         """ Make sure the search has been published and the publication date is less than or equal to now """
         qs = super().get_queryset()
 
-        qs = qs.filter(published_search=True,
-                       publication_date_search__lte=timezone.now())
+        qs = qs.filter(published=True,
+                       publication_date__lte=timezone.now())
 
         return qs
 
@@ -34,14 +34,14 @@ class Searches(ListView):
 
         searches = list()
         for search in context['searches']:
-            options = models.Option.objects.filter(search_option=search.pk)
+            options = models.Option.objects.filter(search=search.pk)
             options = options.annotate(
-                vote_option=Count('vottinguseroption')
+                vote=Count('vottinguseroption')
             )
             searches.append({'search': search,
                              'options': options,
-                             'status': (search.finish_date_search > timezone.now()),
-                             'max_vote': options.aggregate(Max('vote_option'))})
+                             'status': (search.finish_date > timezone.now()),
+                             'max_vote': options.aggregate(Max('vote'))})
         context['searches'] = searches
 
         return context
@@ -58,7 +58,7 @@ class Search(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
 
-        if not context['search'].published_search or context['search'].publication_date_search > timezone.now():
+        if not context['search'].published or context['search'].publication_date > timezone.now():
             return redirect(reverse('search:searches'))
 
         return self.render_to_response(context)
@@ -76,22 +76,22 @@ class Search(DetailView):
 
         search = get_object_or_404(models.Search,
                                    pk=kwargs.get('pk'),
-                                   published_search=True,
-                                   publication_date_search__lte=timezone.now(),
-                                   finish_date_search__gte=timezone.now())
+                                   published=True,
+                                   publication_date__lte=timezone.now(),
+                                   finish_date__gte=timezone.now())
         option = get_object_or_404(models.Option,
                                    pk=request.POST['optionChoice'],
-                                   search_option=search.pk)
-        votting = models.VottingUserOption.objects.filter(user_votting=request.user.pk,
-                                                          option_votting__in=models.Option.objects.filter(
-                                                              search_option=search.pk
+                                   search=search.pk)
+        votting = models.VottingUserOption.objects.filter(user=request.user.pk,
+                                                          option__in=models.Option.objects.filter(
+                                                              search=search.pk
                                                           ))
         if votting.count() == 0:
-            models.VottingUserOption.objects.create(user_votting=request.user,
-                                                    option_votting=option)
+            models.VottingUserOption.objects.create(user=request.user,
+                                                    option=option)
         else:
             votting = votting[0]
-            votting.option_votting = option
+            votting.option = option
             votting.save()
         messages.success(request, 'Obrigado pelo voto')
         return redirect(reverse('search:search', args=[search.pk, ]))
@@ -103,16 +103,16 @@ class Search(DetailView):
         """
         context = super().get_context_data(*args, **kwargs)
 
-        options = models.Option.objects.filter(search_option=context['search'].pk)
+        options = models.Option.objects.filter(search=context['search'].pk)
         options = options.annotate(
-            vote_option=Count('vottinguseroption')
+            vote=Count('vottinguseroption')
         )
         context['options'] = options
-        context['max_vote'] = options.aggregate(Max('vote_option'))
-        context['status'] = (context['search'].finish_date_search > timezone.now())
+        context['max_vote'] = options.aggregate(Max('vote'))
+        context['status'] = (context['search'].finish_date > timezone.now())
         if self.request.user.is_authenticated:
-            context['vote'] = models.VottingUserOption.objects.filter(user_votting=self.request.user.pk,
-                                                                      option_votting__in=options).first
+            context['vote'] = models.VottingUserOption.objects.filter(user=self.request.user.pk,
+                                                                      option__in=options).first
 
         return context
 
@@ -123,7 +123,7 @@ class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = models.Search
     paginate_by = 20
     context_object_name = 'searches'
-    ordering = ['-published_search', '-publication_date_search', 'finish_date_search']
+    ordering = ['-published', '-publication_date', 'finish_date']
     login_url = settings.LOGIN_URL
     permission_required = 'search.view_search'
     permission_denied_message = 'Necessário usuário autorizado'
@@ -132,7 +132,7 @@ class UserSearches(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         """ Select only the user questions """
         qs = super().get_queryset()
 
-        qs = qs.filter(user_search=self.request.user)
+        qs = qs.filter(user=self.request.user)
 
         return qs
 
@@ -163,7 +163,7 @@ class CreateSearch(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
         if option_form.is_valid() and form.is_valid():
             self.object = form.save(commit=False)
-            self.object.user_search = self.request.user
+            self.object.user = self.request.user
             self.object.save()
             option_form.instance = self.object
             option_form.save()
@@ -199,7 +199,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         """ Show the page is the question belongs to the user """
         self.object = self.get_object()
 
-        if self.object.user_search != request.user:
+        if self.object.user != request.user:
             return redirect(reverse('search:user_search'))
 
         return super().get(request, *args, **kwargs)
@@ -208,7 +208,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         """ Make sure the question belongs to the user """
         self.object = self.get_object()
 
-        if self.object.user_search != request.user:
+        if self.object.user != request.user:
             return redirect(reverse('search:user_search'))
 
         return super().post(request, *args, **kwargs)
@@ -256,7 +256,7 @@ class UpdateSearch(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 def delete_search(request):
     """ Delete the user question """
     if request.POST:
-        search = get_object_or_404(models.Search, pk=request.POST.get('primary-key'), user_search=request.user)
+        search = get_object_or_404(models.Search, pk=request.POST.get('primary-key'), user=request.user)
         search.delete()
         messages.success(request, 'Pesquisa deletada')
     return redirect(reverse('search:user_search'))
@@ -272,15 +272,15 @@ def register_report(request):
         messages.error(request, 'Pesquisa não encontrado')
         return redirect(reverse('search:searches'))
 
-    search = get_object_or_404(models.Search, pk=pk, published_search=True)
+    search = get_object_or_404(models.Search, pk=pk, published=True)
     report_description = request.POST.get('report-description')
 
     if not report_description.strip():
         messages.error(request, 'A denúncia não pode estar vázia')
         return redirect(reverse('search:search', kwargs={'pk': pk, }))
 
-    description = 'Pesquisa: {}, Autor: {} - {}'.format(pk, search.user_search, report_description)
+    description = 'Pesquisa: {}, Autor: {} - {}'.format(pk, search.user, report_description)
 
-    Report.objects.create(user_report=search.user_search, description_report=description)
+    Report.objects.create(user=search.user, description=description)
     messages.success(request, 'Sua denúncia foi registrada')
     return redirect(reverse('search:search', kwargs={'pk': pk, }))

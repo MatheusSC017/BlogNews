@@ -12,8 +12,8 @@ from user.views import Login
 class BlogTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        self.py_category = Category.objects.create(title_category='Python')
-        self.django_category = Category.objects.create(title_category='Django')
+        self.py_category = Category.objects.create(title='Python')
+        self.django_category = Category.objects.create(title='Django')
 
         self.user = User.objects.create_user('username_test', 'test@test.com.br', 'password_test')
         self.other_user = User.objects.create_user('username_test2', 'test@test.com.br', 'password_test2')
@@ -23,58 +23,58 @@ class BlogTestCase(TestCase):
         for permission in permissions:
             self.user.user_permissions.add(permission)
 
-        self.post1 = Post.objects.create(title_post='Python Frameworks',
-                                         excerpt_post='Conheça os diversos frameworks disponiveis para a linhagem '
+        self.post1 = Post.objects.create(title='Python Frameworks',
+                                         excerpt='Conheça os diversos frameworks disponiveis para a linhagem '
                                                       'python',
-                                         description_post='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
-                                         category_post=self.py_category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=30),
-                                         user_post=self.user)
-        self.post2 = Post.objects.create(title_post='Django',
-                                         excerpt_post='Tutorial interativo do framework django',
-                                         description_post='Informações diversas sobre o framework e suas '
+                                         description='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
+                                         category=self.py_category,
+                                         publication_date=tz.now() - tz.timedelta(days=30),
+                                         user=self.user)
+        self.post2 = Post.objects.create(title='Django',
+                                         excerpt='Tutorial interativo do framework django',
+                                         description='Informações diversas sobre o framework e suas '
                                                           'funcionalidades',
-                                         category_post=self.django_category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=20),
-                                         user_post=self.user)
-        self.post3 = Post.objects.create(title_post='Python Machine Learning',
-                                         excerpt_post='Introdução a tecnicas de ML com python',
-                                         description_post='O que é ML e apresentação teorica do seu '
+                                         category=self.django_category,
+                                         publication_date=tz.now() - tz.timedelta(days=20),
+                                         user=self.user)
+        self.post3 = Post.objects.create(title='Python Machine Learning',
+                                         excerpt='Introdução a tecnicas de ML com python',
+                                         description='O que é ML e apresentação teorica do seu '
                                                           'funcionamento',
-                                         category_post=self.py_category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=90),
-                                         user_post=self.user)
-        self.post4 = Post.objects.create(title_post='Python Machine Learning Frameworks',
-                                         excerpt_post='Introdução a tecnicas de ML com python e seus frameworks',
-                                         description_post='Framworks Pythons voltados ao uso de Machine Learning',
-                                         category_post=self.py_category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=15),
-                                         published_post=False,
-                                         user_post=self.user)
-        self.post5 = Post.objects.create(title_post='Python análise de dados',
-                                         excerpt_post='Curso de python DataScience (Frameworks)',
-                                         description_post='Informações sobre os processos envolvendo análise de dados',
-                                         category_post=self.py_category,
-                                         publication_date_post=tz.now() - tz.timedelta(days=120),
-                                         user_post=self.user)
-        self.post6 = Post.objects.create(title_post='Posts sobre informação futura',
-                                         excerpt_post='Python e o futuro',
-                                         description_post='Python e o futuro',
-                                         category_post=self.py_category,
-                                         publication_date_post=tz.now() + tz.timedelta(days=120),
-                                         user_post=self.other_user)
+                                         category=self.py_category,
+                                         publication_date=tz.now() - tz.timedelta(days=90),
+                                         user=self.user)
+        self.post4 = Post.objects.create(title='Python Machine Learning Frameworks',
+                                         excerpt='Introdução a tecnicas de ML com python e seus frameworks',
+                                         description='Framworks Pythons voltados ao uso de Machine Learning',
+                                         category=self.py_category,
+                                         publication_date=tz.now() - tz.timedelta(days=15),
+                                         published=False,
+                                         user=self.user)
+        self.post5 = Post.objects.create(title='Python análise de dados',
+                                         excerpt='Curso de python DataScience (Frameworks)',
+                                         description='Informações sobre os processos envolvendo análise de dados',
+                                         category=self.py_category,
+                                         publication_date=tz.now() - tz.timedelta(days=120),
+                                         user=self.user)
+        self.post6 = Post.objects.create(title='Posts sobre informação futura',
+                                         excerpt='Python e o futuro',
+                                         description='Python e o futuro',
+                                         category=self.py_category,
+                                         publication_date=tz.now() + tz.timedelta(days=120),
+                                         user=self.other_user)
 
-        RattingUserPost.objects.create(user_ratting=self.user,
-                                       post_ratting=self.post1,
+        RattingUserPost.objects.create(user=self.user,
+                                       post=self.post1,
                                        ratting=3)
-        RattingUserPost.objects.create(user_ratting=self.user,
-                                       post_ratting=self.post3,
+        RattingUserPost.objects.create(user=self.user,
+                                       post=self.post3,
                                        ratting=5)
-        RattingUserPost.objects.create(user_ratting=self.user,
-                                       post_ratting=self.post4,
+        RattingUserPost.objects.create(user=self.user,
+                                       post=self.post4,
                                        ratting=4)
-        RattingUserPost.objects.create(user_ratting=self.user,
-                                       post_ratting=self.post5,
+        RattingUserPost.objects.create(user=self.user,
+                                       post=self.post5,
                                        ratting=4)
 
 
@@ -143,21 +143,21 @@ class PostPageTestCase(BlogTestCase):
         self.assertIn('comments', response.context)
 
     def test_view_post(self):
-        views = self.post1.anonymous_views_post
+        views = self.post1.anonymous_views
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
-        self.assertEqual(response.context.get('post').anonymous_views_post, views + 1)
+        self.assertEqual(response.context.get('post').anonymous_views, views + 1)
 
     def test_view_post_with_logged_in_user(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        views = self.post1.user_views_post
+        views = self.post1.user_views
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
-        self.assertEqual(response.context.get('post').user_views_post, views + 1)
+        self.assertEqual(response.context.get('post').user_views, views + 1)
 
     def test_double_view_post(self):
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
-        views = response.context.get('post').anonymous_views_post
+        views = response.context.get('post').anonymous_views
         response = self.client.get(reverse('post:post', args=[self.post1.pk]))
-        self.assertEqual(response.context.get('post').anonymous_views_post, views)
+        self.assertEqual(response.context.get('post').anonymous_views, views)
 
     def test_post_method_with_user_logged_out(self):
         response = self.client.post(reverse('post:post', args=[self.post1.pk]),
@@ -177,8 +177,7 @@ class PostPageTestCase(BlogTestCase):
 
     def test_update_feedback_to_post(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        response = self.client.post(reverse('post:post', args=[self.post3.pk, ]),
-                                    {'star': '5', })
+        response = self.client.post(reverse('post:post', args=[self.post3.pk, ]), {'star': '5', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:post', args=[self.post3.pk, ]))
         comments = list(get_messages(response.wsgi_request))
@@ -249,11 +248,11 @@ class UserCreatePostPageTestCase(BlogTestCase):
 
     def test_post_create(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        parameters = {'title_post': 'register_test',
-                      'excerpt_post': 'register_test_excerpt_post',
-                      'description_post': 'register_test_description_post',
-                      'category_post': str(self.py_category.pk),
-                      'image_post': '', }
+        parameters = {'title': 'register_test',
+                      'excerpt': 'register_test_excerpt',
+                      'description': 'register_test_description',
+                      'category': str(self.py_category.pk),
+                      'image': '', }
         response = self.client.post(reverse('post:post_create'), parameters)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))
@@ -279,11 +278,11 @@ class UserUpdatePostPageTestCase(BlogTestCase):
 
     def test_post_update(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        parameters = {'title_post': 'update_test',
-                      'excerpt_post': 'update_test_excerpt_post',
-                      'description_post': 'update_test_description_post',
-                      'category_post': str(self.django_category.pk),
-                      'image_post': '', }
+        parameters = {'title': 'update_test',
+                      'excerpt': 'update_test_excerpt_post',
+                      'description': 'update_test_description_post',
+                      'category': str(self.django_category.pk),
+                      'image': '', }
         response = self.client.post(reverse('post:post_update', args=[self.post1.pk, ]), parameters)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('post:user_blog'))

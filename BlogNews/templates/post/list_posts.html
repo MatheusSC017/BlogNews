@@ -24,7 +24,7 @@
                         <option value="0">Todas</option>
                         {% for category in categories %}
                         <option value="{{ category.pk }}" {% if category.pk == get_request.category.0 %}selected{% endif %}>
-                            {{ category.title_category }}
+                            {{ category.title }}
                         </option>
                         {% endfor %}
                     </select>

@@ -10,12 +10,12 @@ class OptionInlineAdmin(admin.TabularInline):
 
 
 class SearchAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'user_search', 'publication_date_search', 'finish_date_search', 'published_search', ]
-    list_display_links = ['pk', 'user_search', ]
-    list_filter = ['published_search', ]
-    list_editable = ['published_search', ]
-    ordering = ['publication_date_search', 'finish_date_search', ]
-    search_fields = ['description_search', ]
+    list_display = ['pk', 'user', 'publication_date', 'finish_date', 'published', ]
+    list_display_links = ['pk', 'user', ]
+    list_filter = ['published', ]
+    list_editable = ['published', ]
+    ordering = ['publication_date', 'finish_date', ]
+    search_fields = ['description', ]
     list_per_page = 50
     inlines = [OptionInlineAdmin, ]
 

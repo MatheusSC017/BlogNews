@@ -62,17 +62,17 @@
             <div class="banner-most-popular-content">
                 {% for post in posts %}
                 <article class="banner-most-popular gray-bg-color rounded-3 d-sm-flex border border-light">
-                    {% if post.image_post %}
-                    <img src="{{ post.image_post.url }}" class="img-fluid rounded-start">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid rounded-start">
                     {% endif %}
                     <div class="p-3">
                         <h1 class="h4 m-bottom-3">
                             <strong>
-                                {{ post.title_post }}
+                                {{ post.title }}
                             </strong>
                         </h1>
                         <p>
-                            {{ post.excerpt_post }}
+                            {{ post.excerpt }}
                         </p>
                     </div>
                 </article>
@@ -122,8 +122,8 @@
         <div class="col p-3">
             <div class="gallery-image rounded-3 border border-light">
                 <img src="{{ image.image.url }}"
-                     title="{{ image.title_image }}"
-                     alt="{{ image.title_image }}"
+                     title="{{ image.title }}"
+                     alt="{{ image.title }}"
                      class="img-fluid">
             </div>
         </div>
@@ -139,7 +139,7 @@
         <div class="p-3">
             {% for search in searches %}
             <div class="mb-5">
-                <h2 class="h3">{{ search.description_search }}</h2>
+                <h2 class="h3">{{ search.description }}</h2>
                 <p class="m-3">{{ search.max_option }}</p>
             </div>
             {% endfor %}

@@ -22,25 +22,25 @@ class AlbumTestCase(TestCase):
             for permission in permissions:
                 self.user.user_permissions.add(permission)
 
-        self.album1 = models.Album.objects.create(title_album='Album test 1',
-                                                  user_album=self.user)
-        self.album2 = models.Album.objects.create(title_album='Album test 2',
-                                                  user_album=self.user)
+        self.album1 = models.Album.objects.create(title='Album test 1',
+                                                  user=self.user)
+        self.album2 = models.Album.objects.create(title='Album test 2',
+                                                  user=self.user)
 
         with open(settings.STATICFILES_DIRS[1] / 'album/img/test.jpg', 'rb') as img:
             image = SimpleUploadedFile('image.jpg', img.read())
-        self.image1 = models.Image.objects.create(title_image='Image test 1',
+        self.image1 = models.Image.objects.create(title='Image test 1',
                                                   image=image,
-                                                  album_image=self.album1)
-        self.image2 = models.Image.objects.create(title_image='Image test 2',
+                                                  album=self.album1)
+        self.image2 = models.Image.objects.create(title='Image test 2',
                                                   image=image,
-                                                  album_image=self.album1)
-        self.image3 = models.Image.objects.create(title_image='Image test 3',
+                                                  album=self.album1)
+        self.image3 = models.Image.objects.create(title='Image test 3',
                                                   image=image,
-                                                  album_image=self.album1)
-        self.image4 = models.Image.objects.create(title_image='Image test 4',
+                                                  album=self.album1)
+        self.image4 = models.Image.objects.create(title='Image test 4',
                                                   image=image,
-                                                  album_image=self.album2)
+                                                  album=self.album2)
 
 
 class AlbumPageTestCase(AlbumTestCase):
@@ -98,8 +98,8 @@ class AlbumCreatePageTestCase(AlbumTestCase):
 
     def test_album_create(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
-        response = self.client.post(reverse('album:album_create'), {'title_album': 'Album Test',
-                                                                    'published_album': 'True', })
+        response = self.client.post(reverse('album:album_create'), {'title': 'Album Test',
+                                                                    'published': 'True', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
@@ -110,20 +110,20 @@ class AlbumCreatePageTestCase(AlbumTestCase):
 class AlbumUpdateMethodTestCase(AlbumTestCase):
     def test_update_album_without_user(self):
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
-                                                                    'title_album': 'test Album 2', })
+                                                                    'title': 'test Album 2', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_album_with_user_without_permission(self):
         self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
-                                                                    'title_album': 'test Album 2', })
+                                                                    'title': 'test Album 2', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_album(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
-                                                                    'title_album': 'test Album 2',
-                                                                    'published_album': False, })
+                                                                    'title': 'test Album 2',
+                                                                    'published': False, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
@@ -133,8 +133,8 @@ class AlbumUpdateMethodTestCase(AlbumTestCase):
     def test_update_album_with_invalid_data(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:album_update'), {'primary-key': self.album1.pk,
-                                                                    'title_album': 'test',
-                                                                    'published_album': False, })
+                                                                    'title': 'test',
+                                                                    'published': False, })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_album'))
         messages = list(get_messages(response.wsgi_request))
@@ -215,21 +215,21 @@ class ImageUpdateMethodTestCase(AlbumTestCase):
     def test_update_image_without_user(self):
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
-                                     'title_image': 'Image title', })
+                                     'title': 'Image title', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_image_with_user_without_permission(self):
         self.client.login(username='username_test2', password='password_test2', request=HttpRequest())
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
-                                     'title_image': 'Image title', })
+                                     'title': 'Image title', })
         self.assertEqual(response.status_code, 302)
 
     def test_update_image(self):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
-                                     'title_image': 'Image title', })
+                                     'title': 'Image title', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))
@@ -240,7 +240,7 @@ class ImageUpdateMethodTestCase(AlbumTestCase):
         self.client.login(username='username_test', password='password_test', request=HttpRequest())
         response = self.client.post(reverse('album:image_update', args=[self.album1.pk, ]),
                                     {'primary-key': self.image1.pk,
-                                     'title_image': 'Test', })
+                                     'title': 'Test', })
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('album:user_images', args=[self.album1.pk, ]))
         messages = list(get_messages(response.wsgi_request))

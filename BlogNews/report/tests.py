@@ -13,7 +13,7 @@ class ReportActionsTestCase(TestCase):
 
         self.admin = User.objects.create_superuser(username='admin', email='admin@admin.com', password='admin123456')
         self.user = User.objects.create_user(username='username_test', email='email@test.com', password='password_test')
-        self.report = Report.objects.create(user_report=self.user, description_report=lorem_ipsum.paragraph())
+        self.report = Report.objects.create(user=self.user, description=lorem_ipsum.paragraph())
 
     def test_approve_report(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
@@ -24,13 +24,13 @@ class ReportActionsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:report_report_changelist'))
         report = Report.objects.get(pk=self.report.pk)
-        self.assertEqual(report.status_report, 'a')
+        self.assertEqual(report.status, 'a')
         user = User.objects.get_by_natural_key(self.user.username)
-        self.assertEqual(user.userreportregister.reports_userreportregister, 1)
+        self.assertEqual(user.userreportregister.reports, 1)
 
     def test_approve_report_user_with_3_reports(self):
-        UserReportRegister.objects.create(user_userreportregister=self.user,
-                                          reports_userreportregister=2)
+        UserReportRegister.objects.create(user=self.user,
+                                          reports=2)
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
         response = self.client.post(reverse('admin:report_report_changelist'), {
             'action': 'approve_report',
@@ -39,10 +39,10 @@ class ReportActionsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:report_report_changelist'))
         report = Report.objects.get(pk=self.report.pk)
-        self.assertEqual(report.status_report, 'a')
+        self.assertEqual(report.status, 'a')
         user = User.objects.get_by_natural_key(self.user.username)
-        self.assertEqual(user.userreportregister.reports_userreportregister, 3)
-        self.assertEqual(user.userreportregister.status_userreportregister, 'b')
+        self.assertEqual(user.userreportregister.reports, 3)
+        self.assertEqual(user.userreportregister.status, 'b')
 
     def test_reject_report(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
@@ -53,4 +53,4 @@ class ReportActionsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('admin:report_report_changelist'))
         report = Report.objects.get(pk=self.report.pk)
-        self.assertEqual(report.status_report, 'r')
+        self.assertEqual(report.status, 'r')

@@ -10,12 +10,12 @@ class UserReportRegister(models.Model):
         (blocked, 'Bloqueado'),
     ]
 
-    user_userreportregister = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='usuário')
-    reports_userreportregister = models.PositiveIntegerField(default=0, verbose_name='denúncias')
-    status_userreportregister = models.CharField(max_length=1, default=normal, choices=status, verbose_name='situação')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='usuário')
+    reports = models.PositiveIntegerField(default=0, verbose_name='denúncias')
+    status = models.CharField(max_length=1, default=normal, choices=status, verbose_name='situação')
 
     def __str__(self):
-        return str(self.user_userreportregister) + ' - ' + str(self.reports_userreportregister)
+        return str(self.user) + ' - ' + str(self.reports)
 
     class Meta:
         verbose_name = 'denúncias do usuário'

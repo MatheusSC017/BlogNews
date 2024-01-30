@@ -14,25 +14,25 @@ class Home(TemplateView):
         context = super().get_context_data(*args, **kwargs)
 
         context['posts'] = model_post.Post.objects.filter(
-            published_post=True,
-            publication_date_post__lte=timezone.now()
-        ).defer('description_post').order_by('-publication_date_post')[:2]
+            published=True,
+            publication_date__lte=timezone.now()
+        ).defer('description').order_by('-publication_date')[:2]
 
         context['galery'] = model_album.Image.objects.filter(
-            album_image__published_album=True
+            album__published=True
         ).order_by('?')[:6]
 
         options = model_search.Option.objects.filter(
-            search_option=OuterRef('pk')
+            search=OuterRef('pk')
         ).annotate(
-            vote_option=Count('vottinguseroption')
-        ).order_by('-vote_option')[:1]
+            vote=Count('vottinguseroption')
+        ).order_by('-vote')[:1]
         context['searches'] = model_search.Search.objects.filter(
-            published_search=True,
-            publication_date_search__lte=timezone.now()
+            published=True,
+            publication_date__lte=timezone.now()
         ).annotate(
-            max_option=Subquery(options.values('response_option'))
-        ).order_by('-publication_date_search')[:3]
+            max_option=Subquery(options.values('response'))
+        ).order_by('-publication_date')[:3]
 
         return context
 

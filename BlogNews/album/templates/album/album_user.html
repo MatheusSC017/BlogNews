@@ -33,9 +33,9 @@
                     {% for album in albuns %}
                     <tr id="album-{{ album.pk }}">
                         <th>{{ album.pk }}</th>
-                        <td>{{ album.title_album }}</td>
+                        <td>{{ album.title }}</td>
                         <td>
-                            {% if album.published_album %}
+                            {% if album.published %}
                                 Sim
                             {% else %}
                                 Não
@@ -77,16 +77,16 @@
         <form action="{% url 'album:album_update' %}" method="POST" class="form-field">
 
             <div class="form-floating">
-                {{ album_form.title_album }}
-                {{ album_form.title_album.label_tag }}
+                {{ album_form.title }}
+                {{ album_form.title.label_tag }}
                 <div class="secondary-color">
-                    {{ album_form.title_album.errors }}
+                    {{ album_form.title.errors }}
                 </div>
             </div>
 
             <div class="form-check">
-                {{ album_form.published_album }}
-                {{ album_form.published_album.label_tag }}
+                {{ album_form.published }}
+                {{ album_form.published.label_tag }}
             </div>
 
             <input type="hidden" name="primary-key">

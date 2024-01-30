@@ -19,7 +19,7 @@ class BlogTemplate(ListView):
     paginate_by = 10
     context_object_name = 'posts'
     category = None
-    order_by = '-publication_date_post'
+    order_by = '-publication_date'
     search = None
 
     def get_queryset(self, *args, **kwargs):
@@ -36,19 +36,19 @@ class BlogTemplate(ListView):
         qs = super().get_queryset(*args, **kwargs)
 
         qs = qs.annotate(
-            comments_post=Count('comment', distinct=True),
-            ratting_post=Avg('rattinguserpost__ratting', distinct=True)
+            comments=Count('comment', distinct=True),
+            ratting=Avg('rattinguserpost__ratting', distinct=True)
         )
 
         if self.category is not None:
-            qs = qs.filter(category_post=self.category)
+            qs = qs.filter(category=self.category)
 
         if self.search is not None:
-            qs = qs.filter(Q(title_post__icontains=self.search) | Q(excerpt_post__icontains=self.search))
+            qs = qs.filter(Q(title__icontains=self.search) | Q(excerpt__icontains=self.search))
 
         qs = qs.order_by(self.order_by)
 
-        qs = qs.defer('description_post')
+        qs = qs.defer('description')
 
         return qs
 
@@ -71,15 +71,15 @@ class BlogTemplate(ListView):
         search_field = request.GET.get('search')
         order_by_field = request.GET.get('order_by')
 
-        if category_field in [str(_.pk) for _ in CategoryModel.objects.all().defer('title_category')]:
+        if category_field in [str(_.pk) for _ in CategoryModel.objects.all().defer('title')]:
             self.category = category_field
 
         if search_field != '':
             self.search = search_field
 
         order_list = {
-            'publicacao': '-publication_date_post',
-            'avaliacao': '-ratting_post',
+            'publicacao': '-publication_date',
+            'avaliacao': '-ratting',
         }
         if order_by_field in order_list.keys():
             self.order_by = order_list[order_by_field]
@@ -94,8 +94,8 @@ class Blog(BlogTemplate):
     def get_queryset(self, *args, **kwargs):
         """ Select only the published posts """
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.filter(publication_date_post__lte=tz.now())
-        qs = qs.filter(published_post=True)
+        qs = qs.filter(publication_date__lte=tz.now())
+        qs = qs.filter(published=True)
         return qs
 
 
@@ -110,7 +110,7 @@ class Post(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         post = context['post']
-        if not post.published_post:
+        if not post.published:
             return redirect(reverse('post:blog'))
 
         response = self.render_to_response(context)
@@ -119,9 +119,9 @@ class Post(DetailView):
         if request.COOKIES.get('view-flag') != str(post.pk):
             """ Separetes views of anonymous users and logged in users """
             if request.user.is_authenticated:
-                post.user_views_post += 1
+                post.user_views += 1
             else:
-                post.anonymous_views_post += 1
+                post.anonymous_views += 1
 
             post.save()
 
@@ -134,7 +134,7 @@ class Post(DetailView):
         if not request.user.is_authenticated:
             return redirect(reverse('user:login'))
 
-        post = get_object_or_404(PostModel, pk=kwargs.get('pk'), published_post=True, publication_date_post__lte=tz.now())
+        post = get_object_or_404(PostModel, pk=kwargs.get('pk'), published=True, publication_date__lte=tz.now())
 
         try:
             ratting = int(request.POST.get('star'))
@@ -146,13 +146,10 @@ class Post(DetailView):
             messages.error(request, 'Avaliação inválida')
             return redirect(reverse('post:post', kwargs={'pk': kwargs.get('pk')}))
 
-        ratting_post = RattingUserPost.objects.filter(user_ratting=request.user,
-                                                      post_ratting=post)
+        ratting_post = RattingUserPost.objects.filter(user=request.user, post=post)
 
         if ratting_post.count() == 0:
-            RattingUserPost.objects.create(user_ratting=request.user,
-                                           post_ratting=post,
-                                           ratting=ratting)
+            RattingUserPost.objects.create(user=request.user, post=post, ratting=ratting)
         else:
             ratting_post = ratting_post[0]
             ratting_post.ratting = ratting
@@ -166,8 +163,8 @@ class Post(DetailView):
         qs = super().get_queryset(*args, **kwargs)
 
         qs = qs.annotate(
-            comments_post=Count('comment', distinct=True),
-            ratting_post=Avg('rattinguserpost__ratting', distinct=True),
+            comments=Count('comment', distinct=True),
+            ratting=Avg('rattinguserpost__ratting', distinct=True),
         )
 
         return qs
@@ -176,13 +173,13 @@ class Post(DetailView):
         """ Adds the registered comments and the comment form to the context"""
         context = super().get_context_data(*args, **kwargs)
 
-        comments_qs = Comment.objects.select_related('user_comment').filter(post_comment=context.get('post').pk)
+        comments_qs = Comment.objects.select_related('user').filter(post=context.get('post').pk)
 
         context['comments'] = comments_qs
         context['comment_form'] = CommentForm(self.request.POST or None)
         if self.request.user.is_authenticated:
-            ratting_user = RattingUserPost.objects.filter(user_ratting=self.request.user,
-                                                          post_ratting=context['post'])
+            ratting_user = RattingUserPost.objects.filter(user=self.request.user,
+                                                          post=context['post'])
             if ratting_user.count() == 1:
                 context['ratting_user'] = ratting_user[0].ratting
 
@@ -199,7 +196,7 @@ class BlogUser(LoginRequiredMixin, PermissionRequiredMixin, BlogTemplate):
     def get_queryset(self, *args, **kwargs):
         """ Select only the user posts """
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.filter(user_post=self.request.user)
+        qs = qs.filter(user=self.request.user)
         return qs
 
     def post(self, *args, **kwargs):
@@ -207,9 +204,9 @@ class BlogUser(LoginRequiredMixin, PermissionRequiredMixin, BlogTemplate):
         try:
             post = get_object_or_404(PostModel,
                                      pk=self.request.POST['primary-key'],
-                                     user_post=self.request.user.pk)
-            post.published_post = not post.published_post
-            if post.published_post:
+                                     user=self.request.user.pk)
+            post.published = not post.published
+            if post.published:
                 messages.success(self.request, 'Post publicado')
             else:
                 messages.error(self.request, 'Post despublicado')
@@ -233,8 +230,8 @@ class RegisterPost(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         """ Select only the user albuns """
         form = super().get_form(form_class)
 
-        form.fields['album_post'].queryset = album_models.Album.objects.filter(
-            user_album=self.request.user.pk
+        form.fields['album'].queryset = album_models.Album.objects.filter(
+            user=self.request.user.pk
         )
 
         return form
@@ -244,7 +241,7 @@ class RegisterPost(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         form = self.get_form()
         if form.is_valid():
             form = form.save(commit=False)
-            form.user_post = request.user
+            form.user = request.user
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -267,7 +264,7 @@ class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        if self.object.user_post != request.user:
+        if self.object.user != request.user:
             return redirect(reverse('post:user_blog'))
 
         return super().get(request, *args, **kwargs)
@@ -275,7 +272,7 @@ class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        if self.object.user_post != request.user:
+        if self.object.user != request.user:
             return redirect(reverse('post:user_blog'))
 
         return super().post(request, *args, **kwargs)
@@ -284,8 +281,8 @@ class UpdatePost(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         """ Select only the user albuns """
         form = super().get_form(form_class)
 
-        form.fields['album_post'].queryset = album_models.Album.objects.filter(
-            user_album=self.request.user.pk
+        form.fields['album'].queryset = album_models.Album.objects.filter(
+            user=self.request.user.pk
         )
 
         return form
@@ -306,15 +303,15 @@ def register_report(request):
         messages.error(request, 'Post não encontrado')
         return redirect(reverse('post:blog'))
 
-    post = get_object_or_404(PostModel, pk=pk, published_post=True)
+    post = get_object_or_404(PostModel, pk=pk, published=True)
     report_description = request.POST.get('report-description')
 
     if not report_description.strip():
         messages.error(request, 'A denúncia não pode estar vázia')
         return redirect(reverse('post:post', kwargs={'pk': pk, }))
 
-    description = 'Post: {}, Autor: {} - {}'.format(pk, post.user_post, report_description)
+    description = 'Post: {}, Autor: {} - {}'.format(pk, post.user, report_description)
 
-    Report.objects.create(user_report=post.user_post, description_report=description)
+    Report.objects.create(user=post.user, description=description)
     messages.success(request, 'Sua denúncia foi registrada')
     return redirect(reverse('post:post', kwargs={'pk': pk, }))

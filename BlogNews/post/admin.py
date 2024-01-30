@@ -4,15 +4,15 @@ from .models import Post, Category, RattingUserPost
 
 
 class PostAdmin(summer_admin.SummernoteModelAdmin):
-    list_display = ('id', 'title_post', 'user_post', 'published_post', 'publication_date_post',
-                    'edition_date_post', 'album_post', 'category_post',)
-    list_display_links = ('id', 'title_post',)
-    list_filter = ('published_post', 'category_post',)
-    list_editable = ('published_post',)
-    search_fields = ('title_post', 'album_post',)
-    ordering = ('edition_date_post', 'publication_date_post',)
+    list_display = ('id', 'title', 'user', 'published', 'publication_date',
+                    'edition_date', 'album', 'category',)
+    list_display_links = ('id', 'title',)
+    list_filter = ('published', 'category',)
+    list_editable = ('published',)
+    search_fields = ('title', 'album',)
+    ordering = ('edition_date', 'publication_date',)
     list_per_page = 50
-    summernote_fields = ('description_post',)
+    summernote_fields = ('description',)
 
 
 admin.site.register(Post, PostAdmin)

@@ -11,7 +11,7 @@
         <article class="col border border-dark p-3 mb-5">
             <div class="d-flex position-relative">
                 <div>
-                    <h1 class="h4 dark-color">{{ search.search.description_search }}</h1>
+                    <h1 class="h4 dark-color">{{ search.search.description }}</h1>
                 </div>
                 <div class="button-options">
                     {% if search.status %}
@@ -30,16 +30,16 @@
             {% for option in search.options %}
             <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
                 <div class="me-2">
-                    <h2 class="h6">{{ option.response_option }}</h2>
+                    <h2 class="h6">{{ option.response }}</h2>
                 </div>
                 <div class="ms-auto aligment-center">
-                    {% if option.vote_option|to_int == search.max_vote.vote_option__max %}
+                    {% if option.vote|to_int == search.max_vote.vote__max %}
                         <div class="alternative-counter primary-bg-color dark-color text-center p-2 rounded rounded-circle">
-                            {{ option.vote_option|to_int }}
+                            {{ option.vote|to_int }}
                         </div>
                     {% else %}
                         <div class="alternative-counter secondary-bg-color light-color text-center p-2 rounded rounded-circle">
-                            {{ option.vote_option|to_int }}
+                            {{ option.vote|to_int }}
                         </div>
                     {% endif %}
                 </div>

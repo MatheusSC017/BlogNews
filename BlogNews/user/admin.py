@@ -7,36 +7,36 @@ from .models import UserReportRegister
 
 
 class UserReportRegisterAdmin(admin.ModelAdmin):
-    list_display = ['user_userreportregister', 'reports_userreportregister', 'status_userreportregister', ]
-    list_display_links = ['user_userreportregister', ]
-    list_filter = ['status_userreportregister', ]
-    search_fields = ['user_userreportregister', ]
-    exclude = ['status_userreportregister', ]
+    list_display = ['user', 'reports', 'status', ]
+    list_display_links = ['user', ]
+    list_filter = ['status', ]
+    search_fields = ['user', ]
+    exclude = ['status', ]
     actions = ['block_user_permissions', 'unlock_user_permissions', ]
 
     @admin.action(description='Bloquear usuários para criação de conteúdo')
     def block_user_permissions(self, request, queryset):
         for user_report_register in queryset:
-            if user_report_register.status_userreportregister == 'b':
+            if user_report_register.status == 'b':
                 continue
 
-            user_report_register.status_userreportregister = 'b'
+            user_report_register.status = 'b'
             user_report_register.save()
 
-            user = user_report_register.user_userreportregister
+            user = user_report_register.user
             user.user_permissions.clear()
 
     @admin.action(description='Desbloquear usuários para criação de conteúdo')
     def unlock_user_permissions(self, request, queryset):
         for user_report_register in queryset:
-            if user_report_register.status_userreportregister == 'n':
+            if user_report_register.status == 'n':
                 continue
 
-            user_report_register.status_userreportregister = 'n'
-            user_report_register.reports_userreportregister = 0
+            user_report_register.status = 'n'
+            user_report_register.reports = 0
             user_report_register.save()
 
-            user = user_report_register.user_userreportregister
+            user = user_report_register.user
             model_permissions = [Post, Album, Image, Search, Option]
             for model in model_permissions:
                 content_type = ContentType.objects.get_for_model(model)

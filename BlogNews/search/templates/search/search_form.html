@@ -10,7 +10,7 @@
         <div class="col-xl-8 p-3 dark-color dark-bg-color rounded">
             <form method="POST" action="#" class="form-field">
                 {% for field in form %}
-                    {% if field != form.published_search %}
+                    {% if field != form.published %}
                     <div class="form-floating mb-3">
                         {{ field }}
                         <label class="form-label light-color" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -42,12 +42,12 @@
                         {% for option in option_form %}
                         <tr id="album-{{ album.pk }}">
                             <td class="form-floating">
-                                {{ option.response_option }}
-                                <label class="label-form" for="{{ option.response_option.id_for_label }}">
-                                    {{ option.response_option.label }}
+                                {{ option.response }}
+                                <label class="label-form" for="{{ option.response.id_for_label }}">
+                                    {{ option.response.label }}
                                 </label>
                                 <div class="secondary-color">
-                                    {{ option.response_option.errors }}
+                                    {{ option.response.errors }}
                                 </div>
                             </td>
                             <td class="text-center">
@@ -55,7 +55,7 @@
                                     {{ option.DELETE }}
                                 {% endif %}
                                 {{ option.id }}
-                                {{ option.search_option }}
+                                {{ option.search }}
                             </td>
                         </tr>
                         {% endfor %}

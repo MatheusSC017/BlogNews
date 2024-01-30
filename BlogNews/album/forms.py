@@ -6,15 +6,15 @@ class AlbumForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['title_album'].widget.attrs['placeholder'] = 'Título do álbum'
-        self.fields['title_album'].widget.attrs['class'] = 'form-control'
-        self.fields['published_album'].widget.attrs['class'] = 'form-check-input border border-dark'
+        self.fields['title'].widget.attrs['placeholder'] = 'Título do álbum'
+        self.fields['title'].widget.attrs['class'] = 'form-control'
+        self.fields['published'].widget.attrs['class'] = 'form-check-input border border-dark'
 
     def clean(self, *args, **kwargs):
-        title_album = self.cleaned_data.get('title_album')
-        if len(title_album) < 5:
+        title = self.cleaned_data.get('title')
+        if len(title) < 5:
             self.add_error(
-                'title_album',
+                'title',
                 'O título deve possuir ao menos 5 caracteres'
             )
 
@@ -22,7 +22,7 @@ class AlbumForm(forms.ModelForm):
 
     class Meta:
         model = Album
-        fields = ['title_album', 'published_album']
+        fields = ['title', 'published']
 
 
 class ImageForm(forms.Form):

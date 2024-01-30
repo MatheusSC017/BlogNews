@@ -13,9 +13,9 @@ class NewsLetterUserTestCase(TestCase):
     def setUp(self):
         self.client = self.client_class()
 
-        self.user1 = models.NewsLetterUser.objects.create(email_newsletteruser='test1@test.com.br')
-        self.user2 = models.NewsLetterUser.objects.create(email_newsletteruser='test2@test.com.br',
-                                                          activated_newsletteruser=False)
+        self.user1 = models.NewsLetterUser.objects.create(email='test1@test.com.br')
+        self.user2 = models.NewsLetterUser.objects.create(email='test2@test.com.br',
+                                                          activated=False)
 
 
 class AddUserTestCase(NewsLetterUserTestCase):
@@ -111,8 +111,8 @@ class SendNewsLetterMessageTestCase(NewsLetterUserTestCase):
         super().setUp()
 
         self.user = User.objects.create_superuser(username='admin', email='admin@admin.com', password='admin123456')
-        self.message = models.NewsLetterMessage.objects.create(title_newslettermessage=lorem_ipsum.words(7),
-                                                               message_newslettermessage=lorem_ipsum.paragraph())
+        self.message = models.NewsLetterMessage.objects.create(title=lorem_ipsum.words(7),
+                                                               message=lorem_ipsum.paragraph())
 
     def test_send_message_for_newsletter_users(self):
         self.client.login(username='admin', password='admin123456', request=HttpRequest())
@@ -126,4 +126,4 @@ class SendNewsLetterMessageTestCase(NewsLetterUserTestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), '1 mensagem(ns) enviadas com sucesso.')
         message = models.NewsLetterMessage.objects.get(pk=self.message.pk)
-        self.assertTrue(message.published_newslettermessage)
+        self.assertTrue(message.published)
