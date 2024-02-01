@@ -3,6 +3,7 @@ from django.views.generic import View, ListView, CreateView, DetailView
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import JsonResponse
 from django.db.models import Count
 from django.contrib import messages
 from django.conf import settings
@@ -15,8 +16,9 @@ class Album(ListView):
     """ Page with all published albuns with 3 images or more """
     template_name = 'album/album.html'
     model = models.Album
-    paginate_by = 6
+    paginate_by = None
     context_object_name = 'albuns'
+    continuos_load = 6
 
     def get_queryset(self, *args, **kwargs):
         """ Select the published albuns and check if the album has 3 images or more"""
@@ -25,7 +27,7 @@ class Album(ListView):
         qs = qs.filter(published=True)
         qs = qs.annotate(
             count_images=Count('image__album')
-        ).filter(count_images__gte=3)
+        ).filter(count_images__gte=3)[:self.continuos_load]
 
         return qs
 
@@ -38,8 +40,38 @@ class Album(ListView):
             albuns_images.append({'album': album,
                                   'images': models.Image.objects.filter(album=album.pk)[:3], })
         context['albuns'] = albuns_images
+        context['number_of_albums'] = len(albuns_images)
 
         return context
+
+
+def load_more_albuns(request):
+    continuos_load = 6
+
+    offset = request.GET.get('offset')
+
+    qs = models.Album.objects.all()
+    qs = qs.filter(published=True)
+    qs = qs.annotate(
+        count_images=Count('image__album')
+    ).filter(count_images__gte=3)[int(offset): int(offset) + continuos_load]
+
+    albuns_images = list()
+    for album in qs:
+        albuns_images.append({'album': album,
+                              'images': models.Image.objects.filter(album=album.pk)[:3], })
+
+    data = [
+        {
+            'pk': album['album'].pk,
+            'title': album['album'].title,
+            'main_image': album['images'][0].image.url,
+            'second_image': album['images'][0].image.url,
+            'third_image': album['images'][0].image.url
+        } for album in albuns_images
+    ]
+    return JsonResponse(data, safe=False)
+
 
 
 class AlbumImages(DetailView):

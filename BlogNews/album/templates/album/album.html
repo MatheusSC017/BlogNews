@@ -5,7 +5,7 @@
 {% block content %}
 <section class="container-fluid landing-item gray-bg-color p-3">
     <h1 class="pt-3 ps-5 dark-color">Albuns</h1>
-    <div class="row row-cols-1 row-cols-lg-2 justify-content-around">
+    <div id="content" class="row row-cols-1 row-cols-lg-2 justify-content-around">
         {% for album in albuns %}
         <div class="col p-2">
             <article class="dark-bg-color album-item rounded-3 p-3 ms-auto me-auto">
@@ -36,10 +36,61 @@
         </div>
         {% endfor %}
     </div>
-    <div class="row">
-        <div class="col ps-5">
-            {% include 'partials/_pagination.html' %}
-        </div>
-    </div>
 </section>
+{% endblock %}
+
+{% block script %}
+
+<script>
+    localStorage.setItem('offset', {{ number_of_albums }});
+
+    function userReachedBottom() {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const documentHeight = document.documentElement.offsetHeight - 600;
+      return scrollPosition >= documentHeight;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (userReachedBottom()) {
+            let offset = localStorage.getItem('offset');
+            $.ajax({
+                url: '{% url 'album:load_more_content' %}',
+                data: {
+                    'offset': offset,
+                },
+                success: function(albuns) {
+                    if (albuns.length > 0) {
+                        for (var i = 0; i < albuns.length; i++) {
+                            var divElement = $('<div class="col p-2"></div>')
+
+                            var articleElement = $('<article class="dark-bg-color album-item rounded-3 p-3 ms-auto me-auto"></article>');
+
+                            var titleElement = $('<div><h2 class="h5 mb-3">' + albuns[i].title + '</h2></div>');
+
+                            articleElement.append(titleElement)
+
+                            var cardBodyElement = $('<div class="d-flex justify-content-around"></div>');
+
+                            cardBodyElement.append('<div class="album-primary-images gallery-image d-flex"><img src="' + albuns[i].main_image + '" alt="" class="img-fluid border border-light"></div>');
+                            cardBodyElement.append('<div class="album-secondary-images d-flex flex-column gallery-image"><img src="' + albuns[i].second_image + '" alt="" class="img-fluid border border-light"><img src="' + albuns[i].third_image + '" alt="" class="img-fluid border border-light"></div>');
+
+                            articleElement.append(cardBodyElement);
+
+                            var cardFooterElement = $('<div class="text-end mt-1"><a href="album/' + albuns[i].pk + '"><button class="gray-bg-color p-2"><strong>Acessar</strong></button></a></div>');
+
+                            articleElement.append(cardFooterElement);
+
+                            divElement.append(articleElement);
+
+                            $('#content').append(divElement);
+                        }
+                        offset = parseInt(offset) + albuns.length;
+                    }
+                    localStorage.setItem('offset', offset);
+                }
+            });
+        }
+    });
+</script>
+
 {% endblock %}

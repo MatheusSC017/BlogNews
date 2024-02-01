@@ -153,20 +153,20 @@ def option_generator(research):
 
 
 if __name__ == '__main__':
-    admin_generator()
+    # admin_generator()
 
     content_creators = [content_creator_generator() for _ in range(10)]
 
-    categories = [category_generator() for _ in range(5)]
+    # categories = [category_generator() for _ in range(5)]
+    #
+    # [[post_generator(user, choice(categories)) for _ in range(randrange(1, 10))] for user in content_creators]
 
-    [[post_generator(user, choice(categories)) for _ in range(randrange(1, 10))] for user in content_creators]
+    albums = [album_generator(user) for _ in range(randrange(20, 50)) for user in content_creators]
 
-    albums = [album_generator(user) for _ in range(randrange(1, 5)) for user in content_creators]
+    [image_generator(choices(albums)[0]) for _ in range(750)]
 
-    [image_generator(choices(albums)[0]) for _ in range(25)]
-
-    researches = (research_generator(user) for _ in range(randrange(2, 5)) for user in content_creators)
-
-    [[option_generator(research) for _ in range(randrange(2, 8))] for research in researches]
-
-    [user_generator() for _ in range(100)]
+    # researches = (research_generator(user) for _ in range(randrange(2, 5)) for user in content_creators)
+    #
+    # [[option_generator(research) for _ in range(randrange(2, 8))] for research in researches]
+    #
+    # [user_generator() for _ in range(100)]
