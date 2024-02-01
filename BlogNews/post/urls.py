@@ -11,7 +11,6 @@ post_patterns = [
 
 urlpatterns = [
     path('', views.Blog.as_view(), name='blog'),
-    path('load_more/', views.load_more_posts, name='load_more_content'),
     path('<int:pk>/', views.Post.as_view(), name='post'),
     path('meus_posts/', include(post_patterns)),
     path('denunciar/', views.register_report, name='report')
