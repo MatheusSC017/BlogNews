@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.db.models import Q, Count, Avg
 from django.contrib import messages
 from django.utils import timezone as tz
+from django.http import JsonResponse
 from .models import Post as PostModel, Category as CategoryModel, RattingUserPost
 from album import models as album_models
 from comment.models import Comment
@@ -90,13 +91,54 @@ class BlogTemplate(ListView):
 class Blog(BlogTemplate):
     """ List only the published posts """
     template_name = 'post/blog.html'
+    paginate_by = None
 
     def get_queryset(self, *args, **kwargs):
         """ Select only the published posts """
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(publication_date__lte=tz.now())
-        qs = qs.filter(published=True)
+        qs = qs.filter(published=True)[:15]
         return qs
+
+
+def load_more_posts(request):
+    offset = request.GET.get('offset')
+    category = request.GET.get('category')
+    search = request.GET.get('search')
+    order_by = request.GET.get('order_by')
+
+    qs = PostModel.objects.all()
+    qs = qs.annotate(
+        comments=Count('comment', distinct=True),
+        ratting=Avg('rattinguserpost__ratting', distinct=True)
+    )
+
+    if category:
+        qs = qs.filter(category=category)
+
+    if search:
+        qs = qs.filter(Q(title__icontains=search) | Q(excerpt__icontains=search))
+
+    if not order_by:
+        order_by = '-publication_date'
+
+    qs = qs.order_by(order_by)[int(offset):int(offset) + 15]
+
+    qs = qs.defer('description')
+
+    data = [
+        {
+            'pk': post.pk,
+            'image': post.image.url if post.image else '',
+            'title': post.title,
+            'ratting': post.ratting,
+            'views': post.views(),
+            'comments': post.comments,
+            'excerpt': post.excerpt,
+            'published_date': post.publication_date,
+        } for post in qs
+    ]
+    return JsonResponse(data, safe=False)
 
 
 class Post(DetailView):
