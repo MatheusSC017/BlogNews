@@ -42,6 +42,7 @@
 {% block script %}
 
 <script>
+    let eventBlocked = false;
     localStorage.setItem('offset', {{ number_of_albums }});
 
     function userReachedBottom() {
@@ -51,7 +52,8 @@
     }
 
     window.addEventListener('scroll', () => {
-        if (userReachedBottom()) {
+        if (userReachedBottom() && !eventBlocked) {
+            eventBlocked = true;
             let offset = localStorage.getItem('offset');
             $.ajax({
                 url: '{% url 'album:load_more_content' %}',
@@ -89,6 +91,9 @@
                     localStorage.setItem('offset', offset);
                 }
             });
+            setTimeout(() => {
+                eventBlocked = false;
+            }, 500);
         }
     });
 </script>
