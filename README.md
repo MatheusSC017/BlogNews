@@ -45,6 +45,16 @@ SQL_PORT=3306
 
 DATABASE=mysql
 INITIAL_DATA=True
+
+SOCIALACCOUNT='{
+	"google": {
+		"APP": {
+			"client_id": "",
+			"secret": "",
+			"key": ""
+		}
+	}
+}'
 ~~~
 
 4. Run the docker compose file to install the application in development mode, in this form, the basic settings have already been set and some initial data will be generated for you to test the site
@@ -180,6 +190,14 @@ DATABASES = {
     }
 }
 ~~~
+
+### Google Oauth
+To access this resource you will need to create your access in the credentials tab through the [Google APIs console](https://console.cloud.google.com/apis/). Remember to register the following parameters for the functionality to work.
+
+- Authorized JavaScript sources: http://127.0.0.1:8000
+- Authorized redirect URIs: http://127.0.0.1:8000/contas/google/login/callback/
+
+This example is based on the fact that you are running the localmeste project, if you perform the deployment, replace the base URL with the name of your domain
 
 ## Structure
 
