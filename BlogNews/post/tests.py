@@ -24,23 +24,20 @@ class BlogTestCase(TestCase):
             self.user.user_permissions.add(permission)
 
         self.post1 = Post.objects.create(title='Python Frameworks',
-                                         excerpt='Conheça os diversos frameworks disponiveis para a linhagem '
-                                                      'python',
+                                         excerpt='Conheça os diversos frameworks disponiveis para a linhagem python',
                                          description='Django, Numpy, Pandas, Pytorch, MatPlotLib...',
                                          category=self.py_category,
                                          publication_date=tz.now() - tz.timedelta(days=30),
                                          user=self.user)
         self.post2 = Post.objects.create(title='Django',
                                          excerpt='Tutorial interativo do framework django',
-                                         description='Informações diversas sobre o framework e suas '
-                                                          'funcionalidades',
+                                         description='Informações diversas sobre o framework e suas funcionalidades',
                                          category=self.django_category,
                                          publication_date=tz.now() - tz.timedelta(days=20),
                                          user=self.user)
         self.post3 = Post.objects.create(title='Python Machine Learning',
                                          excerpt='Introdução a tecnicas de ML com python',
-                                         description='O que é ML e apresentação teorica do seu '
-                                                          'funcionamento',
+                                         description='O que é ML e apresentação teorica do seu funcionamento',
                                          category=self.py_category,
                                          publication_date=tz.now() - tz.timedelta(days=90),
                                          user=self.user)

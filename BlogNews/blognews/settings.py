@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 try:
     load_dotenv(BASE_DIR.parent / ".env")
-except:
+except Exception:
     load_dotenv(BASE_DIR.parent / ".env.dev")
 
 # Quick-start development settings - unsuitable for production

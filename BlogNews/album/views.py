@@ -73,7 +73,6 @@ def load_more_albuns(request):
     return JsonResponse(data, safe=False)
 
 
-
 class AlbumImages(DetailView):
     """ Shows all images of the selected album """
     template_name = 'album/images.html'
