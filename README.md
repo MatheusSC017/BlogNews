@@ -1,10 +1,17 @@
 # BlogNews
 
+![Linguagem mais usada](https://img.shields.io/github/languages/top/MatheusSC017/BlogNews)
+![Numero de lingaugens usadas](https://img.shields.io/github/languages/count/MatheusSC017/BlogNews)
+![Lincense](https://img.shields.io/github/license/MatheusSC017/BlogNews)
+![Tamanho do projeto](https://img.shields.io/github/languages/code-size/MatheusSC017/BlogNews)
+
 This project was designed with the aim of learning through the application of most of the techniques and functions provided by Django, such as models, views, templates, forms, etc. In addition to testing in practice the knowledge needed to adapt the classes provided by Django or create my own classes.
 
-
-
 ## Requirements
+![Python 3.9](https://img.shields.io/badge/python-3.9-blue?logo=python)
+![Python 3.9](https://img.shields.io/badge/MySQL--gray?logo=mysql&logoColor=white)
+
+
 * **Python 3.9**
 * **MySQL**
 
