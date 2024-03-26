@@ -226,3 +226,5 @@ BlogNews users can be broadly divided into 4 groups:
 2. **Content creators**: They have all the privileges of end users, in addition to being able to create and publish their own Posts, albums and surveys.
 3. **Staff members**: They are those who have access to the administrative area, but they are limited to the permissions granted to them by Super Users. Therefore, if he has permission, he can view all the system's content, whether published or not, and make changes or deletions as he deems necessary.
 4. **Superusers**: It is the highest level of the system, being able to grant permissions to itself and other users to administer the system.
+
+![Index](Documentation/Blognews.png)
